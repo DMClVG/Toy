@@ -6,8 +6,11 @@
 
 OUTDIR=out
 
-all: $(OUTDIR)
+all: $(OUTDIR) tools
 	$(MAKE) -C src
+
+tools: $(OUTDIR)
+	$(MAKE) -C tool
 
 $(OUTDIR):
 	mkdir $(OUTDIR)

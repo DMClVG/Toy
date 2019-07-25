@@ -6,6 +6,7 @@ namespace Toy {
 		LEFT_BRACKET, RIGHT_BRACKET,
 		SEMICOLON, COMMA,
 		SLASH, STAR,
+		MODULO,
 
 		//one or two character tokens
 		PLUS,
@@ -26,6 +27,9 @@ namespace Toy {
 
 		//these can single OR triple
 		DOT, DOT_DOT_DOT,
+
+		//ternary operator
+		QUESTION, COLON,
 
 		//literals
 		IDENTIFIER, STRING, NUMBER,

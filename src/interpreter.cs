@@ -5,11 +5,24 @@ using System.Text;
 
 namespace Toy {
 	class Interpreter {
-		//variables
-		static bool hadError = false;
+		static void Main() {
+			Expr expr = new Binary(
+				new Unary(
+					new Token(TokenType.MINUS, "-", null, 1),
+					new Literal(123)
+				),
+				new Token(TokenType.STAR, "*", null, 1),
+				new Grouping(
+					new Literal(45.67)
+				)
+			);
+
+			AstPrinter printer = new AstPrinter();
+			Console.WriteLine(printer.Print(expr));
+		}
 
 		//static methods
-		static void Main(string[] args) {
+		static void NotMain(string[] args) {
 			//get the app's name
 			string appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
 
@@ -25,7 +38,7 @@ namespace Toy {
 		static void RunFile(string filename) {
 			Run(File.ReadAllText(filename, Encoding.UTF8));
 
-			if (hadError) {
+			if (ErrorHandler.HadError) {
 				Environment.Exit(-1);
 			}
 		}
@@ -39,8 +52,8 @@ namespace Toy {
 				Run(input);
 
 				//ignore errors in prompt mode
-				if (hadError) {
-					hadError = false;
+				if (ErrorHandler.HadError) {
+					ErrorHandler.ResetError();
 				}
 			}
 		}
@@ -52,16 +65,6 @@ namespace Toy {
 			foreach (Token token in tokenList) {
 				Console.WriteLine(token);
 			}
-		}
-
-		//error handling
-		public static void Error(int line, string message) {
-			Report(line, "", message);
-		}
-
-		private static void Report(int line, string where, string message) {
-			Console.Error.WriteLine($"[line {line}] Error {where}: {message}");
-			hadError = true;
 		}
 	}
 }

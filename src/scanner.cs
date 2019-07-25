@@ -87,6 +87,7 @@ namespace Toy {
 				case ';': AddToken(SEMICOLON); break;
 				case ',': AddToken(COMMA); break;
 				case '*': AddToken(STAR); break;
+				case '%': AddToken(MODULO); break;
 
 				//handle double-char tokens
 				case '+':
@@ -118,7 +119,7 @@ namespace Toy {
 					if (Match('&')) {
 						AddToken(AND_AND);
 					} else {
-						Interpreter.Error(line, "Unexpected character (Expected '&')");
+						ErrorHandler.Error(line, "Unexpected character (Expected '&')");
 					}
 					break;
 
@@ -126,7 +127,7 @@ namespace Toy {
 					if (Match('|')) {
 						AddToken(OR_OR);
 					} else {
-						Interpreter.Error(line, "Unexpected character (Expected '|')");
+						ErrorHandler.Error(line, "Unexpected character (Expected '|')");
 					}
 					break;
 
@@ -136,12 +137,16 @@ namespace Toy {
 						if (Match('.')) {
 							AddToken(DOT_DOT_DOT);
 						} else {
-							Interpreter.Error(line, "Unexpected character (Expected '...')");
+							ErrorHandler.Error(line, "Unexpected character (Expected '...')");
 						}
 					} else {
 						AddToken(DOT);
 					}
 					break;
+
+				//ternary operator
+				case '?': AddToken(QUESTION); break;
+				case ':': AddToken(COLON); break;
 
 				//handle longer lexemes
 				case '"':
@@ -155,7 +160,7 @@ namespace Toy {
 					} else if (CheckIsAlpha(tok)) {
 						HandleIdentifier();
 					} else {
-						Interpreter.Error(line, "Unexpected character");
+						ErrorHandler.Error(line, "Unexpected character");
 					}
 					break;
 			}
@@ -172,7 +177,7 @@ namespace Toy {
 
 			//unterminated string
 			if (CheckAtEnd()) {
-				Interpreter.Error(line, "Unterminated string");
+				ErrorHandler.Error(line, "Unterminated string");
 				return;
 			}
 
