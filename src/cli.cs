@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 
 namespace Toy {
-	class Interpreter {
+	class CLI {
 		//static methods
 		static void Main(string[] args) {
 			//get the app's name
