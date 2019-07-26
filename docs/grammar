@@ -29,11 +29,14 @@ constDecl -> "const" IDENTIFIER "=" expression ";" ;
 
 statement -> exprStmt
 	| printStmt
+	| block
 	;
 
 exprStmt -> expression ";" ;
 
 printStmt -> "print" expression ";" ;
+
+block -> "{" delcaration* "}" ;
 
 expression -> assignment ;
 

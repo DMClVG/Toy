@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Toy {
 	abstract class Stmt {
 		public abstract R Accept<R>(StmtVisitor<R> visitor);
@@ -5,6 +7,7 @@ namespace Toy {
 
 	interface StmtVisitor<R> {
 		R Visit(Expression Stmt);
+		R Visit(Block Stmt);
 		R Visit(Print Stmt);
 		R Visit(Var Stmt);
 		R Visit(Const Stmt);
@@ -20,6 +23,18 @@ namespace Toy {
 		}
 
 		public Expr expression;
+	}
+
+	class Block : Stmt {
+		public Block(List<Stmt> statements) {
+			this.statements = statements;
+		}
+
+		public override R Accept<R>(StmtVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public List<Stmt> statements;
 	}
 
 	class Print : Stmt {

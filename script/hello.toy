@@ -1,25 +1,28 @@
-var a = 0;
-
-a += 1;
-
+var a = "global a";
+var b = "global b";
+var c = "global c";
+{
+  var a = "outer a";
+  var b = "outer b";
+  {
+    var a = "inner a";
+    print a;
+    print b;
+    print c;
+  }
+  print a;
+  print b;
+  print c;
+}
 print a;
-
-a -= 1;
-
-print a;
-
-var b = 5;
-
-b *= 5;
-
 print b;
-
-b /= 5;
-
-print b;
-
-var c = 5;
-
-c %= 3;
-
 print c;
+
+print "-----";
+
+var d = 1;
+{
+	var d = d + 2;
+	print d;
+}
+print d;

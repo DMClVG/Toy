@@ -54,6 +54,7 @@ namespace Toy {
 
 		Stmt StatementRule() {
 			if (Match(PRINT)) return PrintStmt();
+			if (Match(LEFT_BRACE)) return new Block(BlockStmt());
 
 			return ExpressionStmt();
 		}
@@ -68,6 +69,17 @@ namespace Toy {
 			Expr expr = ExpressionRule();
 			Consume(SEMICOLON, "Expected ';' after expression");
 			return new Expression(expr);
+		}
+
+		List<Stmt> BlockStmt() {
+			List<Stmt> statements = new List<Stmt>();
+
+			while(Peek().type != RIGHT_BRACE && !CheckAtEnd()) {
+				statements.Add(DeclarationRule());
+			}
+
+			Consume(RIGHT_BRACE, "Expected '}' after block");
+			return statements;
 		}
 
 		Expr ExpressionRule() {

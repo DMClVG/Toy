@@ -22,6 +22,7 @@ namespace Tool {
 
 			DefineAst(args[0], "Stmt", new string[] {
 				"Expression: Expr expression",
+				"Block: List<Stmt> statements",
 				"Print: Expr expression",
 				"Var: Token name, Expr initializer",
 				"Const: Token name, Expr initializer"
@@ -32,6 +33,10 @@ namespace Tool {
 
 		static void DefineAst(string outDir, string baseName, string[] types) {
 			StreamWriter outStream = new StreamWriter($"{outDir}/{baseName.ToLower()}.cs");
+
+			//libraries
+			outStream.WriteLine("using System.Collections.Generic;");
+			outStream.WriteLine("");
 
 			//the namespace
 			outStream.WriteLine("namespace Toy {");

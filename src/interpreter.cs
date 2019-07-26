@@ -53,6 +53,11 @@ namespace Toy {
 			return null;
 		}
 
+		public object Visit(Block stmt) {
+			ExecuteBlock(stmt.statements, new Environment(environment));
+			return null;
+		}
+
 		public object Visit(Expression stmt) {
 			Evaluate(stmt.expression);
 			return null;
@@ -241,6 +246,18 @@ namespace Toy {
 		//helpers
 		void Execute(Stmt stmt) {
 			stmt.Accept(this);
+		}
+
+		void ExecuteBlock(List<Stmt> statements, Environment env) {
+			Environment previous = environment;
+			try {
+				environment = env;
+				foreach (Stmt stmt in statements) {
+					Execute(stmt);
+				}
+			} finally {
+				environment = previous;
+			}
 		}
 
 		object Evaluate(Expr expr) {

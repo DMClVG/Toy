@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Toy {
 	abstract class Expr {
 		public abstract R Accept<R>(ExprVisitor<R> visitor);
