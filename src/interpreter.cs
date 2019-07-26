@@ -68,6 +68,9 @@ namespace Toy {
 
 				case MODULO:
 					CheckNumberOperands(expr.oper, left, right);
+					if ((double)right == 0) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't modulo by 0");
+					}
 					return (double)left % (double)right;
 
 				case GREATER:
