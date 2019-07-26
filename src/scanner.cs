@@ -185,7 +185,7 @@ namespace Toy {
 			//the closing "
 			Advance();
 
-			string str = source.Substring(start + 1, current-start -1);
+			string str = source.Substring(start + 1, current-start - 2);
 			AddToken(STRING, str);
 		}
 

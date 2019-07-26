@@ -23,7 +23,7 @@ namespace Toy {
 			Run(File.ReadAllText(filename, Encoding.UTF8));
 
 			if (ErrorHandler.HadError) {
-				Environment.Exit(-1);
+				System.Environment.Exit(-1);
 			}
 		}
 
@@ -46,18 +46,14 @@ namespace Toy {
 			try {
 				Scanner scanner = new Scanner(source);
 				Parser parser = new Parser(scanner.ScanTokens());
-				Expr expression = parser.ParseTokens();
+				List<Stmt> stmtList = parser.ParseStatements();
 
 				if (ErrorHandler.HadError) {
 					return;
 				}
 
 				Interpreter interpreter = new Interpreter();
-
-				interpreter.Interpret(expression);
-
-				//AstPrinter printer = new AstPrinter();
-				//Console.WriteLine(printer.Print(expression));
+				interpreter.Interpret(stmtList);
 			} catch (Exception) {
 				//DO nothing
 			}

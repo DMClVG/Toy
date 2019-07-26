@@ -4,11 +4,56 @@ namespace Toy {
 	}
 
 	interface ExprVisitor<R> {
+		R Visit(Variable Expr);
+		R Visit(Assign Expr);
+		R Visit(Increment Expr);
 		R Visit(Literal Expr);
 		R Visit(Unary Expr);
 		R Visit(Binary Expr);
 		R Visit(Grouping Expr);
 		R Visit(Ternary Expr);
+	}
+
+	class Variable : Expr {
+		public Variable(Token name) {
+			this.name = name;
+		}
+
+		public override R Accept<R>(ExprVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Token name;
+	}
+
+	class Assign : Expr {
+		public Assign(Token name, Expr value) {
+			this.name = name;
+			this.value = value;
+		}
+
+		public override R Accept<R>(ExprVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Token name;
+		public Expr value;
+	}
+
+	class Increment : Expr {
+		public Increment(Token oper, Variable variable, bool prefix) {
+			this.oper = oper;
+			this.variable = variable;
+			this.prefix = prefix;
+		}
+
+		public override R Accept<R>(ExprVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Token oper;
+		public Variable variable;
+		public bool prefix;
 	}
 
 	class Literal : Expr {

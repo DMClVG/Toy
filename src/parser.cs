@@ -11,90 +11,162 @@ namespace Toy {
 			tokenList = tokens;
 		}
 
-		public Expr ParseTokens() {
+		public List<Stmt> ParseStatements() {
+			List<Stmt> statements = new List<Stmt>();
+			while(!CheckAtEnd()) {
+				statements.Add(DeclarationRule());
+			}
+			return statements;
+		}
+
+		//grammar rules
+		Stmt DeclarationRule() {
 			try {
-				return Expression();
+				if (Match(VAR)) return VarDeclarationRule();
+				if (Match(CONST)) return ConstDeclarationRule();
+
+				return StatementRule();
 			} catch(ErrorHandler.ParserError) {
+				Synchronize();
 				return null;
 			}
 		}
 
-		//grammar rules
-		Expr Expression() {
-			Expr expr = Or();
+		Stmt VarDeclarationRule() {
+			Token name = Consume(IDENTIFIER, "Expected variable name");
+
+			Expr initializer = null;
+			if (Match(EQUAL)) {
+				initializer = ExpressionRule();
+			}
+
+			Consume(SEMICOLON, "Expected ';' after variable declaration");
+			return new Var(name, initializer);
+		}
+
+		Stmt ConstDeclarationRule() {
+			Token name = Consume(IDENTIFIER, "Expected constant name");
+			Consume(EQUAL, "Expected assignment in constant declaration");
+			Expr initializer = ExpressionRule();
+			Consume(SEMICOLON, "Expected ';' after constant declaration");
+			return new Const(name, initializer);
+		}
+
+		Stmt StatementRule() {
+			if (Match(PRINT)) return PrintStmt();
+
+			return ExpressionStmt();
+		}
+
+		Stmt PrintStmt() {
+			Expr expr = ExpressionRule();
+			Consume(SEMICOLON, "Expected ';' after value");
+			return new Print(expr);
+		}
+
+		Stmt ExpressionStmt() {
+			Expr expr = ExpressionRule();
+			Consume(SEMICOLON, "Expected ';' after expression");
+			return new Expression(expr);
+		}
+
+		Expr ExpressionRule() {
+			return AssignmentRule();
+		}
+
+		Expr AssignmentRule() {
+			Expr expr = TernaryRule();
+
+			if (Match(EQUAL)) {
+				Token equals = Previous();
+				Expr value = AssignmentRule();
+
+				if (expr is Variable) {
+					Token name = ((Variable)expr).name;
+					return new Assign(name, value);
+				}
+
+				throw new ErrorHandler.ParserError(equals, "Invalid assignment target");
+			}
+
+			return expr;
+		}
+
+		Expr TernaryRule() {
+			Expr expr = OrRule();
 
 			//handle ternary operator
 			if (Match(QUESTION)) {
-				Expr left = Expression();
+				Expr left = ExpressionRule();
 				Consume(COLON, "Expected ':' in ternary operator");
-				Expr right = Expression();
+				Expr right = ExpressionRule();
 				expr = new Ternary(expr, left, right);
 			}
 
 			return expr;
 		}
 
-		Expr Or() {
-			Expr expr = And();
+		Expr OrRule() {
+			Expr expr = AndRule();
 
 			if (Match(OR_OR)) {
 				Token token = Previous();
-				Expr right = Or();
+				Expr right = OrRule();
 				expr = new Binary(expr, token, right);
 			}
 
 			return expr;
 		}
 
-		Expr And() {
-			Expr expr = Equality();
+		Expr AndRule() {
+			Expr expr = EqualityRule();
 
 			if (Match(AND_AND)) {
 				Token token = Previous();
-				Expr right = And();
+				Expr right = AndRule();
 				expr = new Binary(expr, token, right);
 			}
 
 			return expr;
 		}
 
-		Expr Equality() {
-			Expr expr = Comaprison();
+		Expr EqualityRule() {
+			Expr expr = ComaprisonRule();
 
 			while(Match(EQUAL_EQUAL, BANG_EQUAL)) {
 				Token token = Previous();
-				Expr right = Comaprison();
+				Expr right = ComaprisonRule();
 				expr = new Binary(expr, token, right);
 			}
 
 			return expr;
 		}
 
-		Expr Comaprison() {
-			Expr expr = Addition();
+		Expr ComaprisonRule() {
+			Expr expr = AdditionRule();
 
 			while(Match(LESS, GREATER, LESS_EQUAL, GREATER_EQUAL)) {
 				Token token = Previous();
-				Expr right = Addition();
+				Expr right = AdditionRule();
 				expr = new Binary(expr, token, right);
 			}
 
 			return expr;
 		}
 
-		Expr Addition() {
-			Expr expr = Multiplication();
+		Expr AdditionRule() {
+			Expr expr = MultiplicationRule();
 
 			while(Match(PLUS, MINUS)) {
 				Token token = Previous();
-				Expr right = Multiplication();
+				Expr right = MultiplicationRule();
 				expr = new Binary(expr, token, right);
 			}
 
 			return expr;
 		}
 
-		Expr Multiplication() {
+		Expr MultiplicationRule() {
 			Expr expr = UnaryRule();
 
 			while(Match(STAR, SLASH, MODULO)) {
@@ -113,10 +185,31 @@ namespace Toy {
 				return new Unary(token, right);
 			}
 
-			return Primary();
+			return PrefixRule();
 		}
 
-		Expr Primary() {
+		Expr PrefixRule() {
+			if (Match(PLUS_PLUS, MINUS_MINUS)) {
+				Token token = Previous();
+				Consume(IDENTIFIER, "Expected identifier after prefix increment/decrement operator");
+				Variable variable = new Variable(Previous());
+				return new Increment(token, variable, true);
+			}
+
+			return PostfixRule();
+		}
+
+		Expr PostfixRule() {
+			if (Peek().type == IDENTIFIER && (PeekNext().type == PLUS_PLUS || PeekNext().type == MINUS_MINUS)) {
+				Variable variable = new Variable(Advance());
+				Token token = Advance();
+				return new Increment(token, variable, false);
+			}
+
+			return PrimaryRule();
+		}
+
+		Expr PrimaryRule() {
 			if (Match(TRUE)) return new Literal(true);
 			if (Match(FALSE)) return new Literal(false);
 			if (Match(NIL)) return new Literal(null);
@@ -125,8 +218,12 @@ namespace Toy {
 				return new Literal(Previous().literal);
 			}
 
+			if (Match(IDENTIFIER)) {
+				return new Variable(Previous()); //Variable accesses constants as well
+			}
+
 			if (Match(LEFT_PAREN)) {
-				Expr expr = Expression();
+				Expr expr = ExpressionRule();
 				Consume(RIGHT_PAREN, "Expected ')' after expression");
 				return new Grouping(expr);
 			}
@@ -159,6 +256,10 @@ namespace Toy {
 
 		Token Peek() {
 			return tokenList[current];
+		}
+
+		Token PeekNext() {
+			return tokenList[current + 1];
 		}
 
 		Token Previous() {

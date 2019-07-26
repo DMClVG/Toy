@@ -1,14 +1,19 @@
 using System;
+using System.Collections.Generic;
 
 using static Toy.TokenType;
 
 namespace Toy {
-	class Interpreter : ExprVisitor<object> {
+	class Interpreter : ExprVisitor<object>, StmtVisitor<object> {
+		//members
+		Environment environment = new Environment();
+
 		//access
-		public int Interpret(Expr expr) {
+		public int Interpret(List<Stmt> stmtList) {
 			try {
-				object value = Evaluate(expr);
-				Console.WriteLine(value); //tmp
+				foreach (Stmt stmt in stmtList) {
+					Execute(stmt);
+				}
 			} catch(ErrorHandler.RuntimeError e) {
 				throw e;
 			} catch(Exception e) {
@@ -19,6 +24,70 @@ namespace Toy {
 		}
 
 		//visitor pattern
+		public object Visit(Print stmt) {
+			object value = Evaluate(stmt.expression);
+
+			//unescape a string
+			if (value is string) {
+				Console.WriteLine(System.Text.RegularExpressions.Regex.Unescape((string)value));
+			} else if (value is null) {
+				Console.WriteLine("null");
+			} else {
+				Console.WriteLine(value);
+			}
+
+			return null;
+		}
+
+		public object Visit(Var stmt) {
+			object value = null;
+			if (stmt.initializer != null) {
+				value = Evaluate(stmt.initializer);
+			}
+			environment.Define(stmt.name, value, false);
+			return null;
+		}
+
+		public object Visit(Const stmt) {
+			environment.Define(stmt.name, Evaluate(stmt.initializer), true);
+			return null;
+		}
+
+		public object Visit(Expression stmt) {
+			Evaluate(stmt.expression);
+			return null;
+		}
+
+		public object Visit(Variable expr) {
+			return environment.Get(expr.name);
+		}
+
+		public object Visit(Assign expr) {
+			object value = Evaluate(expr.value);
+			return environment.Set(expr.name, value);
+		}
+
+		public object Visit(Increment expr) {
+			object value = environment.Get(expr.variable.name);
+			object originalValue = value;
+
+			if (expr.oper.type == PLUS_PLUS) {
+				value = (double)value + 1;
+			} else if (expr.oper.type == MINUS_MINUS) {
+				value = (double)value - 1;
+			} else {
+				throw new ErrorHandler.RuntimeError(expr.oper, "Bad increment implementation");
+			}
+
+			environment.Set(expr.variable.name, value);
+
+			if (expr.prefix) {
+				return value;
+			} else {
+				return originalValue;
+			}
+		}
+
 		public object Visit(Literal expr) {
 			return expr.value;
 		}
@@ -119,6 +188,10 @@ namespace Toy {
 		}
 
 		//helpers
+		void Execute(Stmt stmt) {
+			stmt.Accept(this);
+		}
+
 		object Evaluate(Expr expr) {
 			return expr.Accept(this);
 		}

@@ -10,11 +10,21 @@ namespace Tool {
 			}
 
 			DefineAst(args[0], "Expr", new string[] {
+				"Variable: Token name",
+				"Assign: Token name, Expr value",
+				"Increment: Token oper, Variable variable, bool prefix",
 				"Literal: object value",
 				"Unary: Token oper, Expr right",
 				"Binary: Expr left, Token oper, Expr right",
 				"Grouping: Expr expression",
 				"Ternary: Expr cond, Expr left, Expr right"
+			});
+
+			DefineAst(args[0], "Stmt", new string[] {
+				"Expression: Expr expression",
+				"Print: Expr expression",
+				"Var: Token name, Expr initializer",
+				"Const: Token name, Expr initializer"
 			});
 
 			return 0;

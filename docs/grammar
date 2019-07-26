@@ -19,9 +19,27 @@ operator -> "+" | "-" | "*" | "/" | "%"
 
 -------------------------------------------------------------------------------
 
-# calculator syntax
+program -> delcaration* EOF ;
 
-expression -> or ( "?" expression ":" expression )? ;
+declaration -> varDecl | constDecl | statement;
+
+varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
+
+constDecl -> "const" IDENTIFIER "=" expression ";" ;
+
+statement -> exprStmt
+	| printStmt
+	;
+
+exprStmt -> expression ";" ;
+
+printStmt -> "print" expression ";" ;
+
+expression -> assignment ;
+
+assignment -> IDENTIFIER "=" expression | ternary ;
+
+ternary -> or ( "?" expression ":" expression )? ;
 
 or -> and ( "||" or )* ;
 
@@ -35,9 +53,13 @@ addition -> addition ( ( "-" "+" ) multiplication )* | multiplication ;
 
 multiplication -> unary ( ( "*" | "/" | "%" ) unary )* ;
 
-unary -> ( "!" | "-" ) unary | primary ;
+unary -> ( "!" | "-" ) unary | prefix ;
 
-primary -> NUMBER | STRING | "true" | "false" | "null" | "(" expression ")" ;
+prefix -> ( "++" | "--" ) IDENTIFIER | postfix ;
+
+postfix -> IDENTIFIER ( "++" | "--" ) | primary ;
+
+primary -> NUMBER | STRING | IDENTIFIER | "true" | "false" | "null" | "(" expression ")" ;
 
 -------------------------------------------------------------------------------
 
