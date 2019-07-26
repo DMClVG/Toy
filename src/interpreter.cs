@@ -61,6 +61,9 @@ namespace Toy {
 
 				case SLASH:
 					CheckNumberOperands(expr.oper, left, right);
+					if ((double)right == 0) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't divide by 0");
+					}
 					return (double)left / (double)right;
 
 				case MODULO:
