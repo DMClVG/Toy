@@ -13,7 +13,8 @@ namespace Tool {
 				"Literal: object value",
 				"Unary: Token oper, Expr right",
 				"Binary: Expr left, Token oper, Expr right",
-				"Grouping: Expr expression"
+				"Grouping: Expr expression",
+				"Ternary: Expr cond, Expr left, Expr right"
 			});
 
 			return 0;

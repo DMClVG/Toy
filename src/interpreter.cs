@@ -5,24 +5,8 @@ using System.Text;
 
 namespace Toy {
 	class Interpreter {
-		static void Main() {
-			Expr expr = new Binary(
-				new Unary(
-					new Token(TokenType.MINUS, "-", null, 1),
-					new Literal(123)
-				),
-				new Token(TokenType.STAR, "*", null, 1),
-				new Grouping(
-					new Literal(45.67)
-				)
-			);
-
-			AstPrinter printer = new AstPrinter();
-			Console.WriteLine(printer.Print(expr));
-		}
-
 		//static methods
-		static void NotMain(string[] args) {
+		static void Main(string[] args) {
 			//get the app's name
 			string appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
 
@@ -60,11 +44,15 @@ namespace Toy {
 
 		static void Run(string source) {
 			Scanner scanner = new Scanner(source);
-			List<Token> tokenList = scanner.ScanTokens();
+			Parser parser = new Parser(scanner.ScanTokens());
+			Expr expression = parser.ParseTokens();
 
-			foreach (Token token in tokenList) {
-				Console.WriteLine(token);
+			if (ErrorHandler.HadError) {
+				return;
 			}
+
+			AstPrinter printer = new AstPrinter();
+			Console.WriteLine(printer.Print(expression));
 		}
 	}
 }

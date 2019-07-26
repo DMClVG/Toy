@@ -8,6 +8,7 @@ namespace Toy {
 		R Visit(Unary Expr);
 		R Visit(Binary Expr);
 		R Visit(Grouping Expr);
+		R Visit(Ternary Expr);
 	}
 
 	class Literal : Expr {
@@ -62,6 +63,22 @@ namespace Toy {
 		}
 
 		public Expr expression;
+	}
+
+	class Ternary : Expr {
+		public Ternary(Expr cond, Expr left, Expr right) {
+			this.cond = cond;
+			this.left = left;
+			this.right = right;
+		}
+
+		public override R Accept<R>(ExprVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Expr cond;
+		public Expr left;
+		public Expr right;
 	}
 
 }

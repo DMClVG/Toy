@@ -25,6 +25,10 @@ namespace Toy {
 			return Parenthesize("group", expr.expression);
 		}
 
+		public string Visit(Ternary expr) {
+			return Parenthesize("ternary", expr.cond, expr.left, expr.right);
+		}
+
 		//helpers
 		string Parenthesize(string name, params Expr[] exprs) {
 			string str = "(" + name;

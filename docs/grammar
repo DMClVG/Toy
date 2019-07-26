@@ -1,3 +1,5 @@
+# basic example of syntax
+
 expression -> literal
 	| unary
 	| binary
@@ -14,3 +16,24 @@ grouping -> "(" expression ")" ;
 
 operator -> "+" | "-" | "*" | "/" | "%"
 	| "==" | "!=" | ">" | "<" | ">=" | "<=" ;
+
+-------------------------------------------------------------------------------
+
+# calculator syntax
+
+expression -> equality "?" expression ":" expression | equality ;
+
+equality -> comparison ( ("==" | "!=" ) comparison )* ;
+
+comparison -> addition( ( ">" | ">=" | "<" | "<=" ) addition )* ;
+
+addition -> multiplication ( ( "-" "+" ) multiplication )* ;
+
+multiplication -> unary ( ( "*" | "/" | "%" ) unary )* ;
+
+unary -> ( "!" | "-" ) unary | primary ;
+
+primary -> NUMBER | STRING | "true" | "false" | "null" | "(" expression ")" ;
+
+-------------------------------------------------------------------------------
+
