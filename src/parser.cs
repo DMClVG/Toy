@@ -77,16 +77,16 @@ namespace Toy {
 		Expr AssignmentRule() {
 			Expr expr = TernaryRule();
 
-			if (Match(EQUAL)) {
-				Token equals = Previous();
+			if (Match(EQUAL, PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL, MODULO_EQUAL)) {
+				Token token = Previous();
 				Expr value = AssignmentRule();
 
 				if (expr is Variable) {
 					Token name = ((Variable)expr).name;
-					return new Assign(name, value);
+					return new Assign(name, token, value);
 				}
 
-				throw new ErrorHandler.ParserError(equals, "Invalid assignment target");
+				throw new ErrorHandler.ParserError(token, "Invalid assignment target");
 			}
 
 			return expr;

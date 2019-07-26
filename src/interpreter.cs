@@ -64,7 +64,58 @@ namespace Toy {
 
 		public object Visit(Assign expr) {
 			object value = Evaluate(expr.value);
-			return environment.Set(expr.name, value);
+			object originalValue = environment.Get(expr.name);
+
+			switch(expr.oper.type) {
+				case EQUAL:
+					return environment.Set(expr.name, value);
+
+				case PLUS_EQUAL:
+					if (!(originalValue is double)) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't increment-assign a non-number variable");
+					}
+
+					return environment.Set(expr.name, (double)originalValue + (double)value);
+
+				case MINUS_EQUAL:
+					if (!(originalValue is double)) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't decrement-assign a non-number variable");
+					}
+
+					return environment.Set(expr.name, (double)originalValue - (double)value);
+
+				case STAR_EQUAL:
+					if (!(originalValue is double)) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't multiply-assign a non-number variable");
+					}
+
+					return environment.Set(expr.name, (double)originalValue * (double)value);
+
+				case SLASH_EQUAL:
+					if (!(originalValue is double)) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't divide-assign a non-number variable");
+					}
+
+					if ((double)originalValue == 0) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't divide by 0");
+					}
+
+					return environment.Set(expr.name, (double)originalValue / (double)value);
+
+				case MODULO_EQUAL:
+					if (!(originalValue is double)) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't modulo-assign a non-number variable");
+					}
+
+					if ((double)originalValue == 0) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't modulo by 0");
+					}
+
+					return environment.Set(expr.name, (double)originalValue % (double)value);
+
+				default:
+					throw new ErrorHandler.RuntimeError(expr.oper, "Unknown operator");
+			}
 		}
 
 		public object Visit(Increment expr) {

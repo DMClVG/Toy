@@ -27,8 +27,9 @@ namespace Toy {
 	}
 
 	class Assign : Expr {
-		public Assign(Token name, Expr value) {
+		public Assign(Token name, Token oper, Expr value) {
 			this.name = name;
+			this.oper = oper;
 			this.value = value;
 		}
 
@@ -37,6 +38,7 @@ namespace Toy {
 		}
 
 		public Token name;
+		public Token oper;
 		public Expr value;
 	}
 

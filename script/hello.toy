@@ -1,11 +1,25 @@
 var a = 0;
-print a;
-a++;
-print a;
 
-print a++;
+a += 1;
+
 print a;
 
-var b = 0;
+a -= 1;
 
-print ++b;
+print a;
+
+var b = 5;
+
+b *= 5;
+
+print b;
+
+b /= 5;
+
+print b;
+
+var c = 5;
+
+c %= 3;
+
+print c;

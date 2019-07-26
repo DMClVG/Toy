@@ -63,6 +63,9 @@ namespace Toy {
 							Advance(); //eat *
 							Advance(); //eat /
 						}
+					} else if (Peek() == '=') {
+						AddToken(SLASH_EQUAL);
+						Advance();
 					} else {
 						AddToken(SLASH);
 					}
@@ -87,8 +90,6 @@ namespace Toy {
 				case ']': AddToken(RIGHT_BRACE); break;
 				case ';': AddToken(SEMICOLON); break;
 				case ',': AddToken(COMMA); break;
-				case '*': AddToken(STAR); break;
-				case '%': AddToken(MODULO); break;
 
 				//handle double-char tokens
 				case '+':
@@ -97,6 +98,14 @@ namespace Toy {
 
 				case '-':
 					AddToken(Match('-') ? MINUS_MINUS : Match('=') ? MINUS_EQUAL : MINUS);
+					break;
+
+				case '*':
+					AddToken(Match('=') ? STAR_EQUAL : STAR);
+					break;
+
+				case '%':
+					AddToken(Match('=') ? MODULO_EQUAL : MODULO);
 					break;
 	
 				case '=':

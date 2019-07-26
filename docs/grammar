@@ -37,7 +37,7 @@ printStmt -> "print" expression ";" ;
 
 expression -> assignment ;
 
-assignment -> IDENTIFIER "=" expression | ternary ;
+assignment -> IDENTIFIER ( "=" | "+=" | "-=" | "*=" | "/=" | "%=" ) expression | ternary ;
 
 ternary -> or ( "?" expression ":" expression )? ;
 

@@ -11,7 +11,7 @@ namespace Tool {
 
 			DefineAst(args[0], "Expr", new string[] {
 				"Variable: Token name",
-				"Assign: Token name, Expr value",
+				"Assign: Token name, Token oper, Expr value",
 				"Increment: Token oper, Variable variable, bool prefix",
 				"Literal: object value",
 				"Unary: Token oper, Expr right",
