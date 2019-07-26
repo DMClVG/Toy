@@ -15,6 +15,12 @@ namespace Toy {
 			}
 		}
 
+		public class RuntimeError : ApplicationException {
+			public RuntimeError(Token token, string message) {
+				ErrorHandler.Report(token.line, "at '" + token.lexeme + "'", message);
+			}
+		}
+
 		//variables
 		public static bool HadError { get; private set; } = false;
 

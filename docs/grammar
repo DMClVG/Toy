@@ -21,13 +21,17 @@ operator -> "+" | "-" | "*" | "/" | "%"
 
 # calculator syntax
 
-expression -> equality "?" expression ":" expression | equality ;
+expression -> or ( "?" expression ":" expression )? ;
 
-equality -> comparison ( ("==" | "!=" ) comparison )* ;
+or -> and ( "||" or )* ;
 
-comparison -> addition( ( ">" | ">=" | "<" | "<=" ) addition )* ;
+and -> equality ( "&&" and )* ;
 
-addition -> multiplication ( ( "-" "+" ) multiplication )* ;
+equality -> equality ( ("==" | "!=" ) comparison )* | comparison ;
+
+comparison -> comparison ( ( ">" | ">=" | "<" | "<=" ) addition )* | addition ;
+
+addition -> addition ( ( "-" "+" ) multiplication )* | multiplication ;
 
 multiplication -> unary ( ( "*" | "/" | "%" ) unary )* ;
 

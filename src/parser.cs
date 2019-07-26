@@ -21,7 +21,7 @@ namespace Toy {
 
 		//grammar rules
 		Expr Expression() {
-			Expr expr = Equality();
+			Expr expr = Or();
 
 			//handle ternary operator
 			if (Match(QUESTION)) {
@@ -29,6 +29,30 @@ namespace Toy {
 				Consume(COLON, "Expected ':' in ternary operator");
 				Expr right = Expression();
 				expr = new Ternary(expr, left, right);
+			}
+
+			return expr;
+		}
+
+		Expr Or() {
+			Expr expr = And();
+
+			if (Match(OR_OR)) {
+				Token token = Previous();
+				Expr right = Or();
+				expr = new Binary(expr, token, right);
+			}
+
+			return expr;
+		}
+
+		Expr And() {
+			Expr expr = Equality();
+
+			if (Match(AND_AND)) {
+				Token token = Previous();
+				Expr right = And();
+				expr = new Binary(expr, token, right);
 			}
 
 			return expr;

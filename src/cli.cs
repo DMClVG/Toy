@@ -43,16 +43,24 @@ namespace Toy {
 		}
 
 		static void Run(string source) {
-			Scanner scanner = new Scanner(source);
-			Parser parser = new Parser(scanner.ScanTokens());
-			Expr expression = parser.ParseTokens();
+			try {
+				Scanner scanner = new Scanner(source);
+				Parser parser = new Parser(scanner.ScanTokens());
+				Expr expression = parser.ParseTokens();
 
-			if (ErrorHandler.HadError) {
-				return;
+				if (ErrorHandler.HadError) {
+					return;
+				}
+
+				Interpreter interpreter = new Interpreter();
+
+				interpreter.Interpret(expression);
+
+				//AstPrinter printer = new AstPrinter();
+				//Console.WriteLine(printer.Print(expression));
+			} catch (Exception) {
+				//DO nothing
 			}
-
-			AstPrinter printer = new AstPrinter();
-			Console.WriteLine(printer.Print(expression));
 		}
 	}
 }

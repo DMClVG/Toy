@@ -22,6 +22,7 @@ namespace Toy {
 			{"true", TRUE},
 			{"false", FALSE},
 			{"function", FUNCTION},
+			{"return", RETURN},
 			{"if", IF},
 			{"else", ELSE},
 			{"do", DO},
