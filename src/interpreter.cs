@@ -70,16 +70,23 @@ namespace Toy {
 		}
 
 		public object Visit(For stmt) {
-			Execute(stmt.initializer);
+			Environment previous = environment;
+			environment = new Environment(previous);
 
-			while (CheckIsTruthy(Evaluate(stmt.cond))) {
-				Token signal = (Token)Execute(stmt.body);
+			try {
+				Execute(stmt.initializer);
 
-				if (signal != null && signal.type == BREAK) {
-					break;
+				while (CheckIsTruthy(Evaluate(stmt.cond))) {
+					Token signal = (Token)Execute(stmt.body);
+
+					if (signal != null && signal.type == BREAK) {
+						break;
+					}
+
+					Evaluate(stmt.increment);
 				}
-
-				Evaluate(stmt.increment);
+			} finally {
+				environment = previous;
 			}
 
 			return null;
@@ -94,7 +101,7 @@ namespace Toy {
 		}
 
 		public object Visit(Block stmt) {
-			return ExecuteBlock(stmt, new Environment(environment));
+			return ExecuteBlock(stmt);
 		}
 
 		public object Visit(Var stmt) {
@@ -307,12 +314,12 @@ namespace Toy {
 			return stmt.Accept(this);
 		}
 
-		object ExecuteBlock(Block stmt, Environment env) {
+		object ExecuteBlock(Block stmt) {
 			Environment previous = environment;
+			environment = new Environment(previous);
 			Token signal = null;
 
 			try {
-				environment = env;
 				foreach (Stmt s in stmt.statements) {
 					signal = (Token)Execute(s);
 

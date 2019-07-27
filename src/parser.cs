@@ -129,6 +129,11 @@ namespace Toy {
 			//body
 			Stmt body = StatementRule(true);
 
+			//implicitly create a block if the body isn't enclosed by one
+			if (!(body is Block)) {
+				body = new Block(new List<Stmt>() {body}, true);
+			}
+
 			return new For(initializer, cond, increment, body);
 		}
 
