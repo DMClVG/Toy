@@ -75,7 +75,11 @@ unary -> ( "!" | "-" ) unary | prefix ;
 
 prefix -> ( "++" | "--" ) IDENTIFIER | postfix ;
 
-postfix -> IDENTIFIER ( "++" | "--" ) | primary ;
+postfix -> IDENTIFIER ( "++" | "--" ) | call ;
+
+call -> primary ( "(" arguments? ")" )* ;
+
+arguments -> expression ( "," expression )* ;
 
 primary -> NUMBER | STRING | IDENTIFIER | "true" | "false" | "null" | "(" expression ")" ;
 

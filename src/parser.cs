@@ -302,7 +302,21 @@ namespace Toy {
 				return new Increment(token, variable, false);
 			}
 
-			return PrimaryRule();
+			return CallRule();
+		}
+
+		Expr CallRule() {
+			Expr expr = PrimaryRule();
+
+			while(true) {
+				if (Match(LEFT_PAREN)) {
+					expr = FinishCall(expr);
+				} else {
+					break;
+				}
+			}
+
+			return expr;
 		}
 
 		Expr PrimaryRule() {
@@ -325,6 +339,24 @@ namespace Toy {
 			}
 
 			throw new ErrorHandler.ParserError(Peek(), "Expected expression");
+		}
+
+		Expr FinishCall(Expr callee) {
+			List<Expr> arguments = new List<Expr>();
+
+			if (Peek().type != RIGHT_PAREN) {
+				do {
+					if (arguments.Count > 255) {
+						ErrorHandler.Error(Peek().line, "Can't have more than 255 arguments");
+					}
+
+					arguments.Add(ExpressionRule());
+				} while(Match(COMMA));
+			}
+
+			Token paren = Consume(RIGHT_PAREN, "Expected ')' after function call");
+
+			return new Call(callee, paren, arguments);
 		}
 
 		//helpers

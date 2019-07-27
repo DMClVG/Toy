@@ -8,6 +8,10 @@ namespace Toy {
 		//members
 		Environment environment = new Environment();
 
+		public Interpreter() {
+			Library.Standard.Initialize(environment); //NOTE: temporary, until the module system is working
+		}
+
 		//access
 		public int Interpret(List<Stmt> stmtList) {
 			try {
@@ -294,6 +298,27 @@ namespace Toy {
 			}
 
 			return null;
+		}
+
+		public object Visit(Call expr) {
+			object callee = Evaluate(expr.callee);
+
+			List<object> arguments = new List<object>();
+			foreach (Expr argument in expr.arguments) {
+				arguments.Add(Evaluate(argument));
+			}
+
+			if (!(callee is Callable)) {
+				throw new ErrorHandler.RuntimeError(expr.paren, "Can't call this datatype");
+			}
+
+			Callable function = (Callable)callee;
+
+			if (arguments.Count != function.Arity()) {
+				throw new ErrorHandler.RuntimeError(expr.paren, "Expected " + function.Arity() + " arguments but received " + arguments.Count);
+			}
+
+			return function.Call(this, arguments);
 		}
 
 		public object Visit(Grouping expr) {

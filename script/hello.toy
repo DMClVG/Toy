@@ -46,6 +46,8 @@ for (var i = 0; i < 10; i++) {
 	print str;
 }
 
+while (true) print Clock();
+
 //TODO: built in methods for string, array and dictionary
 //TODO: mutating strings
 //TODO: type casting (string -> number and number -> string)
@@ -69,3 +71,7 @@ for (var i = 0; i < 10; i++) {
 //TODO: How would I do generics?
 //TODO: automatic properties?
 //TODO: Vector (position) library
+//TODO: https://stackoverflow.com/questions/509211/understanding-slice-notation
+//TODO: break x;
+//TODO: continue x;
+

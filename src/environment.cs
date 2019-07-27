@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using static Toy.TokenType;
+
 namespace Toy {
 	class Environment {
 		//members
@@ -16,6 +18,10 @@ namespace Toy {
 
 		public Environment(Environment other) {
 			enclosing = other;
+		}
+
+		public void Define(string name, object value, bool constant) {
+			Define(new Token(EOF, name, null, -1), value, constant);
 		}
 
 		public void Define(Token name, object value, bool constant) {
