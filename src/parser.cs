@@ -52,9 +52,14 @@ namespace Toy {
 			return new Const(name, initializer);
 		}
 
-		Stmt StatementRule() {
+		Stmt StatementRule(bool breakable = false) {
 			if (Match(PRINT)) return PrintStmt();
-			if (Match(LEFT_BRACE)) return new Block(BlockStmt());
+			if (Match(IF)) return IfStmt();
+			if (Match(WHILE)) return WhileStmt();
+			if (Match(FOR)) return ForStmt();
+			if (Match(BREAK)) return BreakStmt();
+			if (Match(CONTINUE)) return ContinueStmt();
+			if (Match(LEFT_BRACE)) return new Block(BlockStmt(), breakable);
 
 			return ExpressionStmt();
 		}
@@ -65,10 +70,78 @@ namespace Toy {
 			return new Print(expr);
 		}
 
-		Stmt ExpressionStmt() {
-			Expr expr = ExpressionRule();
-			Consume(SEMICOLON, "Expected ';' after expression");
-			return new Expression(expr);
+		Stmt IfStmt() {
+			Consume(LEFT_PAREN, "Expected '(' after if statement");
+			Expr cond = ExpressionRule();
+			Consume(RIGHT_PAREN, "Expected ')' after if condition");
+
+			Stmt thenBranch = StatementRule();
+			Stmt elseBranch = null;
+			if (Match(ELSE)) {
+				elseBranch = StatementRule();
+			}
+
+			return new If(cond, thenBranch, elseBranch);
+		}
+
+		Stmt WhileStmt() {
+			Consume(LEFT_PAREN, "Expected '(' after while statement");
+			Expr cond = ExpressionRule();
+			Consume(RIGHT_PAREN, "Expected ')' after while condition");
+
+			Stmt body = StatementRule(true);
+
+			//implicitly create a block if the body isn't enclosed by one
+			if (!(body is Block)) {
+				body = new Block(new List<Stmt>() {body}, true);
+			}
+
+			return new While(cond, body);
+		}
+
+		Stmt ForStmt() {
+			Consume(LEFT_PAREN, "Expected '(' after for statement");
+
+			//initializer
+			Stmt initializer;
+			if (Match(SEMICOLON)) {
+				initializer = null;
+			} else if (Match(VAR)) {
+				initializer = VarDeclarationRule();
+			} else {
+				initializer = ExpressionStmt();
+			}
+
+			//condition
+			Expr cond = null;
+			if (Peek().type != SEMICOLON) {
+				cond = ExpressionRule();
+			}
+			Consume(SEMICOLON, "Expected ';' after for loop condition");
+
+			//increment
+			Expr increment = null;
+			if (Peek().type != RIGHT_PAREN) {
+				increment = ExpressionRule();
+			}
+			Consume(RIGHT_PAREN, "Expected ')' after for clauses");
+
+			//body
+			Stmt body = StatementRule(true);
+
+			return new For(initializer, cond, increment, body);
+		}
+
+		Stmt BreakStmt() {
+			Stmt stmt = new Break(Previous());
+			Consume(SEMICOLON, "Expected ';' after break statement");
+			return stmt;
+		}
+
+		Stmt ContinueStmt() {
+			Stmt stmt = new Continue(Previous());
+			Consume(SEMICOLON, "Expected ';' after continue statement");
+			return stmt;
 		}
 
 		List<Stmt> BlockStmt() {
@@ -80,6 +153,12 @@ namespace Toy {
 
 			Consume(RIGHT_BRACE, "Expected '}' after block");
 			return statements;
+		}
+
+		Stmt ExpressionStmt() {
+			Expr expr = ExpressionRule();
+			Consume(SEMICOLON, "Expected ';' after expression");
+			return new Expression(expr);
 		}
 
 		Expr ExpressionRule() {
@@ -124,7 +203,7 @@ namespace Toy {
 			if (Match(OR_OR)) {
 				Token token = Previous();
 				Expr right = OrRule();
-				expr = new Binary(expr, token, right);
+				expr = new Logical(expr, token, right);
 			}
 
 			return expr;
@@ -136,7 +215,7 @@ namespace Toy {
 			if (Match(AND_AND)) {
 				Token token = Previous();
 				Expr right = AndRule();
-				expr = new Binary(expr, token, right);
+				expr = new Logical(expr, token, right);
 			}
 
 			return expr;

@@ -10,6 +10,7 @@ namespace Toy {
 		R Visit(Assign Expr);
 		R Visit(Increment Expr);
 		R Visit(Literal Expr);
+		R Visit(Logical Expr);
 		R Visit(Unary Expr);
 		R Visit(Binary Expr);
 		R Visit(Grouping Expr);
@@ -70,6 +71,22 @@ namespace Toy {
 		}
 
 		public object value;
+	}
+
+	class Logical : Expr {
+		public Logical(Expr left, Token oper, Expr right) {
+			this.left = left;
+			this.oper = oper;
+			this.right = right;
+		}
+
+		public override R Accept<R>(ExprVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Expr left;
+		public Token oper;
+		public Expr right;
 	}
 
 	class Unary : Expr {

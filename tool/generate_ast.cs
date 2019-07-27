@@ -14,6 +14,7 @@ namespace Tool {
 				"Assign: Token name, Token oper, Expr value",
 				"Increment: Token oper, Variable variable, bool prefix",
 				"Literal: object value",
+				"Logical: Expr left, Token oper, Expr right",
 				"Unary: Token oper, Expr right",
 				"Binary: Expr left, Token oper, Expr right",
 				"Grouping: Expr expression",
@@ -21,11 +22,16 @@ namespace Tool {
 			});
 
 			DefineAst(args[0], "Stmt", new string[] {
-				"Expression: Expr expression",
-				"Block: List<Stmt> statements",
 				"Print: Expr expression",
+				"If: Expr cond, Stmt thenBranch, Stmt elseBranch",
+				"While: Expr cond, Stmt body",
+				"For: Stmt initializer, Expr cond, Expr increment, Stmt body",
+				"Break: Token signal",
+				"Continue: Token signal",
+				"Block: List<Stmt> statements, bool breakable",
 				"Var: Token name, Expr initializer",
-				"Const: Token name, Expr initializer"
+				"Const: Token name, Expr initializer",
+				"Expression: Expr expression"
 			});
 
 			return 0;

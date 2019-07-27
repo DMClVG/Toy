@@ -2,17 +2,17 @@ var a = "global a";
 var b = "global b";
 var c = "global c";
 {
-  var a = "outer a";
-  var b = "outer b";
-  {
-    var a = "inner a";
-    print a;
-    print b;
-    print c;
-  }
-  print a;
-  print b;
-  print c;
+	var a = "outer a";
+	var b = "outer b";
+	{
+		var a = "inner a";
+		print a;
+		print b;
+		print c;
+	}
+	print a;
+	print b;
+	print c;
 }
 print a;
 print b;
@@ -26,3 +26,15 @@ var d = 1;
 	print d;
 }
 print d;
+
+print "-----";
+
+for (var i = 0; i < 10; i++) {
+	print i;
+	if (i >= 7) {
+		continue;
+	}
+	print "end of the loop";
+}
+
+//TODO: default arugments

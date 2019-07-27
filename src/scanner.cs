@@ -30,7 +30,9 @@ namespace Toy {
 			{"for", FOR},
 			{"foreach", FOREACH},
 			{"in", IN},
-			{"of", OF}
+			{"of", OF},
+			{"break", BREAK},
+			{"continue", CONTINUE}
 		};
 
 		//methods

@@ -29,14 +29,29 @@ constDecl -> "const" IDENTIFIER "=" expression ";" ;
 
 statement -> exprStmt
 	| printStmt
+	| ifStmt
+	| whileStmt
+	| forStmt
 	| block
+	| breakStmt
+	| continueStmt
 	;
 
 exprStmt -> expression ";" ;
 
 printStmt -> "print" expression ";" ;
 
+ifStmt -> "if" "(" expression ")" statement ( "else" statement )? ;
+
+whileStmt -> "while" "(" expression ")" statement ;
+
+forStmt -> "for" "(" ( varDecl | exprStmt | ";") expression? ";" expression ")" statement ;
+
 block -> "{" delcaration* "}" ;
+
+breakStmt -> "break" ";" ;
+
+continueStmt -> "continue" ";" ;
 
 expression -> assignment ;
 

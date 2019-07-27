@@ -33,7 +33,7 @@ namespace Toy {
 
 		//keywords (nil = null)
 		NIL, PRINT, IMPORT, VAR, CONST, TRUE, FALSE, FUNCTION, RETURN,
-		IF, ELSE, DO, WHILE, FOR, FOREACH, IN, OF,
+		IF, ELSE, DO, WHILE, FOR, FOREACH, IN, OF, BREAK, CONTINUE,
 
 		EOF
 	}

@@ -12,12 +12,20 @@ namespace Toy {
 		public int Interpret(List<Stmt> stmtList) {
 			try {
 				foreach (Stmt stmt in stmtList) {
-					Execute(stmt);
+					Token signal = (Token)Execute(stmt);
+
+					if (signal != null) {
+						if (signal.type == BREAK) {
+							throw new ErrorHandler.RuntimeError(signal, "Unexpected break statement outside of a loop");
+						} else if (signal.type == CONTINUE) {
+							throw new ErrorHandler.RuntimeError(signal, "Unexpected continue statement outside of a loop");
+						}
+					}
 				}
 			} catch(ErrorHandler.RuntimeError e) {
 				throw e;
 			} catch(Exception e) {
-				throw new ErrorHandler.RuntimeError(new Token(EOF, "", null, -1), e.Message);
+				throw new ErrorHandler.RuntimeError(new Token(EOF, "interpreter", null, -1), e.ToString());
 			}
 
 			return 0;
@@ -39,6 +47,56 @@ namespace Toy {
 			return null;
 		}
 
+		public object Visit(If stmt) {
+			if (CheckIsTruthy( Evaluate(stmt.cond) )) {
+				return Execute(stmt.thenBranch);
+			} else if (stmt.elseBranch != null) {
+				return Execute(stmt.elseBranch);
+			}
+
+			return null;
+		}
+
+		public object Visit(While stmt) {
+			while (CheckIsTruthy(Evaluate(stmt.cond))) {
+				Token signal = (Token)Execute(stmt.body);
+
+				if (signal != null && signal.type == BREAK) {
+					break;
+				}
+			}
+
+			return null;
+		}
+
+		public object Visit(For stmt) {
+			Execute(stmt.initializer);
+
+			while (CheckIsTruthy(Evaluate(stmt.cond))) {
+				Token signal = (Token)Execute(stmt.body);
+
+				if (signal != null && signal.type == BREAK) {
+					break;
+				}
+
+				Evaluate(stmt.increment);
+			}
+
+			return null;
+		}
+
+		public object Visit(Break stmt) {
+			return stmt.signal;
+		}
+
+		public object Visit(Continue stmt) {
+			return stmt.signal;
+		}
+
+		public object Visit(Block stmt) {
+			return ExecuteBlock(stmt, new Environment(environment));
+		}
+
 		public object Visit(Var stmt) {
 			object value = null;
 			if (stmt.initializer != null) {
@@ -50,11 +108,6 @@ namespace Toy {
 
 		public object Visit(Const stmt) {
 			environment.Define(stmt.name, Evaluate(stmt.initializer), true);
-			return null;
-		}
-
-		public object Visit(Block stmt) {
-			ExecuteBlock(stmt.statements, new Environment(environment));
 			return null;
 		}
 
@@ -148,6 +201,18 @@ namespace Toy {
 			return expr.value;
 		}
 
+		public object Visit(Logical expr) {
+			object left = Evaluate(expr.left);
+
+			if (expr.oper.type == OR_OR) {
+				if (CheckIsTruthy(left)) return left;
+			} else {
+				if (!CheckIsTruthy(left)) return left;
+			}
+
+			return Evaluate(expr.right);
+		}
+
 		public object Visit(Unary expr) {
 			object right = Evaluate(expr.right);
 
@@ -219,12 +284,6 @@ namespace Toy {
 
 				case EQUAL_EQUAL:
 					return CheckIsEqual(left, right);
-
-				case AND_AND:
-					return CheckIsTruthy(left) && CheckIsTruthy(right);
-
-				case OR_OR:
-					return CheckIsTruthy(left) || CheckIsTruthy(right);
 			}
 
 			return null;
@@ -244,20 +303,30 @@ namespace Toy {
 		}
 
 		//helpers
-		void Execute(Stmt stmt) {
-			stmt.Accept(this);
+		object Execute(Stmt stmt) {
+			return stmt.Accept(this);
 		}
 
-		void ExecuteBlock(List<Stmt> statements, Environment env) {
+		object ExecuteBlock(Block stmt, Environment env) {
 			Environment previous = environment;
+			Token signal = null;
+
 			try {
 				environment = env;
-				foreach (Stmt stmt in statements) {
-					Execute(stmt);
+				foreach (Stmt s in stmt.statements) {
+					signal = (Token)Execute(s);
+
+					if (signal != null) {
+						if (signal.type == BREAK || signal.type == CONTINUE) {
+							break;
+						}
+					}
 				}
 			} finally {
 				environment = previous;
 			}
+
+			return signal;
 		}
 
 		object Evaluate(Expr expr) {
