@@ -35,6 +35,7 @@ statement -> exprStmt
 	| block
 	| breakStmt
 	| continueStmt
+	| returnStmt
 	;
 
 exprStmt -> expression ";" ;
@@ -52,6 +53,8 @@ block -> "{" delcaration* "}" ;
 breakStmt -> "break" ";" ;
 
 continueStmt -> "continue" ";" ;
+
+returnStmt -> "return" expression? ";" ;
 
 expression -> assignment ;
 
@@ -81,7 +84,13 @@ call -> primary ( "(" arguments? ")" )* ;
 
 arguments -> expression ( "," expression )* ;
 
-primary -> NUMBER | STRING | IDENTIFIER | "true" | "false" | "null" | "(" expression ")" ;
+primary -> NUMBER | STRING | IDENTIFIER | function | "true" | "false" | "null" | "(" expression ")" ;
+
+function -> "function" "(" parameters? ")" block
+	| "(" parameters ")" "=>" statement
+	;
+
+parameters -> IDENTIFIER ( "," IDENTIFIER )* ;
 
 -------------------------------------------------------------------------------
 

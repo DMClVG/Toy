@@ -12,6 +12,7 @@ namespace Toy {
 		R Visit(For Stmt);
 		R Visit(Break Stmt);
 		R Visit(Continue Stmt);
+		R Visit(Return Stmt);
 		R Visit(Block Stmt);
 		R Visit(Var Stmt);
 		R Visit(Const Stmt);
@@ -100,6 +101,20 @@ namespace Toy {
 		}
 
 		public Token signal;
+	}
+
+	class Return : Stmt {
+		public Return(Token keyword, Expr value) {
+			this.keyword = keyword;
+			this.value = value;
+		}
+
+		public override R Accept<R>(StmtVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Token keyword;
+		public Expr value;
 	}
 
 	class Block : Stmt {

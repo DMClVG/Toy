@@ -1,52 +1,35 @@
-var a = "global a";
-var b = "global b";
-var c = "global c";
-{
-	var a = "outer a";
-	var b = "outer b";
-	{
-		var a = "inner a";
-		print a;
-		print b;
-		print c;
-	}
-	print a;
-	print b;
-	print c;
-}
-print a;
-print b;
-print c;
-
-print "-----";
-
-var d = 1;
-{
-	var d = d + 2;
-	print d;
-}
-print d;
-
-print "-----";
-
-for (var i = 0; i < 10; i++) {
-	print i;
-	if (i >= 7) {
-		continue;
-	}
-	print "end of the loop";
+//print the fibonacci numbers
+var fibonacci = (n) => {
+	if (n <= 1) return n;
+	return fibonacci(n - 2) + fibonacci(n - 1);
 }
 
-print "-----";
-
-var str = "";
-
-for (var i = 0; i < 10; i++) {
-	str = str + "x";
-	print str;
+for (var i = 0; i < 20; i++) {
+	print fibonacci(i);
 }
 
-while (true) print Clock();
+var identity = x => x;
+
+for (var i = 0; i < 10; i++) print identity("foobar");
+print "done";
+
+var makeCounter = () => {
+  var i = 0;
+  var count = () => {
+    return ++i;
+  }
+
+  return count;
+}
+
+var counter = makeCounter();
+print counter(); // "1"
+print counter(); // "2"
+print counter(); // "3"
+
+(() => { print "foobar"; })();
+
+//while (true) print Clock();
 
 //TODO: built in methods for string, array and dictionary
 //TODO: mutating strings
@@ -58,9 +41,6 @@ while (true) print Clock();
 //TODO: foreach(var element in object)
 //TODO: foreach(var index of object)
 //TODO: foreach(var char in "string")
-//TODO: function keyword
-//TODO: arrow functions
-//TODO: explicitly support closures
 //TODO: rest/spread operator
 //TODO: destructuring
 //TODO: MAYBE promises
@@ -72,6 +52,6 @@ while (true) print Clock();
 //TODO: automatic properties?
 //TODO: Vector (position) library
 //TODO: https://stackoverflow.com/questions/509211/understanding-slice-notation
-//TODO: break x;
-//TODO: continue x;
+//TODO: MAYBE break x;
+//TODO: MAYBE continue x;
 

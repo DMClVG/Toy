@@ -6,7 +6,7 @@ using static Toy.TokenType;
 namespace Toy {
 	class Interpreter : ExprVisitor<object>, StmtVisitor<object> {
 		//members
-		Environment environment = new Environment();
+		public Environment environment = new Environment();
 
 		public Interpreter() {
 			Library.Standard.Initialize(environment); //NOTE: temporary, until the module system is working
@@ -104,8 +104,17 @@ namespace Toy {
 			return stmt.signal;
 		}
 
+		public object Visit(Return stmt) {
+			object value = null;
+			if (stmt.value != null) {
+				value = Evaluate(stmt.value);
+			}
+
+			throw new ReturnException(value);
+		}
+
 		public object Visit(Block stmt) {
-			return ExecuteBlock(stmt);
+			return ExecuteBlock(stmt, new Environment(environment));
 		}
 
 		public object Visit(Var stmt) {
@@ -321,6 +330,10 @@ namespace Toy {
 			return function.Call(this, arguments);
 		}
 
+		public object Visit(Function expr) {
+			return new ScriptFunction(expr, environment);
+		}
+
 		public object Visit(Grouping expr) {
 			return Evaluate(expr.expression);
 		}
@@ -335,13 +348,13 @@ namespace Toy {
 		}
 
 		//helpers
-		object Execute(Stmt stmt) {
+		public object Execute(Stmt stmt) {
 			return stmt.Accept(this);
 		}
 
-		object ExecuteBlock(Block stmt) {
+		public object ExecuteBlock(Block stmt, Environment env, bool killOnBreak = false) {
 			Environment previous = environment;
-			environment = new Environment(previous);
+			environment = env;
 			Token signal = null;
 
 			try {
@@ -350,6 +363,9 @@ namespace Toy {
 
 					if (signal != null) {
 						if (signal.type == BREAK || signal.type == CONTINUE) {
+							if (killOnBreak) {
+								throw new ErrorHandler.RuntimeError(signal, "Unexpected break or continue statement");
+							}
 							break;
 						}
 					}
@@ -361,7 +377,7 @@ namespace Toy {
 			return signal;
 		}
 
-		object Evaluate(Expr expr) {
+		public object Evaluate(Expr expr) {
 			return expr.Accept(this);
 		}
 

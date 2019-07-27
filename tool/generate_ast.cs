@@ -18,6 +18,7 @@ namespace Tool {
 				"Unary: Token oper, Expr right",
 				"Binary: Expr left, Token oper, Expr right",
 				"Call: Expr callee, Token paren, List<Expr> arguments",
+				"Function: List<Expr> parameters, List<Stmt> body",
 				"Grouping: Expr expression",
 				"Ternary: Expr cond, Expr left, Expr right"
 			});
@@ -29,6 +30,7 @@ namespace Tool {
 				"For: Stmt initializer, Expr cond, Expr increment, Stmt body",
 				"Break: Token signal",
 				"Continue: Token signal",
+				"Return: Token keyword, Expr value",
 				"Block: List<Stmt> statements, bool breakable",
 				"Var: Token name, Expr initializer",
 				"Const: Token name, Expr initializer",

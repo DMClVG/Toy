@@ -14,7 +14,10 @@ namespace Toy {
 		public List<Stmt> ParseStatements() {
 			List<Stmt> statements = new List<Stmt>();
 			while(!CheckAtEnd()) {
-				statements.Add(DeclarationRule());
+				//ignore blank semicolons
+				if (!Match(SEMICOLON)) {
+					statements.Add(DeclarationRule());
+				}
 			}
 			return statements;
 		}
@@ -40,7 +43,10 @@ namespace Toy {
 				initializer = ExpressionRule();
 			}
 
-			Consume(SEMICOLON, "Expected ';' after variable declaration");
+			if (!(initializer is Function)) {
+				Consume(SEMICOLON, "Expected ';' after variable declaration");
+			}
+
 			return new Var(name, initializer);
 		}
 
@@ -48,7 +54,11 @@ namespace Toy {
 			Token name = Consume(IDENTIFIER, "Expected constant name");
 			Consume(EQUAL, "Expected assignment in constant declaration");
 			Expr initializer = ExpressionRule();
-			Consume(SEMICOLON, "Expected ';' after constant declaration");
+
+			if (!(initializer is Function)) {
+				Consume(SEMICOLON, "Expected ';' after constant declaration");
+			}
+
 			return new Const(name, initializer);
 		}
 
@@ -59,6 +69,7 @@ namespace Toy {
 			if (Match(FOR)) return ForStmt();
 			if (Match(BREAK)) return BreakStmt();
 			if (Match(CONTINUE)) return ContinueStmt();
+			if (Match(RETURN)) return ReturnStmt();
 			if (Match(LEFT_BRACE)) return new Block(BlockStmt(), breakable);
 
 			return ExpressionStmt();
@@ -114,14 +125,14 @@ namespace Toy {
 
 			//condition
 			Expr cond = null;
-			if (Peek().type != SEMICOLON) {
+			if (!CheckTokenType(SEMICOLON)) {
 				cond = ExpressionRule();
 			}
 			Consume(SEMICOLON, "Expected ';' after for loop condition");
 
 			//increment
 			Expr increment = null;
-			if (Peek().type != RIGHT_PAREN) {
+			if (!CheckTokenType(RIGHT_PAREN)) {
 				increment = ExpressionRule();
 			}
 			Consume(RIGHT_PAREN, "Expected ')' after for clauses");
@@ -149,10 +160,21 @@ namespace Toy {
 			return stmt;
 		}
 
+		Stmt ReturnStmt() {
+			Token keyword = Previous();
+			Expr value = null;
+			if (!CheckTokenType(SEMICOLON)) {
+				value = ExpressionRule();
+			}
+
+			Consume(SEMICOLON, "Expected ';' at end of return statement");
+			return new Return(keyword, value);
+		}
+
 		List<Stmt> BlockStmt() {
 			List<Stmt> statements = new List<Stmt>();
 
-			while(Peek().type != RIGHT_BRACE && !CheckAtEnd()) {
+			while(!CheckTokenType(RIGHT_BRACE) && !CheckAtEnd()) {
 				statements.Add(DeclarationRule());
 			}
 
@@ -162,7 +184,9 @@ namespace Toy {
 
 		Stmt ExpressionStmt() {
 			Expr expr = ExpressionRule();
-			Consume(SEMICOLON, "Expected ';' after expression");
+			if (!(expr is Function)) {
+				Consume(SEMICOLON, "Expected ';' after expression");
+			}
 			return new Expression(expr);
 		}
 
@@ -296,7 +320,7 @@ namespace Toy {
 		}
 
 		Expr PostfixRule() {
-			if (Peek().type == IDENTIFIER && (PeekNext().type == PLUS_PLUS || PeekNext().type == MINUS_MINUS)) {
+			if (CheckTokenType(IDENTIFIER) && (PeekNext().type == PLUS_PLUS || PeekNext().type == MINUS_MINUS)) {
 				Variable variable = new Variable(Advance());
 				Token token = Advance();
 				return new Increment(token, variable, false);
@@ -329,13 +353,39 @@ namespace Toy {
 			}
 
 			if (Match(IDENTIFIER)) {
+				if (CheckTokenType(EQUAL_GREATER)) {
+					Expr variable = new Variable(Previous());
+					Consume(EQUAL_GREATER, "Expected '=>' in arrow function");
+					return FunctionRule(new List<Expr>() { variable });
+				}
 				return new Variable(Previous()); //Variable accesses constants as well
 			}
 
+			//function keyword
+			if (Match(FUNCTION)) {
+				return FunctionRule(null);
+			}
+
 			if (Match(LEFT_PAREN)) {
-				Expr expr = ExpressionRule();
-				Consume(RIGHT_PAREN, "Expected ')' after expression");
-				return new Grouping(expr);
+				List<Expr> expressions = new List<Expr>();
+
+				if (!CheckTokenType(RIGHT_PAREN)) {
+					do {
+						expressions.Add(ExpressionRule());
+					} while (Match(COMMA));
+				}
+
+				Consume(RIGHT_PAREN, "Expected ')' after arrow function declaration");
+
+				//arrow function
+				if (Match(EQUAL_GREATER)) {
+					return FunctionRule(expressions);
+				} else {
+					if (expressions.Count != 1) {
+						throw new ErrorHandler.ParserError(Peek(), "Incorrect number of expressions, expected 1 found " + expressions.Count);
+					}
+					return new Grouping(expressions[0]);
+				}
 			}
 
 			throw new ErrorHandler.ParserError(Peek(), "Expected expression");
@@ -344,7 +394,7 @@ namespace Toy {
 		Expr FinishCall(Expr callee) {
 			List<Expr> arguments = new List<Expr>();
 
-			if (Peek().type != RIGHT_PAREN) {
+			if (!CheckTokenType(RIGHT_PAREN)) {
 				do {
 					if (arguments.Count > 255) {
 						ErrorHandler.Error(Peek().line, "Can't have more than 255 arguments");
@@ -357,6 +407,49 @@ namespace Toy {
 			Token paren = Consume(RIGHT_PAREN, "Expected ')' after function call");
 
 			return new Call(callee, paren, arguments);
+		}
+
+		Expr FunctionRule(List<Expr> parameters) {
+			bool wasNull = false;
+			//read the parameters
+			if (parameters == null) {
+				wasNull = true;
+				Consume(LEFT_PAREN, "Expected '(' after function keyword");
+				parameters = new List<Expr>();
+				do {
+					parameters.Add(ExpressionRule());
+				} while (Match(COMMA));
+				Consume(RIGHT_PAREN, "Expected ')' after function expressions");
+			}
+
+			//read the  opening brace?
+			bool hasBraces = false;
+			if (wasNull || CheckTokenType(LEFT_BRACE)) {
+				//using the function keyword OR optional braces
+				hasBraces = true;
+
+				Consume(LEFT_BRACE, "Expected '{' after function declaration");
+			}
+
+			//read the body
+			List<Stmt> body = new List<Stmt>();
+
+			do {
+				if (hasBraces) {
+					body.Add(DeclarationRule());
+				} else {
+					//implicit return inserted
+					body.Add(new Return(new Token(RETURN, "implicit return", null, Previous().line), ExpressionRule()));
+				}
+			} while(hasBraces && !CheckTokenType(RIGHT_BRACE) && !CheckAtEnd());
+
+			//read the closing brace?
+			if (hasBraces) {
+				Consume(RIGHT_BRACE, "Expected '}' after function definition");
+			}
+
+			//finally
+			return new Function(parameters, body);
 		}
 
 		//helpers
