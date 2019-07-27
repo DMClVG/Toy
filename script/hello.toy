@@ -55,3 +55,14 @@ print counter(); // "3"
 //TODO: MAYBE break x;
 //TODO: MAYBE continue x;
 
+//Here's the "bug"
+var a = "global";
+{
+  var showA = function() {
+    print a;
+  }
+
+  showA();
+  var a = "block";
+  showA();
+}

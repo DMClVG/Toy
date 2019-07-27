@@ -417,7 +417,9 @@ namespace Toy {
 				Consume(LEFT_PAREN, "Expected '(' after function keyword");
 				parameters = new List<Expr>();
 				do {
-					parameters.Add(ExpressionRule());
+					if (!CheckTokenType(RIGHT_PAREN)) {
+						parameters.Add(ExpressionRule());
+					}
 				} while (Match(COMMA));
 				Consume(RIGHT_PAREN, "Expected ')' after function expressions");
 			}
