@@ -65,16 +65,16 @@ namespace Toy {
 
 			} catch (ErrorHandler.ParserError e) {
 				Console.WriteLine("Parser error caught at Run()");
-				Console.WriteLine("The following output is for internal debugging only:\n" + e.ToString());
+				Console.WriteLine("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
 			} catch (ErrorHandler.ResolverError e) {
 				Console.WriteLine("Resolver error caught at Run()");
-				Console.WriteLine("The following output is for internal debugging only:\n" + e.ToString());
+				Console.WriteLine("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
 			} catch (ErrorHandler.RuntimeError e) {
 				Console.WriteLine("Runtime error caught at Run()");
-				Console.WriteLine("The following output is for internal debugging only:\n" + e.ToString());
+				Console.WriteLine("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
 			} catch (Exception e) {
 				Console.WriteLine("Terminal error caught at Run()");
-				Console.WriteLine("The following output is for internal debugging only:\n" + e.ToString());
+				Console.WriteLine("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
 			}
 		}
 	}

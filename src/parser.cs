@@ -56,6 +56,7 @@ namespace Toy {
 		Stmt StatementRule(bool breakable = false) {
 			if (Match(PRINT)) return PrintStmt();
 			if (Match(IF)) return IfStmt();
+			if (Match(DO)) return DoStmt();
 			if (Match(WHILE)) return WhileStmt();
 			if (Match(FOR)) return ForStmt();
 			if (Match(BREAK)) return BreakStmt();
@@ -89,6 +90,24 @@ namespace Toy {
 			}
 
 			return new If(cond, thenBranch, elseBranch);
+		}
+
+		Stmt DoStmt() {
+			Stmt body = StatementRule(true);
+
+			//implicitly create a block if the body isn't enclosed by one
+			if (!(body is Block)) {
+				body = new Block(new List<Stmt>() {body}, true);
+			}
+
+			//read the while condition
+			Consume(WHILE, "Expected 'while' following do statement");
+			Consume(LEFT_PAREN, "Expected '(' after do-while statement");
+			Expr cond = ExpressionRule();
+			Consume(RIGHT_PAREN, "Expected ')' after do-while condition");
+			Consume(SEMICOLON, "Expected ';' after for do-while condition");
+
+			return new Do(body, cond);
 		}
 
 		Stmt WhileStmt() {

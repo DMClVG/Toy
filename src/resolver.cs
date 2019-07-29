@@ -10,6 +10,7 @@ namespace Toy {
 
 		enum LoopType {
 			NONE,
+			DO,
 			WHILE,
 			FOR
 		};
@@ -35,6 +36,19 @@ namespace Toy {
 			if (stmt.elseBranch != null) {
 				Resolve(stmt.elseBranch);
 			}
+			return null;
+		}
+
+		public object Visit(Do stmt) {
+			LoopType enclosingLoopType = currentLoopType;
+			currentLoopType = LoopType.DO;
+
+			BeginScope();
+			Resolve(stmt.body);
+			Resolve(stmt.cond);
+			EndScope();
+
+			currentLoopType = enclosingLoopType;
 			return null;
 		}
 

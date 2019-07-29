@@ -8,6 +8,7 @@ namespace Toy {
 	interface StmtVisitor<R> {
 		R Visit(Print Stmt);
 		R Visit(If Stmt);
+		R Visit(Do Stmt);
 		R Visit(While Stmt);
 		R Visit(For Stmt);
 		R Visit(Break Stmt);
@@ -46,6 +47,20 @@ namespace Toy {
 		public Expr cond;
 		public Stmt thenBranch;
 		public Stmt elseBranch;
+	}
+
+	class Do : Stmt {
+		public Do(Stmt body, Expr cond) {
+			this.body = body;
+			this.cond = cond;
+		}
+
+		public override R Accept<R>(StmtVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Stmt body;
+		public Expr cond;
 	}
 
 	class While : Stmt {

@@ -17,22 +17,16 @@ namespace Toy {
 
 		//access
 		public int Interpret(List<Stmt> stmtList) {
-			try {
-				foreach (Stmt stmt in stmtList) {
-					Token signal = (Token)Execute(stmt);
+			foreach (Stmt stmt in stmtList) {
+				Token signal = (Token)Execute(stmt);
 
-					if (signal != null) {
-						if (signal.type == BREAK) {
-							throw new ErrorHandler.RuntimeError(signal, "Unexpected break statement outside of a loop");
-						} else if (signal.type == CONTINUE) {
-							throw new ErrorHandler.RuntimeError(signal, "Unexpected continue statement outside of a loop");
-						}
+				if (signal != null) {
+					if (signal.type == BREAK) {
+						throw new ErrorHandler.RuntimeError(signal, "Unexpected break statement outside of a loop");
+					} else if (signal.type == CONTINUE) {
+						throw new ErrorHandler.RuntimeError(signal, "Unexpected continue statement outside of a loop");
 					}
 				}
-			} catch(ErrorHandler.RuntimeError e) {
-				throw e;
-			} catch(Exception e) {
-				throw new ErrorHandler.RuntimeError(new Token(EOF, "interpreter", null, -1), e.ToString());
 			}
 
 			return 0;
@@ -60,6 +54,18 @@ namespace Toy {
 			} else if (stmt.elseBranch != null) {
 				return Execute(stmt.elseBranch);
 			}
+
+			return null;
+		}
+
+		public object Visit(Do stmt) {
+			do {
+				Token signal = (Token)Execute(stmt.body);
+
+				if (signal != null && signal.type == BREAK) {
+					break;
+				}
+			} while (CheckIsTruthy(Evaluate(stmt.cond)));
 
 			return null;
 		}
@@ -206,6 +212,11 @@ namespace Toy {
 
 		public object Visit(Increment expr) {
 			object value = LookupVariable(expr.variable);
+
+			if (!(value is double)) {
+				throw new ErrorHandler.RuntimeError(expr.oper, "Unexpected type (expected a number, received " + (value != null ? value.ToString() : "null") + ")");
+			}
+
 			object originalValue = value;
 
 			if (expr.oper.type == PLUS_PLUS) {
