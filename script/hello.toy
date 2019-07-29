@@ -24,11 +24,18 @@ f();
 call(empty);
 call(hello);
 
-print "testing assert";
 
-for (var i = 0; i < 10; i++) {
-	print i;
-	assert(i < 5, "i is larger or equal to 5");
+var makeCounter = function() {
+	var count = 0;
+	return () => {
+		return ++count;
+	};
+};
+
+var counter = makeCounter();
+
+while (false) {
+	print counter();
 }
 
 //while (true) print Clock();

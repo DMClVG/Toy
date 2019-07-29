@@ -1,24 +1,3 @@
-# basic example of syntax
-
-expression -> literal
-	| unary
-	| binary
-	| grouping
-	;
-
-literal -> NUMBER | STRING | "true" | "false" | "null" ;
-
-unary -> ( "-" | "!" ) expression ;
-
-binary -> expression operator expression ;
-
-grouping -> "(" expression ")" ;
-
-operator -> "+" | "-" | "*" | "/" | "%"
-	| "==" | "!=" | ">" | "<" | ">=" | "<=" ;
-
--------------------------------------------------------------------------------
-
 program -> delcaration* EOF ;
 
 declaration -> varDecl | constDecl | statement;
@@ -27,34 +6,42 @@ varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
 
 constDecl -> "const" IDENTIFIER "=" expression ";" ;
 
-statement -> exprStmt
-	| printStmt
+statement ->
+	  printStmt
 	| ifStmt
+	| DoStmt
 	| whileStmt
 	| forStmt
-	| block
 	| breakStmt
 	| continueStmt
 	| returnStmt
+	| assertStmt
+	| block
+	| ";"
+	| exprStmt
 	;
-
-exprStmt -> expression ";" ;
 
 printStmt -> "print" expression ";" ;
 
 ifStmt -> "if" "(" expression ")" statement ( "else" statement )? ;
 
+DoStmt -> "do" statement "while" "(" expression ")" ";" ;
+
 whileStmt -> "while" "(" expression ")" statement ;
 
 forStmt -> "for" "(" ( varDecl | exprStmt | ";") expression? ";" expression ")" statement ;
-
-block -> "{" delcaration* "}" ;
 
 breakStmt -> "break" ";" ;
 
 continueStmt -> "continue" ";" ;
 
 returnStmt -> "return" expression? ";" ;
+
+assertStmt -> "assert" "(" expression ( "," expression )? ")" ";" ;
+
+block -> "{" delcaration* "}" ;
+
+exprStmt -> expression ";" ;
 
 expression -> assignment ;
 
@@ -84,11 +71,9 @@ call -> primary ( "(" arguments? ")" )* ;
 
 arguments -> expression ( "," expression )* ;
 
-primary -> NUMBER | STRING | IDENTIFIER | function | "true" | "false" | "null" | "(" expression ")" ;
+primary -> "true" | "false" | "null" | NUMBER | STRING | IDENTIFIER | function | "(" expression ")" ;
 
-function -> "function" "(" parameters? ")" block
-	| "(" parameters ")" "=>" statement
-	;
+function -> "function" "(" parameters? ")" block | ( "(" parameters ")" | IDENTIFIER ) "=>" ( expression | block ) ;
 
 parameters -> IDENTIFIER ( "," IDENTIFIER )* ;
 

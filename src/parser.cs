@@ -197,6 +197,7 @@ namespace Toy {
 				message = ExpressionRule();
 			}
 			Consume(RIGHT_PAREN, "Expected ')' after assert expressions");
+			Consume(SEMICOLON, "Expected ';' after assert statement");
 
 			return new Assert(keyword, cond, message);
 		}
@@ -371,6 +372,24 @@ namespace Toy {
 			return expr;
 		}
 
+		Expr FinishCall(Expr callee) {
+			List<Expr> arguments = new List<Expr>();
+
+			if (!CheckTokenType(RIGHT_PAREN)) {
+				do {
+					if (arguments.Count > 255) {
+						ErrorHandler.Error(Peek().line, "Can't have more than 255 arguments");
+					}
+
+					arguments.Add(ExpressionRule());
+				} while(Match(COMMA));
+			}
+
+			Token paren = Consume(RIGHT_PAREN, "Expected ')' after function call");
+
+			return new Call(callee, paren, arguments);
+		}
+
 		Expr PrimaryRule() {
 			if (Match(TRUE)) return new Literal(true);
 			if (Match(FALSE)) return new Literal(false);
@@ -429,24 +448,6 @@ namespace Toy {
 			}
 
 			throw new ErrorHandler.ParserError(Peek(), "Expected expression");
-		}
-
-		Expr FinishCall(Expr callee) {
-			List<Expr> arguments = new List<Expr>();
-
-			if (!CheckTokenType(RIGHT_PAREN)) {
-				do {
-					if (arguments.Count > 255) {
-						ErrorHandler.Error(Peek().line, "Can't have more than 255 arguments");
-					}
-
-					arguments.Add(ExpressionRule());
-				} while(Match(COMMA));
-			}
-
-			Token paren = Consume(RIGHT_PAREN, "Expected ')' after function call");
-
-			return new Call(callee, paren, arguments);
 		}
 
 		Expr FunctionRule(List<Expr> parameters, bool isArrowFunction) {
