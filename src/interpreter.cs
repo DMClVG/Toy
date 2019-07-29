@@ -134,6 +134,11 @@ namespace Toy {
 			return null;
 		}
 
+		public object Visit(Pass stmt) {
+			//DO NOTHING
+			return null;
+		}
+
 		public object Visit(Expression stmt) {
 			Evaluate(stmt.expression);
 			return null;

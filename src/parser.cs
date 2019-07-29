@@ -14,10 +14,7 @@ namespace Toy {
 		public List<Stmt> ParseStatements() {
 			List<Stmt> statements = new List<Stmt>();
 			while(!CheckAtEnd()) {
-				//ignore blank semicolons
-				if (!Match(SEMICOLON)) {
-					statements.Add(DeclarationRule());
-				}
+				statements.Add(DeclarationRule());
 			}
 			return statements;
 		}
@@ -71,6 +68,11 @@ namespace Toy {
 			if (Match(CONTINUE)) return ContinueStmt();
 			if (Match(RETURN)) return ReturnStmt();
 			if (Match(LEFT_BRACE)) return new Block(BlockStmt(), breakable);
+
+			if (Match(SEMICOLON)) {
+				//empty statement
+				return new Pass(Previous());
+			}
 
 			return ExpressionStmt();
 		}
@@ -438,7 +440,12 @@ namespace Toy {
 
 			do {
 				if (hasBraces) {
-					body.Add(DeclarationRule());
+					if (CheckTokenType(RIGHT_BRACE)) {
+						//empty function body
+						body.Add(new Pass( Peek() ));
+					} else {
+						body.Add(DeclarationRule());
+					}
 				} else {
 					//implicit return inserted
 					body.Add(new Return(new Token(RETURN, "implicit return", null, Previous().line), ExpressionRule()));

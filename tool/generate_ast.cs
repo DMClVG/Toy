@@ -34,6 +34,7 @@ namespace Tool {
 				"Block: List<Stmt> statements, bool breakable",
 				"Var: Token name, Expr initializer",
 				"Const: Token name, Expr initializer",
+				"Pass: Token keyword",
 				"Expression: Expr expression"
 			});
 

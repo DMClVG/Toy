@@ -8,19 +8,33 @@ for (var i = 0; i < 20; i++) {
 	print fibonacci(i);
 }
 
+var hello = () => {print "hello";};
+var empty = () => {}
+
+var call = cb => cb();
+
+for (var i = 0; i < 10; i++) ;
+
+var f = function () {}
+
+call(empty);
+call(hello);
+
 //while (true) print Clock();
 
-//TODO: built in methods for string, array and dictionary
-//TODO: mutating strings
-//TODO: type casting (string -> number and number -> string)
-//TODO: default arugments
-//TODO: import/module system
-//TODO: arrays
-//TODO: dictionaries
 //TODO: do loops
-//TODO: foreach(var element in object)
+//TODO: assert keyword
+
+//TODO: arrays[start:stop:step]
+//TODO: dictionaries
+//TODO: import/module system
+//TODO: built in methods (or libraries) for string, array and dictionary manipulation
+//TODO: type casting (number, string, array, etc.)
+
+//TODO: foreach(var element in object) //foreach(var char in "string")
 //TODO: foreach(var index of object)
-//TODO: foreach(var char in "string")
+
+//TODO: default arugments
 //TODO: rest/spread operator
 //TODO: destructuring
 //TODO: MAYBE promises
@@ -28,11 +42,8 @@ for (var i = 0; i < 20; i++) {
 //TODO: MAYBE regex
 //TODO: MAYBE template strings
 //TODO: MAYBE namespaces
+//TODO: MAYBE break x;
+//TODO: MAYBE continue x;
 //TODO: How would I do generics?
 //TODO: automatic properties?
 //TODO: Vector (position) library
-//TODO: https://stackoverflow.com/questions/509211/understanding-slice-notation
-//TODO: MAYBE break x;
-//TODO: MAYBE continue x;
-//TODO: assert keyword
-//TODO: allow empty functions
