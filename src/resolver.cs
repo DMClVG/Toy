@@ -161,8 +161,8 @@ namespace Toy {
 		}
 
 		public object Visit(Assign expr) {
+			ResolveLocal(expr.variable);
 			Resolve(expr.value);
-			ResolveLocal(expr);
 			return null;
 		}
 

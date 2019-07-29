@@ -169,33 +169,33 @@ namespace Toy {
 		}
 
 		public object Visit(Assign expr) {
+			object originalValue = LookupVariable(expr.variable);
 			object value = Evaluate(expr.value);
-			object originalValue = LookupVariable(expr);
 
 			switch(expr.oper.type) {
 				case EQUAL:
-					return AssignVariable(expr, value);
+					return AssignVariable(expr.variable, value);
 
 				case PLUS_EQUAL:
 					if (!(originalValue is double)) {
 						throw new ErrorHandler.RuntimeError(expr.oper, "Can't increment-assign a non-number variable");
 					}
 
-					return AssignVariable(expr, (double)originalValue + (double)value);
+					return AssignVariable(expr.variable, (double)originalValue + (double)value);
 
 				case MINUS_EQUAL:
 					if (!(originalValue is double)) {
 						throw new ErrorHandler.RuntimeError(expr.oper, "Can't decrement-assign a non-number variable");
 					}
 
-					return AssignVariable(expr, (double)originalValue - (double)value);
+					return AssignVariable(expr.variable, (double)originalValue - (double)value);
 
 				case STAR_EQUAL:
 					if (!(originalValue is double)) {
 						throw new ErrorHandler.RuntimeError(expr.oper, "Can't multiply-assign a non-number variable");
 					}
 
-					return AssignVariable(expr, (double)originalValue * (double)value);
+					return AssignVariable(expr.variable, (double)originalValue * (double)value);
 
 				case SLASH_EQUAL:
 					if (!(originalValue is double)) {
@@ -206,7 +206,7 @@ namespace Toy {
 						throw new ErrorHandler.RuntimeError(expr.oper, "Can't divide by 0");
 					}
 
-					return AssignVariable(expr, (double)originalValue / (double)value);
+					return AssignVariable(expr.variable, (double)originalValue / (double)value);
 
 				case MODULO_EQUAL:
 					if (!(originalValue is double)) {
@@ -217,7 +217,7 @@ namespace Toy {
 						throw new ErrorHandler.RuntimeError(expr.oper, "Can't modulo by 0");
 					}
 
-					return AssignVariable(expr, (double)originalValue % (double)value);
+					return AssignVariable(expr.variable, (double)originalValue % (double)value);
 
 				default:
 					throw new ErrorHandler.RuntimeError(expr.oper, "Unknown operator");
@@ -241,7 +241,7 @@ namespace Toy {
 				throw new ErrorHandler.RuntimeError(expr.oper, "Bad increment implementation");
 			}
 
-			environment.Set(expr.variable.name, value);
+			AssignVariable(expr.variable, value);
 
 			if (expr.prefix) {
 				return value;

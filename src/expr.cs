@@ -32,8 +32,8 @@ namespace Toy {
 	}
 
 	class Assign : Expr {
-		public Assign(Token name, Token oper, Expr value) {
-			this.name = name;
+		public Assign(Variable variable, Token oper, Expr value) {
+			this.variable = variable;
 			this.oper = oper;
 			this.value = value;
 		}
@@ -42,7 +42,7 @@ namespace Toy {
 			return visitor.Visit(this);
 		}
 
-		public Token name;
+		public Variable variable;
 		public Token oper;
 		public Expr value;
 	}

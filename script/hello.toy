@@ -34,9 +34,9 @@ var makeCounter = function() {
 
 var counter = makeCounter();
 
-while (false) {
-	print counter();
-}
+print counter(); //1
+print counter(); //2
+print counter(); //3
 
 //while (true) print Clock();
 

@@ -231,8 +231,7 @@ namespace Toy {
 				Expr value = AssignmentRule();
 
 				if (expr is Variable) {
-					Token name = ((Variable)expr).name;
-					return new Assign(name, token, value);
+					return new Assign((Variable)expr, token, value);
 				}
 
 				throw new ErrorHandler.ParserError(token, "Invalid assignment target");
