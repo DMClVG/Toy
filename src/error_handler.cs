@@ -15,6 +15,16 @@ namespace Toy {
 			}
 		}
 
+		public class ResolverError : ApplicationException {
+			public ResolverError(Token token, string message) {
+				if (token.type == EOF) {
+					ErrorHandler.Report(token.line, "at end", message);
+				} else {
+					ErrorHandler.Report(token.line, "at '" + token.lexeme + "'", message);
+				}
+			}
+		}
+
 		public class RuntimeError : ApplicationException {
 			public RuntimeError(Token token, string message) {
 				ErrorHandler.Report(token.line, "at '" + token.lexeme + "'", message);

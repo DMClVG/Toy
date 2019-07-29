@@ -80,27 +80,27 @@ namespace Toy {
 	}
 
 	class Break : Stmt {
-		public Break(Token signal) {
-			this.signal = signal;
+		public Break(Token keyword) {
+			this.keyword = keyword;
 		}
 
 		public override R Accept<R>(StmtVisitor<R> visitor) {
 			return visitor.Visit(this);
 		}
 
-		public Token signal;
+		public Token keyword;
 	}
 
 	class Continue : Stmt {
-		public Continue(Token signal) {
-			this.signal = signal;
+		public Continue(Token keyword) {
+			this.keyword = keyword;
 		}
 
 		public override R Accept<R>(StmtVisitor<R> visitor) {
 			return visitor.Visit(this);
 		}
 
-		public Token signal;
+		public Token keyword;
 	}
 
 	class Return : Stmt {

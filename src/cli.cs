@@ -53,9 +53,28 @@ namespace Toy {
 				}
 
 				Interpreter interpreter = new Interpreter();
+
+				Resolver resolver = new Resolver(interpreter);
+				resolver.Resolve(stmtList);
+
+				if (ErrorHandler.HadError) {
+					return;
+				}
+
 				interpreter.Interpret(stmtList);
-			} catch (Exception) {
-				//DO nothing
+
+			} catch (ErrorHandler.ParserError e) {
+				Console.WriteLine("Parser error caught at Run()");
+				Console.WriteLine("The following output is for internal debugging only:\n" + e.ToString());
+			} catch (ErrorHandler.ResolverError e) {
+				Console.WriteLine("Resolver error caught at Run()");
+				Console.WriteLine("The following output is for internal debugging only:\n" + e.ToString());
+			} catch (ErrorHandler.RuntimeError e) {
+				Console.WriteLine("Runtime error caught at Run()");
+				Console.WriteLine("The following output is for internal debugging only:\n" + e.ToString());
+			} catch (Exception e) {
+				Console.WriteLine("Terminal error caught at Run()");
+				Console.WriteLine("The following output is for internal debugging only:\n" + e.ToString());
 			}
 		}
 	}

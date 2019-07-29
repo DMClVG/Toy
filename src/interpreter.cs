@@ -6,9 +6,12 @@ using static Toy.TokenType;
 namespace Toy {
 	class Interpreter : ExprVisitor<object>, StmtVisitor<object> {
 		//members
-		public Environment environment = new Environment();
+		public Environment globals = new Environment();
+		public Environment environment;
+		Dictionary<Expr, int> locals = new Dictionary<Expr, int>();
 
 		public Interpreter() {
+			environment = globals;
 			Library.Standard.Initialize(environment); //NOTE: temporary, until the module system is working
 		}
 
@@ -97,11 +100,11 @@ namespace Toy {
 		}
 
 		public object Visit(Break stmt) {
-			return stmt.signal;
+			return stmt.keyword;
 		}
 
 		public object Visit(Continue stmt) {
-			return stmt.signal;
+			return stmt.keyword;
 		}
 
 		public object Visit(Return stmt) {
@@ -137,37 +140,37 @@ namespace Toy {
 		}
 
 		public object Visit(Variable expr) {
-			return environment.Get(expr.name);
+			return LookupVariable(expr);
 		}
 
 		public object Visit(Assign expr) {
 			object value = Evaluate(expr.value);
-			object originalValue = environment.Get(expr.name);
+			object originalValue = LookupVariable(expr);
 
 			switch(expr.oper.type) {
 				case EQUAL:
-					return environment.Set(expr.name, value);
+					return AssignVariable(expr, value);
 
 				case PLUS_EQUAL:
 					if (!(originalValue is double)) {
 						throw new ErrorHandler.RuntimeError(expr.oper, "Can't increment-assign a non-number variable");
 					}
 
-					return environment.Set(expr.name, (double)originalValue + (double)value);
+					return AssignVariable(expr, (double)originalValue + (double)value);
 
 				case MINUS_EQUAL:
 					if (!(originalValue is double)) {
 						throw new ErrorHandler.RuntimeError(expr.oper, "Can't decrement-assign a non-number variable");
 					}
 
-					return environment.Set(expr.name, (double)originalValue - (double)value);
+					return AssignVariable(expr, (double)originalValue - (double)value);
 
 				case STAR_EQUAL:
 					if (!(originalValue is double)) {
 						throw new ErrorHandler.RuntimeError(expr.oper, "Can't multiply-assign a non-number variable");
 					}
 
-					return environment.Set(expr.name, (double)originalValue * (double)value);
+					return AssignVariable(expr, (double)originalValue * (double)value);
 
 				case SLASH_EQUAL:
 					if (!(originalValue is double)) {
@@ -178,7 +181,7 @@ namespace Toy {
 						throw new ErrorHandler.RuntimeError(expr.oper, "Can't divide by 0");
 					}
 
-					return environment.Set(expr.name, (double)originalValue / (double)value);
+					return AssignVariable(expr, (double)originalValue / (double)value);
 
 				case MODULO_EQUAL:
 					if (!(originalValue is double)) {
@@ -189,7 +192,7 @@ namespace Toy {
 						throw new ErrorHandler.RuntimeError(expr.oper, "Can't modulo by 0");
 					}
 
-					return environment.Set(expr.name, (double)originalValue % (double)value);
+					return AssignVariable(expr, (double)originalValue % (double)value);
 
 				default:
 					throw new ErrorHandler.RuntimeError(expr.oper, "Unknown operator");
@@ -197,7 +200,7 @@ namespace Toy {
 		}
 
 		public object Visit(Increment expr) {
-			object value = environment.Get(expr.variable.name);
+			object value = LookupVariable(expr.variable);
 			object originalValue = value;
 
 			if (expr.oper.type == PLUS_PLUS) {
@@ -318,7 +321,7 @@ namespace Toy {
 			}
 
 			if (!(callee is Callable)) {
-				throw new ErrorHandler.RuntimeError(expr.paren, "Can't call this datatype");
+				throw new ErrorHandler.RuntimeError(expr.paren, "Can't call this datatype: " + ( callee == null ? "null" : callee.ToString() ));
 			}
 
 			Callable function = (Callable)callee;
@@ -381,6 +384,26 @@ namespace Toy {
 			return expr.Accept(this);
 		}
 
+		public void Resolve(Expr expr, int depth) {
+			locals[expr] = depth;
+		}
+
+		object LookupVariable(Expr expr) {
+			if (locals.ContainsKey(expr)) {
+				return environment.GetAt(locals[expr], ((Variable)expr).name);
+			} else {
+				return globals.Get(((Variable)expr).name);
+			}
+		}
+
+		object AssignVariable(Expr expr, object value) {
+			if (locals.ContainsKey(expr)) {
+				return environment.SetAt(locals[expr], ((Variable)expr).name, value);
+			} else {
+				return globals.Set(((Variable)expr).name, value);
+			}
+		}
+
 		bool CheckIsTruthy(object obj) {
 			if (obj == null) return false;
 			if (obj is bool) return (bool)obj;
@@ -408,7 +431,7 @@ namespace Toy {
 		void CheckNumberOperands(Token oper, params object[] operands) {
 			foreach(object obj in operands) {
 				if (!(obj is double)) {
-					throw new ErrorHandler.RuntimeError(oper, "Unexpected operand type (expected a number)");
+					throw new ErrorHandler.RuntimeError(oper, "Unexpected operand type (expected a number, recieved " + (obj == null ? "null" : obj.GetType().ToString()) + ")");
 				}
 			}
 		}

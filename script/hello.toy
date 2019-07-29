@@ -8,27 +8,6 @@ for (var i = 0; i < 20; i++) {
 	print fibonacci(i);
 }
 
-var identity = x => x;
-
-for (var i = 0; i < 10; i++) print identity("foobar");
-print "done";
-
-var makeCounter = () => {
-  var i = 0;
-  var count = () => {
-    return ++i;
-  }
-
-  return count;
-}
-
-var counter = makeCounter();
-print counter(); // "1"
-print counter(); // "2"
-print counter(); // "3"
-
-(() => { print "foobar"; })();
-
 //while (true) print Clock();
 
 //TODO: built in methods for string, array and dictionary
@@ -38,6 +17,7 @@ print counter(); // "3"
 //TODO: import/module system
 //TODO: arrays
 //TODO: dictionaries
+//TODO: do loops
 //TODO: foreach(var element in object)
 //TODO: foreach(var index of object)
 //TODO: foreach(var char in "string")
@@ -54,15 +34,5 @@ print counter(); // "3"
 //TODO: https://stackoverflow.com/questions/509211/understanding-slice-notation
 //TODO: MAYBE break x;
 //TODO: MAYBE continue x;
-
-//Here's the "bug"
-var a = "global";
-{
-  var showA = function() {
-    print a;
-  }
-
-  showA();
-  var a = "block";
-  showA();
-}
+//TODO: assert keyword
+//TODO: allow empty functions

@@ -44,6 +44,10 @@ namespace Toy {
 			return values[name.lexeme].Item2;
 		}
 
+		public object GetAt(int distance, Token name) {
+			return Ancestor(distance).Get(name);
+		}
+
 		public object Set(Token name, object value) {
 			if (!values.ContainsKey(name.lexeme)) {
 				if (enclosing == null) {
@@ -58,6 +62,18 @@ namespace Toy {
 			}
 
 			return values[name.lexeme] = new Tuple<bool, object>(false, value);
+		}
+
+		public object SetAt(int distance, Token name, object value) {
+			return Ancestor(distance).Set(name, value);
+		}
+
+		Environment Ancestor(int distance) {
+			Environment env = this;
+			for (int i = 0; i < distance; i++) {
+				env = env.enclosing;
+			}
+			return env;
 		}
 	}
 }
