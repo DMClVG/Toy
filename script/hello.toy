@@ -33,8 +33,6 @@ for (var i = 0; i < 10; i++) {
 
 //while (true) print Clock();
 
-//TODO: assert keyword
-
 //TODO: arrays[start:stop:step]
 //TODO: dictionaries
 //TODO: import/module system
