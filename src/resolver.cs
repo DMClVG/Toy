@@ -107,6 +107,17 @@ namespace Toy {
 			return null;
 		}
 
+		public object Visit(Assert stmt) {
+			Resolve(stmt.cond);
+
+			//a bit of type checking
+			if (stmt.message != null && !(stmt.message is Literal && ((Literal)stmt.message).value is string)) {
+				throw new ErrorHandler.ResolverError(stmt.keyword, "Assert may only take a string literal as it's optional second argument");
+			}
+
+			return null;
+		}
+
 		public object Visit(Block stmt) {
 			BeginScope();
 			Resolve(stmt.statements);

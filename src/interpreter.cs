@@ -122,6 +122,20 @@ namespace Toy {
 			throw new ReturnException(value);
 		}
 
+		public object Visit(Assert stmt) {
+			if (!CheckIsTruthy(Evaluate(stmt.cond))) {
+				string msg = "<no message>";
+
+				if (stmt.message != null) {
+					msg = (string)Evaluate(stmt.message);
+				}
+
+				throw new ErrorHandler.AssertError(stmt.keyword, msg);
+			}
+
+			return null;
+		}
+
 		public object Visit(Block stmt) {
 			return ExecuteBlock(stmt, new Environment(environment));
 		}

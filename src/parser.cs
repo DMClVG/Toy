@@ -62,6 +62,7 @@ namespace Toy {
 			if (Match(BREAK)) return BreakStmt();
 			if (Match(CONTINUE)) return ContinueStmt();
 			if (Match(RETURN)) return ReturnStmt();
+			if (Match(ASSERT)) return AssertStmt();
 			if (Match(LEFT_BRACE)) return new Block(BlockStmt(), breakable);
 
 			if (Match(SEMICOLON)) {
@@ -184,6 +185,20 @@ namespace Toy {
 
 			Consume(SEMICOLON, "Expected ';' at end of return statement");
 			return new Return(keyword, value);
+		}
+
+		Stmt AssertStmt() {
+			Token keyword = Previous();
+
+			Consume(LEFT_PAREN, "Expected '(' after assert statement");
+			Expr cond = ExpressionRule();
+			Expr message = null;
+			if (Match(COMMA)) {
+				message = ExpressionRule();
+			}
+			Consume(RIGHT_PAREN, "Expected ')' after assert expressions");
+
+			return new Assert(keyword, cond, message);
 		}
 
 		List<Stmt> BlockStmt() {

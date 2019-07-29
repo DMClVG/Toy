@@ -32,7 +32,8 @@ namespace Toy {
 			{"in", IN},
 			{"of", OF},
 			{"break", BREAK},
-			{"continue", CONTINUE}
+			{"continue", CONTINUE},
+			{"assert", ASSERT}
 		};
 
 		//methods

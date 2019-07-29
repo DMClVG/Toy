@@ -63,6 +63,9 @@ namespace Toy {
 
 				interpreter.Interpret(stmtList);
 
+			} catch(ErrorHandler.AssertError) {
+				Console.WriteLine("Assert error caught at Run()");
+				Console.WriteLine("The program will now exit early");
 			} catch (ErrorHandler.ParserError e) {
 				Console.WriteLine("Parser error caught at Run()");
 				Console.WriteLine("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());

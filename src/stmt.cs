@@ -17,6 +17,7 @@ namespace Toy {
 		R Visit(Block Stmt);
 		R Visit(Var Stmt);
 		R Visit(Const Stmt);
+		R Visit(Assert Stmt);
 		R Visit(Pass Stmt);
 		R Visit(Expression Stmt);
 	}
@@ -173,6 +174,22 @@ namespace Toy {
 
 		public Token name;
 		public Expr initializer;
+	}
+
+	class Assert : Stmt {
+		public Assert(Token keyword, Expr cond, Expr message) {
+			this.keyword = keyword;
+			this.cond = cond;
+			this.message = message;
+		}
+
+		public override R Accept<R>(StmtVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Token keyword;
+		public Expr cond;
+		public Expr message;
 	}
 
 	class Pass : Stmt {

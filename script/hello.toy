@@ -24,12 +24,12 @@ f();
 call(empty);
 call(hello);
 
-var i = 0;
-do {
-	print "foo";
-	continue;
-	print "bar";
-} while(++i < 10);
+print "testing assert";
+
+for (var i = 0; i < 10; i++) {
+	print i;
+	assert(i < 5, "i is larger or equal to 5");
+}
 
 //while (true) print Clock();
 
