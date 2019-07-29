@@ -38,6 +38,7 @@ for (var i = 0; i < 10; i++) {
 //TODO: import/module system
 //TODO: built in methods (or libraries) for string, array and dictionary manipulation
 //TODO: type casting (number, string, array, etc.)
+//TODO: maths library
 
 //TODO: foreach(var element in object) //foreach(var char in "string")
 //TODO: foreach(var index of object)
@@ -54,4 +55,4 @@ for (var i = 0; i < 10; i++) {
 //TODO: MAYBE continue x;
 //TODO: How would I do generics?
 //TODO: automatic properties?
-//TODO: Vector (position) library
+
