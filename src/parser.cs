@@ -40,10 +40,7 @@ namespace Toy {
 				initializer = ExpressionRule();
 			}
 
-			if (!(initializer is Function)) {
-				Consume(SEMICOLON, "Expected ';' after variable declaration");
-			}
-
+			Consume(SEMICOLON, "Expected ';' after variable declaration");
 			return new Var(name, initializer);
 		}
 
@@ -52,10 +49,7 @@ namespace Toy {
 			Consume(EQUAL, "Expected assignment in constant declaration");
 			Expr initializer = ExpressionRule();
 
-			if (!(initializer is Function)) {
-				Consume(SEMICOLON, "Expected ';' after constant declaration");
-			}
-
+			Consume(SEMICOLON, "Expected ';' after constant declaration");
 			return new Const(name, initializer);
 		}
 
@@ -186,9 +180,7 @@ namespace Toy {
 
 		Stmt ExpressionStmt() {
 			Expr expr = ExpressionRule();
-			if (!(expr is Function)) {
-				Consume(SEMICOLON, "Expected ';' after expression");
-			}
+			Consume(SEMICOLON, "Expected ';' after expression");
 			return new Expression(expr);
 		}
 
@@ -358,14 +350,26 @@ namespace Toy {
 				if (CheckTokenType(EQUAL_GREATER)) {
 					Expr variable = new Variable(Previous());
 					Consume(EQUAL_GREATER, "Expected '=>' in arrow function");
-					return FunctionRule(new List<Expr>() { variable });
+					return FunctionRule(new List<Expr>() { variable }, true);
 				}
 				return new Variable(Previous()); //Variable accesses constants as well
 			}
 
 			//function keyword
 			if (Match(FUNCTION)) {
-				return FunctionRule(null);
+				Consume(LEFT_PAREN, "Expected '(' after function keyword");
+
+				List<Expr> expressions = new List<Expr>();
+
+				if (!CheckTokenType(RIGHT_PAREN)) {
+					do {
+						expressions.Add(ExpressionRule());
+					} while (Match(COMMA));
+				}
+
+				Consume(RIGHT_PAREN, "Expected ')' after function argument list");
+
+				return FunctionRule(expressions, false);
 			}
 
 			if (Match(LEFT_PAREN)) {
@@ -377,14 +381,14 @@ namespace Toy {
 					} while (Match(COMMA));
 				}
 
-				Consume(RIGHT_PAREN, "Expected ')' after arrow function declaration");
+				Consume(RIGHT_PAREN, "Expected ')' after grouping or arrow function argument list");
 
 				//arrow function
 				if (Match(EQUAL_GREATER)) {
-					return FunctionRule(expressions);
+					return FunctionRule(expressions, true);
 				} else {
 					if (expressions.Count != 1) {
-						throw new ErrorHandler.ParserError(Peek(), "Incorrect number of expressions, expected 1 found " + expressions.Count);
+						throw new ErrorHandler.ParserError(Peek(), "Incorrect number of expressions in grouping, expected 1 found " + expressions.Count);
 					}
 					return new Grouping(expressions[0]);
 				}
@@ -411,24 +415,10 @@ namespace Toy {
 			return new Call(callee, paren, arguments);
 		}
 
-		Expr FunctionRule(List<Expr> parameters) {
-			bool wasNull = false;
-			//read the parameters
-			if (parameters == null) {
-				wasNull = true;
-				Consume(LEFT_PAREN, "Expected '(' after function keyword");
-				parameters = new List<Expr>();
-				do {
-					if (!CheckTokenType(RIGHT_PAREN)) {
-						parameters.Add(ExpressionRule());
-					}
-				} while (Match(COMMA));
-				Consume(RIGHT_PAREN, "Expected ')' after function expressions");
-			}
-
+		Expr FunctionRule(List<Expr> parameters, bool isArrowFunction) {
 			//read the  opening brace?
 			bool hasBraces = false;
-			if (wasNull || CheckTokenType(LEFT_BRACE)) {
+			if (!isArrowFunction || CheckTokenType(LEFT_BRACE)) {
 				//using the function keyword OR optional braces
 				hasBraces = true;
 
@@ -438,24 +428,25 @@ namespace Toy {
 			//read the body
 			List<Stmt> body = new List<Stmt>();
 
-			do {
-				if (hasBraces) {
-					if (CheckTokenType(RIGHT_BRACE)) {
-						//empty function body
-						body.Add(new Pass( Peek() ));
-					} else {
-						body.Add(DeclarationRule());
-					}
-				} else {
-					//implicit return inserted
-					body.Add(new Return(new Token(RETURN, "implicit return", null, Previous().line), ExpressionRule()));
-				}
-			} while(hasBraces && !CheckTokenType(RIGHT_BRACE) && !CheckAtEnd());
-
-			//read the closing brace?
-			if (hasBraces) {
-				Consume(RIGHT_BRACE, "Expected '}' after function definition");
+			//check for empty body
+			if (hasBraces && CheckTokenType(RIGHT_BRACE)) {
+				body.Add(new Pass( Advance() ));
+				return new Function(parameters, body);
 			}
+
+			//check for one-line body
+			if (!hasBraces) {
+				//implicit return inserted
+				body.Add( new Return(new Token(RETURN, "implicit return", null, Previous().line), ExpressionRule()) );
+				return new Function(parameters, body);
+			}
+
+			do {
+				body.Add(DeclarationRule());
+			} while(!CheckTokenType(RIGHT_BRACE) && !CheckAtEnd());
+
+			//read the closing brace
+			Consume(RIGHT_BRACE, "Expected '}' after function definition");
 
 			//finally
 			return new Function(parameters, body);

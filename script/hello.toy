@@ -1,22 +1,26 @@
 //print the fibonacci numbers
-var fibonacci = (n) => {
+const fibonacci = (n) => {
 	if (n <= 1) return n;
 	return fibonacci(n - 2) + fibonacci(n - 1);
-}
+};
 
 for (var i = 0; i < 20; i++) {
 	print fibonacci(i);
 }
 
-var hello = () => {print "hello";};
-var empty = () => {}
-
-var call = cb => cb();
-
 for (var i = 0; i < 10; i++) ;
 
-var f = function () {}
+var hello = () => {print "hello";};
+var identity = x => x;
+var empty = () => {};
+var call = cb => cb();
+var f = function () {};
 
+a => { print a; }("barfoo");
+
+hello();
+print identity("a");
+f();
 call(empty);
 call(hello);
 
