@@ -12,7 +12,6 @@ namespace Toy {
 
 		public Interpreter() {
 			environment = globals;
-			Library.Standard.Initialize(environment); //NOTE: temporary, until the module system is working
 		}
 
 		//access
@@ -44,6 +43,32 @@ namespace Toy {
 			} else {
 				Console.WriteLine(value);
 			}
+
+			return null;
+		}
+
+		public object Visit(Import stmt) {
+			//try a bunch of different names
+			Type type = Type.GetType((string)((Literal)(stmt.expression)).value);
+
+			if (type == null) {
+				type = Type.GetType("Toy.Plugin." + (string)((Literal)(stmt.expression)).value);
+			}
+
+			if (type == null) { //user plugins take precedence over built-in libraries
+				type = Type.GetType("Toy.Library." + (string)((Literal)(stmt.expression)).value);
+			}
+
+			//still not found
+			if (type == null) {
+				throw new ErrorHandler.RuntimeError(stmt.keyword, "Unexpected library name");
+			}
+
+			//create the plugin and cast it to the correct type
+			dynamic plugin = Convert.ChangeType(Activator.CreateInstance(type), type);
+
+			//initialize the plugin
+			plugin.Initialize(environment);
 
 			return null;
 		}
@@ -177,11 +202,13 @@ namespace Toy {
 					return AssignVariable(expr.variable, value);
 
 				case PLUS_EQUAL:
-					if (!(originalValue is double)) {
-						throw new ErrorHandler.RuntimeError(expr.oper, "Can't increment-assign a non-number variable");
+					if (originalValue is double && value is double) {
+						return AssignVariable(expr.variable, (double)originalValue + (double)value);
+					} else if (originalValue is string && value is string) {
+						return AssignVariable(expr.variable, (string)originalValue + (string)value);
+					} else {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Unexpected operand type (expected both numbers or both strings)");
 					}
-
-					return AssignVariable(expr.variable, (double)originalValue + (double)value);
 
 				case MINUS_EQUAL:
 					if (!(originalValue is double)) {
@@ -350,11 +377,11 @@ namespace Toy {
 				arguments.Add(Evaluate(argument));
 			}
 
-			if (!(callee is Callable)) {
+			if (!(callee is ICallable)) {
 				throw new ErrorHandler.RuntimeError(expr.paren, "Can't call this datatype: " + ( callee == null ? "null" : callee.ToString() ));
 			}
 
-			Callable function = (Callable)callee;
+			ICallable function = (ICallable)callee;
 
 			if (arguments.Count != function.Arity()) {
 				throw new ErrorHandler.RuntimeError(expr.paren, "Expected " + function.Arity() + " arguments but received " + arguments.Count);

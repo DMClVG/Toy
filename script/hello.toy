@@ -38,7 +38,17 @@ print counter(); //1
 print counter(); //2
 print counter(); //3
 
-//while (true) print Clock();
+
+var str = "";
+
+for (var i = 0; i < 10; i++) {
+	str += "x";
+	print str;
+}
+
+import "Standard";
+
+while (true) print Clock();
 
 //TODO: arrays[start:stop:step]
 //TODO: dictionaries

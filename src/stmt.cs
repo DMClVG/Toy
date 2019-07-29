@@ -7,6 +7,7 @@ namespace Toy {
 
 	interface StmtVisitor<R> {
 		R Visit(Print Stmt);
+		R Visit(Import Stmt);
 		R Visit(If Stmt);
 		R Visit(Do Stmt);
 		R Visit(While Stmt);
@@ -31,6 +32,20 @@ namespace Toy {
 			return visitor.Visit(this);
 		}
 
+		public Expr expression;
+	}
+
+	class Import : Stmt {
+		public Import(Token keyword, Expr expression) {
+			this.keyword = keyword;
+			this.expression = expression;
+		}
+
+		public override R Accept<R>(StmtVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Token keyword;
 		public Expr expression;
 	}
 

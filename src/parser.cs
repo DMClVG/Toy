@@ -55,6 +55,7 @@ namespace Toy {
 
 		Stmt StatementRule(bool breakable = false) {
 			if (Match(PRINT)) return PrintStmt();
+			if (Match(IMPORT)) return ImportStmt();
 			if (Match(IF)) return IfStmt();
 			if (Match(DO)) return DoStmt();
 			if (Match(WHILE)) return WhileStmt();
@@ -75,8 +76,15 @@ namespace Toy {
 
 		Stmt PrintStmt() {
 			Expr expr = ExpressionRule();
-			Consume(SEMICOLON, "Expected ';' after value");
+			Consume(SEMICOLON, "Expected ';' after print statement");
 			return new Print(expr);
+		}
+
+		Stmt ImportStmt() {
+			Token keyword = Previous();
+			Expr expr = ExpressionRule();
+			Consume(SEMICOLON, "Expected ';' after expression statement");
+			return new Import(keyword, expr);
 		}
 
 		Stmt IfStmt() {

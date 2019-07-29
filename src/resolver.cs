@@ -30,6 +30,17 @@ namespace Toy {
 			return null;
 		}
 
+		public object Visit(Import stmt) {
+			Resolve(stmt.expression);
+
+			//a bit of type checking
+			if (stmt.expression == null || !(stmt.expression is Literal && ((Literal)stmt.expression).value is string)) {
+				throw new ErrorHandler.ResolverError(stmt.keyword, "Import may only take a string literal as it's argument");
+			}
+
+			return null;
+		}
+
 		public object Visit(If stmt) {
 			Resolve(stmt.cond);
 			Resolve(stmt.thenBranch);

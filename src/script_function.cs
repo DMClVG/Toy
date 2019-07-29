@@ -1,12 +1,7 @@
 using System.Collections.Generic;
 
 namespace Toy {
-	abstract class Callable {
-		public abstract int Arity();
-		public abstract object Call(Interpreter interpreter, List<object> arguments);
-	}
-
-	class ScriptFunction : Callable {
+	class ScriptFunction : ICallable {
 		Function declaration;
 		Environment closure;
 
@@ -15,8 +10,11 @@ namespace Toy {
 			closure = env;
 		}
 
-		public override int Arity() { return declaration.parameters.Count; }
-		public override object Call(Interpreter interpreter, List<object> arguments) {
+		public int Arity() {
+			return declaration.parameters.Count;
+		}
+
+		public object Call(Interpreter interpreter, List<object> arguments) {
 			Environment environment = new Environment(closure);
 
 			for (int i = 0; i < declaration.parameters.Count; i++) {
@@ -31,6 +29,7 @@ namespace Toy {
 
 			return null;
 		}
+
 		public override string ToString() { return "<function>"; }
 	}
 }
