@@ -363,6 +363,9 @@ namespace Toy {
 			while(true) {
 				if (Match(LEFT_PAREN)) {
 					expr = FinishCall(expr);
+//				} else if (Match(DOT)) {
+//					Token name = Consume(IDENTIFIER, "Expected property name after '.'");
+//					expr = new Get(expr, name);
 				} else {
 					break;
 				}
@@ -394,7 +397,7 @@ namespace Toy {
 			if (Match(FALSE)) return new Literal(false);
 			if (Match(NIL)) return new Literal(null);
 
-			if (Match(NUMBER, STRING)) {
+			if (Match(NUMBER, STRING)) { //numbers and strings are built-in literals
 				return new Literal(Previous().literal);
 			}
 
@@ -544,17 +547,19 @@ namespace Toy {
 				if (Previous().type == SEMICOLON) return;
 
 				switch(Peek().type) {
-					//TODO: handle arrow functions (they're expressions, I think)
 					case PRINT:
 					case IMPORT:
 					case VAR:
 					case CONST:
-					case FUNCTION:
+					case RETURN:
 					case IF:
 					case DO:
 					case WHILE:
 					case FOR:
 					case FOREACH:
+					case BREAK:
+					case CONTINUE:
+					case ASSERT:
 						return;
 				}
 

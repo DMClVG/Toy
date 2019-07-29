@@ -29,7 +29,7 @@ namespace Toy {
 		QUESTION, COLON,
 
 		//literals
-		IDENTIFIER, STRING, NUMBER,
+		IDENTIFIER, NUMBER, STRING, PLUGIN,
 
 		//keywords (nil = null)
 		NIL, PRINT, IMPORT, VAR, CONST, TRUE, FALSE, FUNCTION, RETURN,

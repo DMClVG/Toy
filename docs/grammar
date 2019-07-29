@@ -67,7 +67,7 @@ prefix -> ( "++" | "--" ) IDENTIFIER | postfix ;
 
 postfix -> IDENTIFIER ( "++" | "--" ) | call ;
 
-call -> primary ( "(" arguments? ")" )* ;
+call -> primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 
 arguments -> expression ( "," expression )* ;
 
