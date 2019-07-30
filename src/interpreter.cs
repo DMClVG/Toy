@@ -396,7 +396,7 @@ namespace Toy {
 
 		public object Visit(Property expr) {
 			IBundle bundle = (IBundle)Evaluate(expr.expression);
-			return bundle.Property(this, expr.name, new List<object>() { expr.name.lexeme });
+			return bundle.Property(this, expr.name, expr.name.lexeme);
 		}
 
 		public object Visit(Grouping expr) {

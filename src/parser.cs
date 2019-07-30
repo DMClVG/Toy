@@ -125,7 +125,7 @@ namespace Toy {
 			Consume(LEFT_PAREN, "Expected '(' after do-while statement");
 			Expr cond = ExpressionRule();
 			Consume(RIGHT_PAREN, "Expected ')' after do-while condition");
-			Consume(SEMICOLON, "Expected ';' after for do-while condition");
+			Consume(SEMICOLON, "Expected ';' after do-while condition");
 
 			return new Do(body, cond);
 		}
@@ -154,6 +154,8 @@ namespace Toy {
 				initializer = null;
 			} else if (Match(VAR)) {
 				initializer = VarDeclarationRule();
+			} else if (Match(CONST)) {
+				initializer = ConstDeclarationRule();
 			} else {
 				initializer = ExpressionStmt();
 			}

@@ -36,12 +36,12 @@ namespace Toy {
 				}
 
 				//IBundle
-				public object Property(Interpreter interpreter, Token token, List<object> arguments) {
-					if (arguments.Count != 1) {
-						throw new ErrorHandler.RuntimeError(token, "Incorrect number of properties in a property chain");
+				public object Property(Interpreter interpreter, Token token, object argument) {
+					if (!(argument is string)) {
+						throw new ErrorHandler.RuntimeError(token, "Incorrect argument type, expected string");
 					}
 
-					string propertyName = (string)arguments[0];
+					string propertyName = (string)argument;
 
 					switch(propertyName) {
 						case "Push": return new Push(this);
@@ -52,6 +52,7 @@ namespace Toy {
 						case "Sort": return new Sort(this);
 						case "Insert": return new Insert(this);
 						case "Delete": return new Delete(this);
+						case "ToString": return new ToStringCallable(this);
 
 						default:
 							throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
@@ -223,6 +224,24 @@ namespace Toy {
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 						self.memberList.RemoveAt(Convert.ToInt32(arguments[0]));
 						return null;
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				class ToStringCallable : ICallable {
+					ArrayInstance self = null;
+
+					public ToStringCallable(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 0;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						return self.ToString();
 					}
 
 					public override string ToString() { return "<Array function>"; }

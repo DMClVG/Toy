@@ -32,9 +32,8 @@ namespace Toy {
 	//for any class that maps to a type
 	interface IBundle {
 		//called when a property is accessed
-		//each string argument is another link in the chain of properties
-		//object.property1.property2.property3...
+		//the argument is the property name
 		//the return is returned in the script
-		object Property(Interpreter interpreter, Token token, List<object> arguments);
+		object Property(Interpreter interpreter, Token token, object argument);
 	}
 }
