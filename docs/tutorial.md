@@ -278,9 +278,9 @@ assert(false); //Error!
 assert(true, 42); //The program won't run!
 ```
 
-## Import
+## Import As
 
-`import` is used to load external libraries, plugins and ~~external \*.toy files~~. Several libraries and ~~two plugins~~ are provided by default. The import keyword can only take a string literal as it's argument, and can only be used at the global scope; if either of these conditions are not met, it will cause an error before the program runs.
+`import` is used to load external libraries, plugins and ~~external \*.toy files~~. Several libraries and ~~two plugins~~ are provided by default. The import keyword can only take a string literal as it's argument, followed by an optional "`as` alias", and can only be used at the global scope; if either of these conditions are not met, it will cause an error before the program runs.
 
 You can see a list of [libraries](libraries.md) and [plugins](plugins.md) via those links.
 
@@ -288,6 +288,10 @@ You can see a list of [libraries](libraries.md) and [plugins](plugins.md) via th
 import "Standard";
 
 print Clock(); //the clock function is provided by Standard
+
+import "Standard" as std;
+
+print std.Clock(); //Standard is bundled into "std"
 ```
 
 Coming Soon: Loading external .toy files!

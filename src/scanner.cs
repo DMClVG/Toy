@@ -17,6 +17,7 @@ namespace Toy {
 			{"null", NIL},
 			{"print", PRINT},
 			{"import", IMPORT},
+			{"as", AS},
 			{"var", VAR},
 			{"const", CONST},
 			{"true", TRUE},

@@ -49,14 +49,14 @@ namespace Toy {
 
 		public object Visit(Import stmt) {
 			//try a bunch of different names
-			Type type = Type.GetType((string)((Literal)(stmt.expression)).value);
+			Type type = Type.GetType((string)((Literal)(stmt.library)).value);
 
 			if (type == null) {
-				type = Type.GetType("Toy.Plugin." + (string)((Literal)(stmt.expression)).value);
+				type = Type.GetType("Toy.Plugin." + (string)((Literal)(stmt.library)).value);
 			}
 
 			if (type == null) { //user plugins take precedence over built-in libraries
-				type = Type.GetType("Toy.Library." + (string)((Literal)(stmt.expression)).value);
+				type = Type.GetType("Toy.Library." + (string)((Literal)(stmt.library)).value);
 			}
 
 			//still not found
@@ -64,11 +64,11 @@ namespace Toy {
 				throw new ErrorHandler.RuntimeError(stmt.keyword, "Unexpected library name");
 			}
 
-			//create the plugin and cast it to the correct type
-			dynamic plugin = Convert.ChangeType(Activator.CreateInstance(type), type);
+			//create the library and cast it to the correct type
+			dynamic library = Convert.ChangeType(Activator.CreateInstance(type), type);
 
-			//initialize the plugin
-			plugin.Initialize(environment);
+			//initialize the library
+			library.Initialize(environment, stmt.alias != null ? ((Variable)stmt.alias).name.lexeme : null);
 
 			return null;
 		}

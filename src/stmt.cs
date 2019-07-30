@@ -36,9 +36,10 @@ namespace Toy {
 	}
 
 	class Import : Stmt {
-		public Import(Token keyword, Expr expression) {
+		public Import(Token keyword, Expr library, Expr alias) {
 			this.keyword = keyword;
-			this.expression = expression;
+			this.library = library;
+			this.alias = alias;
 		}
 
 		public override R Accept<R>(StmtVisitor<R> visitor) {
@@ -46,7 +47,8 @@ namespace Toy {
 		}
 
 		public Token keyword;
-		public Expr expression;
+		public Expr library;
+		public Expr alias;
 	}
 
 	class If : Stmt {

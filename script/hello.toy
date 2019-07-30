@@ -90,6 +90,10 @@ print array;
 
 print array.ToString() + array.ToString();
 
+import "Standard" as Standard;
+
+print Standard.Clock();
+
 //TODO: arrays[start:stop:step]
 //TODO: dictionaries
 //TODO: handle circular structures (especially with ToString())

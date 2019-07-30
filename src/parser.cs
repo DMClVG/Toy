@@ -82,9 +82,13 @@ namespace Toy {
 
 		Stmt ImportStmt() {
 			Token keyword = Previous();
-			Expr expr = ExpressionRule();
-			Consume(SEMICOLON, "Expected ';' after expression statement");
-			return new Import(keyword, expr);
+			Expr library = ExpressionRule();
+			Expr alias = null;
+			if (Match(AS)) {
+				alias = ExpressionRule();
+			}
+			Consume(SEMICOLON, "Expected ';' after import statement");
+			return new Import(keyword, library, alias);
 		}
 
 		Stmt IfStmt() {

@@ -6,7 +6,9 @@ namespace Toy {
 		//this is called when the script calls: import "plugin"
 		//inside, the environment object can be loaded with objects deriving
 		//from the interfaces below
-		void Initialize(Environment env);
+		//the whole plugin should be renamed to the value of alias if it is not
+		//null
+		void Initialize(Environment env, string alias);
 	}
 
 	//for any class that maps to a Toy function

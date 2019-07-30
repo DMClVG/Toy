@@ -35,11 +35,21 @@ namespace Toy {
 				throw new ErrorHandler.ResolverError(stmt.keyword, "Can only import at the global scope (no functions, loops or blocks)");
 			}
 
-			Resolve(stmt.expression);
+			Resolve(stmt.library);
+
+			if (stmt.alias != null) {
+				Resolve(stmt.alias);
+			}
 
 			//a bit of type checking
-			if (stmt.expression == null || !(stmt.expression is Literal && ((Literal)stmt.expression).value is string)) {
-				throw new ErrorHandler.ResolverError(stmt.keyword, "Import may only take a string literal as it's argument");
+			if (stmt.library == null || !(stmt.library is Literal && ((Literal)stmt.library).value is string)) {
+				throw new ErrorHandler.ResolverError(stmt.keyword, "Import may only take a string literal for the library name");
+			}
+
+			if (stmt.alias != null) {
+				if (!(stmt.alias is Variable)) {
+					throw new ErrorHandler.ResolverError(stmt.keyword, "Import alias may only be an identifier");
+				}
 			}
 
 			return null;

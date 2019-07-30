@@ -26,7 +26,7 @@ namespace Tool {
 
 			DefineAst(args[0], "Stmt", new string[] {
 				"Print: Expr expression",
-				"Import: Token keyword, Expr expression",
+				"Import: Token keyword, Expr library, Expr alias",
 				"If: Expr cond, Stmt thenBranch, Stmt elseBranch",
 				"Do: Stmt body, Expr cond",
 				"While: Expr cond, Stmt body",

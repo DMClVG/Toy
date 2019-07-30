@@ -6,8 +6,8 @@ namespace Toy {
 		//the plugin class
 		class Array : IPlugin, ICallable {
 			//IPlugin
-			public void Initialize(Environment env) {
-				env.Define("Array", this, true);
+			public void Initialize(Environment env, string alias) {
+				env.Define(String.IsNullOrEmpty(alias) ? "Array" : alias, this, true);
 			}
 
 			//ICallable
@@ -37,10 +37,6 @@ namespace Toy {
 
 				//IBundle
 				public object Property(Interpreter interpreter, Token token, object argument) {
-					if (!(argument is string)) {
-						throw new ErrorHandler.RuntimeError(token, "Incorrect argument type, expected string");
-					}
-
 					string propertyName = (string)argument;
 
 					switch(propertyName) {

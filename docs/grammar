@@ -24,7 +24,7 @@ statement ->
 
 printStmt -> "print" expression ";" ;
 
-importStmt -> "import" STRING ";" ;
+importStmt -> "import" STRING ( "as" IDENTIFIER )? ";" ;
 
 ifStmt -> "if" "(" expression ")" statement ( "else" statement )? ;
 

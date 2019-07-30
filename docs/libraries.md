@@ -6,11 +6,11 @@ Several libraries are provided by default with Toy, and can be accessed via the 
 import "Standard";
 ```
 
-Libraries insert their contents directly into the global scope when the `import` keyword is used. The functions provided are implemented in native code, rather than written in Toy.
+The functions provided are implemented in native code, rather than written in Toy.
 
 # Standard
 
-Standard is exactly that - the standard library for Toy.
+Standard is exactly that - the standard library for Toy. When imported without an alias, the following functions are added to the global scope. When an alias is used, they are bundled into the alias.
 
 ## Clock()
 
