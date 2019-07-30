@@ -52,7 +52,7 @@ while (true) print Clock();
 
 //TODO: arrays[start:stop:step]
 //TODO: dictionaries
-//TODO: import/module system
+//TODO: import/module system (external toy files)
 //TODO: built in methods (or libraries) for string, array and dictionary manipulation
 //TODO: type casting (number, string, array, etc.)
 //TODO: maths library

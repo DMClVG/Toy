@@ -16,12 +16,15 @@ statement ->
 	| continueStmt
 	| returnStmt
 	| assertStmt
+	| importStmt
 	| block
 	| ";"
 	| exprStmt
 	;
 
 printStmt -> "print" expression ";" ;
+
+importStmt -> "import" STRING ";" ;
 
 ifStmt -> "if" "(" expression ")" statement ( "else" statement )? ;
 

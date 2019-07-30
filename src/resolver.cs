@@ -31,6 +31,10 @@ namespace Toy {
 		}
 
 		public object Visit(Import stmt) {
+			if (scopes.Count > 0) {
+				throw new ErrorHandler.ResolverError(stmt.keyword, "Can only import at the global scope (no functions, loops or blocks)");
+			}
+
 			Resolve(stmt.expression);
 
 			//a bit of type checking
