@@ -15,7 +15,7 @@ namespace Toy {
 					return 0;
 				}
 
-				public object Call(Interpreter interpreter, List<object> arguments) {
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds() / (double)1000;
 				}
 
@@ -28,7 +28,7 @@ namespace Toy {
 				public Random() {
 					//initialize the randomizer
 					if (rand == null) {
-						rand = new System.Random((new DateTimeOffset(DateTime.Now).Millisecond ));
+						rand = new System.Random((new DateTimeOffset(DateTime.Now).Millisecond));
 					}
 				}
 
@@ -36,7 +36,7 @@ namespace Toy {
 					return 0;
 				}
 
-				public object Call(Interpreter interpreter, List<object> arguments) {
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return rand.NextDouble();
 				}
 

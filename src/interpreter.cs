@@ -381,17 +381,22 @@ namespace Toy {
 				throw new ErrorHandler.RuntimeError(expr.paren, "Can't call this datatype: " + ( callee == null ? "null" : callee.ToString() ));
 			}
 
-			ICallable function = (ICallable)callee;
+			ICallable called = (ICallable)callee;
 
-			if (arguments.Count != function.Arity()) {
-				throw new ErrorHandler.RuntimeError(expr.paren, "Expected " + function.Arity() + " arguments but received " + arguments.Count);
+			if (arguments.Count != called.Arity()) {
+				throw new ErrorHandler.RuntimeError(expr.paren, "Expected " + called.Arity() + " arguments but received " + arguments.Count);
 			}
 
-			return function.Call(this, arguments);
+			return called.Call(this, expr.paren, arguments);
 		}
 
 		public object Visit(Function expr) {
 			return new ScriptFunction(expr, environment);
+		}
+
+		public object Visit(Property expr) {
+			IBundle bundle = (IBundle)Evaluate(expr.expression);
+			return bundle.Property(this, expr.name, new List<object>() { expr.name.lexeme });
 		}
 
 		public object Visit(Grouping expr) {

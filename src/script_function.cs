@@ -14,7 +14,7 @@ namespace Toy {
 			return declaration.parameters.Count;
 		}
 
-		public object Call(Interpreter interpreter, List<object> arguments) {
+		public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 			Environment environment = new Environment(closure);
 
 			for (int i = 0; i < declaration.parameters.Count; i++) {

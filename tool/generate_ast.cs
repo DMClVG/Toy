@@ -19,6 +19,7 @@ namespace Tool {
 				"Binary: Expr left, Token oper, Expr right",
 				"Call: Expr callee, Token paren, List<Expr> arguments",
 				"Function: List<Expr> parameters, List<Stmt> body",
+				"Property: Expr expression, Token name",
 				"Grouping: Expr expression",
 				"Ternary: Expr cond, Expr left, Expr right"
 			});

@@ -382,9 +382,9 @@ namespace Toy {
 			while(true) {
 				if (Match(LEFT_PAREN)) {
 					expr = FinishCall(expr);
-//				} else if (Match(DOT)) {
-//					Token name = Consume(IDENTIFIER, "Expected property name after '.'");
-//					expr = new Get(expr, name);
+				} else if (Match(DOT)) {
+					Token name = Consume(IDENTIFIER, "Expected property name after '.'");
+					expr = new Property(expr, name);
 				} else {
 					break;
 				}

@@ -231,6 +231,11 @@ namespace Toy {
 			return null;
 		}
 
+		public object Visit(Property expr) {
+			Resolve(expr.expression);
+			return null;
+		}
+
 		public object Visit(Grouping expr) {
 			Resolve(expr.expression);
 			return null;

@@ -15,6 +15,7 @@ namespace Toy {
 		R Visit(Binary Expr);
 		R Visit(Call Expr);
 		R Visit(Function Expr);
+		R Visit(Property Expr);
 		R Visit(Grouping Expr);
 		R Visit(Ternary Expr);
 	}
@@ -149,6 +150,20 @@ namespace Toy {
 
 		public List<Expr> parameters;
 		public List<Stmt> body;
+	}
+
+	class Property : Expr {
+		public Property(Expr expression, Token name) {
+			this.expression = expression;
+			this.name = name;
+		}
+
+		public override R Accept<R>(ExprVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Expr expression;
+		public Token name;
 	}
 
 	class Grouping : Expr {

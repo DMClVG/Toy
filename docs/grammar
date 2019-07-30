@@ -74,7 +74,7 @@ call -> primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 
 arguments -> expression ( "," expression )* ;
 
-primary -> "true" | "false" | "null" | NUMBER | STRING | IDENTIFIER | function | "(" expression ")" ;
+primary -> "true" | "false" | "null" | NUMBER | STRING | IDENTIFIER | PLUGIN | function | "(" expression ")" ;
 
 function -> "function" "(" parameters? ")" block | ( "(" parameters ")" | IDENTIFIER ) "=>" ( expression | block ) ;
 

@@ -46,9 +46,47 @@ for (var i = 0; i < 10; i++) {
 	print str;
 }
 
-import "Standard";
+print "-----TESTING ARRAY-----";
+import "Array";
 
-while(true) print Random();
+var array = Array();
+
+array.Push(1);
+array.Push(2);
+array.Push(3);
+array.Push(4);
+array.Push(5);
+array.Push(4);
+array.Push(3);
+array.Push(2);
+array.Push(1);
+
+print array;
+
+print array.Pop();
+
+print array;
+
+array.Unshift("Hello world");
+
+print array;
+
+print array.Shift();
+
+print array;
+print array.Length();
+
+array.Insert(1, "x");
+
+print array;
+
+array.Delete(1);
+
+print array;
+
+print array;
+array.Sort((a, b) => a - b); //NOTE: only works with integer arrays
+print array;
 
 //TODO: arrays[start:stop:step]
 //TODO: dictionaries

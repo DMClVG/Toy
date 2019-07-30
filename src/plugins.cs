@@ -16,7 +16,7 @@ namespace Toy {
 
 		//the call function
 		//the return is returned in the script
-		object Call(Interpreter interpreter, List<object> arguments);
+		object Call(Interpreter interpreter, Token token, List<object> arguments);
 	}
 
 	//for any class that maps to bracket access
@@ -26,7 +26,7 @@ namespace Toy {
 		//these normally represent "beginning", "end" and "step"
 		//Any that aren't proveded will be null, starting from the end
 		//the return is returned in the script
-		object Access(Interpreter interpreter, List<object> arguments);
+		object Access(Interpreter interpreter, Token token, List<object> arguments);
 	}
 
 	//for any class that maps to a type
@@ -35,6 +35,6 @@ namespace Toy {
 		//each string argument is another link in the chain of properties
 		//object.property1.property2.property3...
 		//the return is returned in the script
-		object Property(Interpreter interpreter, List<object> arguments);
+		object Property(Interpreter interpreter, Token token, List<object> arguments);
 	}
 }
