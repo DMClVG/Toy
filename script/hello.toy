@@ -96,6 +96,7 @@ print array.ToString() + array.ToString();
 //TODO: import/module system (external toy files)
 //TODO: built in methods (or libraries) for string, array and dictionary manipulation
 //TODO: type casting (number, string, array, etc.)
+//TODO: equality between arrays and dictionaries
 
 //TODO: maths library
 //TODO: JSON library
