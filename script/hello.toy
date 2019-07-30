@@ -48,15 +48,16 @@ for (var i = 0; i < 10; i++) {
 
 import "Standard";
 
-while(true) print Clock();
+while(true) print Random();
 
 //TODO: arrays[start:stop:step]
 //TODO: dictionaries
 //TODO: import/module system (external toy files)
 //TODO: built in methods (or libraries) for string, array and dictionary manipulation
 //TODO: type casting (number, string, array, etc.)
-//TODO: maths library
 
+//TODO: maths library
+//TODO: JSON library
 //TODO: foreach(var element in object) //foreach(var char in "string")
 //TODO: foreach(var index of object)
 
