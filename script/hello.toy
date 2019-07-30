@@ -48,7 +48,7 @@ for (var i = 0; i < 10; i++) {
 
 import "Standard";
 
-while (true) print Clock();
+while(true) print Clock();
 
 //TODO: arrays[start:stop:step]
 //TODO: dictionaries

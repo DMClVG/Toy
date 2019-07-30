@@ -93,9 +93,20 @@ namespace Toy {
 			Consume(RIGHT_PAREN, "Expected ')' after if condition");
 
 			Stmt thenBranch = StatementRule();
+
+			//implicitly create a block if the branch isn't enclosed by one
+			if (!(thenBranch is Block)) {
+				thenBranch = new Block(new List<Stmt>() {thenBranch}, false);
+			}
+
 			Stmt elseBranch = null;
 			if (Match(ELSE)) {
 				elseBranch = StatementRule();
+
+				//implicitly create a block if the branch isn't enclosed by one
+				if (!(elseBranch is Block)) {
+					elseBranch = new Block(new List<Stmt>() {elseBranch}, false);
+				}
 			}
 
 			return new If(cond, thenBranch, elseBranch);

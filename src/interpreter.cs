@@ -207,7 +207,7 @@ namespace Toy {
 					} else if (originalValue is string && value is string) {
 						return AssignVariable(expr.variable, (string)originalValue + (string)value);
 					} else {
-						throw new ErrorHandler.RuntimeError(expr.oper, "Unexpected operand type (expected both numbers or both strings)");
+						throw new ErrorHandler.RuntimeError(expr.oper, "Unexpected operand type (expected both numbers or both strings, got " + (originalValue != null ? originalValue : "null") + " and " + (value != null ? value : "null") + ")");
 					}
 
 				case MINUS_EQUAL:
@@ -318,7 +318,7 @@ namespace Toy {
 					} else if (left is string && right is string) {
 						return (string)left + (string)right;
 					} else {
-						throw new ErrorHandler.RuntimeError(expr.oper, "Unexpected operand type (expected both numbers or both strings)");
+						throw new ErrorHandler.RuntimeError(expr.oper, "Unexpected operand type (expected both numbers or both strings, got " + (left != null ? left : "null") + " and " + (right != null ? right : "null") + ")");
 					}
 
 				case MINUS:
