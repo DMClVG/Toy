@@ -388,6 +388,8 @@ namespace Toy {
 			while(true) {
 				if (Match(LEFT_PAREN)) {
 					expr = FinishCall(expr);
+				} else if (Match(LEFT_BRACKET)) {
+					expr = FinishIndex(expr);
 				} else if (Match(DOT)) {
 					Token name = Consume(IDENTIFIER, "Expected property name after '.'");
 					expr = new Property(expr, name);
@@ -412,9 +414,40 @@ namespace Toy {
 				} while(Match(COMMA));
 			}
 
-			Token paren = Consume(RIGHT_PAREN, "Expected ')' after function call");
+			Token paren = Consume(RIGHT_PAREN, "Expected ')' after call");
 
 			return new Call(callee, paren, arguments);
+		}
+
+		Expr FinishIndex(Expr callee) {
+			Expr first = null;
+			Expr second = null;
+			Expr third = null;
+
+			//read first
+			if (!CheckTokenType(RIGHT_BRACKET) && !CheckTokenType(COLON)) {
+				first = ExpressionRule();
+			} else if (CheckTokenType(COLON)) {
+				first = new Literal(double.NegativeInfinity);
+			}
+
+			//colon present, read second
+			if (Match(COLON)) {
+				if (!CheckTokenType(RIGHT_BRACKET) && !CheckTokenType(COLON)) {
+					second = ExpressionRule();
+				} else {
+					second = new Literal(double.PositiveInfinity);
+				}
+			}
+
+			//colon present, read third
+			if (Match(COLON)) {
+				third = ExpressionRule();
+			}
+
+			Token bracket = Consume(RIGHT_BRACKET, "Expected ']' after index");
+
+			return new Index(callee, first, second, third, bracket);
 		}
 
 		Expr PrimaryRule() {

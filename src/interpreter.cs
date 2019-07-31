@@ -390,6 +390,22 @@ namespace Toy {
 			return called.Call(this, expr.paren, arguments);
 		}
 
+		public object Visit(Index expr) {
+			object callee = Evaluate(expr.callee);
+
+			if (!(callee is ICollection)) {
+				throw new ErrorHandler.RuntimeError(expr.bracket, "Expected indexable type");
+			}
+
+			ICollection called = (ICollection)callee;
+
+			object first = Evaluate(expr.first);
+			object second = expr.second != null ? Evaluate(expr.second) : null;
+			object third = expr.third != null ? Evaluate(expr.third) : null;
+
+			return called.Access(this, expr.bracket, first, second, third);
+		}
+
 		public object Visit(Function expr) {
 			return new ScriptFunction(expr, environment);
 		}

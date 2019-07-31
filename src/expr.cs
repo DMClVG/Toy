@@ -14,6 +14,7 @@ namespace Toy {
 		R Visit(Unary Expr);
 		R Visit(Binary Expr);
 		R Visit(Call Expr);
+		R Visit(Index Expr);
 		R Visit(Function Expr);
 		R Visit(Property Expr);
 		R Visit(Grouping Expr);
@@ -136,6 +137,26 @@ namespace Toy {
 		public Expr callee;
 		public Token paren;
 		public List<Expr> arguments;
+	}
+
+	class Index : Expr {
+		public Index(Expr callee, Expr first, Expr second, Expr third, Token bracket) {
+			this.callee = callee;
+			this.first = first;
+			this.second = second;
+			this.third = third;
+			this.bracket = bracket;
+		}
+
+		public override R Accept<R>(ExprVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Expr callee;
+		public Expr first;
+		public Expr second;
+		public Expr third;
+		public Token bracket;
 	}
 
 	class Function : Expr {

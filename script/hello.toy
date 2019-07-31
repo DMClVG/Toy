@@ -99,6 +99,23 @@ for (var i = 0; i < 10; i++) {
 	print std.Random();
 }
 
+print "-----TESTING INDEXING-----";
+var arr = Array();
+
+arr.Push(1);
+arr.Push(2);
+arr.Push(3);
+arr.Push(4);
+arr.Push(5);
+
+print arr[1];
+print arr[1:3];
+print arr[1:3:-1];
+print arr[:];
+print arr[::-1];
+
+//arr[2] = "hello world";
+
 //TODO: arrays[start:stop:step]
 //TODO: dictionaries
 //TODO: handle circular structures (especially with ToString())
@@ -112,6 +129,7 @@ for (var i = 0; i < 10; i++) {
 //TODO: foreach(var element in object) //foreach(var char in "string")
 //TODO: foreach(var index of object)
 
+//TODO: assert as a Standard function
 //TODO: default arugments
 //TODO: rest/spread operator
 //TODO: destructuring

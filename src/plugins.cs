@@ -26,9 +26,14 @@ namespace Toy {
 		//called when the bracket syntax is used
 		//arguments are in the format [first:second:third]
 		//these normally represent "beginning", "end" and "step"
-		//Any that aren't proveded will be null, starting from the end
+		//first is always defined
+		//if end is provided, second will also be defined
+		//if step is provided, third will also be defined
+		//if first has no value, it will be double.NegativeInfinity
+		//if second has no value, it will be double.PositiveInfinity
+		//if third is defined, it will always have a value
 		//the return is returned in the script
-		object Access(Interpreter interpreter, Token token, List<object> arguments);
+		object Access(Interpreter interpreter, Token token, object first, object second, object third);
 	}
 
 	//for any class that maps to a type

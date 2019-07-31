@@ -70,9 +70,11 @@ prefix -> ( "++" | "--" ) IDENTIFIER | postfix ;
 
 postfix -> IDENTIFIER ( "++" | "--" ) | call ;
 
-call -> primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
+call -> primary ( "(" arguments? ")" | "[" slice "]" | "." IDENTIFIER )* ;
 
 arguments -> expression ( "," expression )* ;
+
+slice -> primary | primary? ":" primary? ( ":" primary )? ;
 
 primary -> "true" | "false" | "null" | NUMBER | STRING | IDENTIFIER | PLUGIN | function | "(" expression ")" ;
 

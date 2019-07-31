@@ -16,7 +16,7 @@ namespace Toy {
 			}
 
 			public object Call(Interpreter Interpreter, Token token, List<object> arguments) {
-				return new ArrayInstance(arguments);
+				return new ArrayInstance(new List<object>());
 			}
 
 			//the instance class
@@ -26,13 +26,34 @@ namespace Toy {
 
 				//methods
 				public ArrayInstance(List<object> arguments) {
-					//DO NOTHING
+					memberList = arguments;
 				}
 
 				//ICollection
-				public object Access(Interpreter interpreter, Token token, List<object> arguments) {
-					//TODO
-					return null;
+				public object Access(Interpreter interpreter, Token token, object first, object second, object third) {
+					//index
+					if (second == null) {
+						return memberList[(int)(double)first];
+					}
+
+					//default values for slice notation (begin and end are inclusive)
+					int begin = (double)first == double.NegativeInfinity ? 0 : (int)(double)first;
+					int end = (double)second == double.PositiveInfinity ? memberList.Count - 1 : (int)(double)second;
+					int step = third == null ? 1 : (int)(double)third;
+
+					//check for infinite loops
+					if (step == 0) {
+						throw new ErrorHandler.RuntimeError(token, "Can't have an array step of 0");
+					}
+
+					//build the new array
+					List<object> result = new List<object>();
+					for (int index = step > 0 ? begin : end; index >= begin && index <= end; index += step) {
+						result.Add(memberList[index]);
+					}
+
+					//return a new array
+					return new ArrayInstance(result);
 				}
 
 				//IBundle

@@ -225,6 +225,19 @@ namespace Toy {
 			return null;
 		}
 
+		public object Visit(Index expr) {
+			Resolve(expr.callee);
+
+			if (expr.first == null) {
+				throw new ErrorHandler.ResolverError(expr.bracket, "Expected literal or variable as an index");
+			}
+
+			Resolve(expr.first);
+			if (expr.second != null) Resolve(expr.second);
+			if (expr.third != null) Resolve(expr.third);
+			return null;
+		}
+
 		public object Visit(Function expr) {
 			FunctionType enclosingFunctionType = currentFunctionType;
 			currentFunctionType = FunctionType.FUNCTION;
