@@ -90,9 +90,14 @@ print array;
 
 print array.ToString() + array.ToString();
 
-import "Standard" as Standard;
+import "Standard" as std;
 
-print Standard.Clock();
+print std.Clock();
+
+for (var i = 0; i < 10; i++) {
+	std.RandomSeed(1.1);
+	print std.Random();
+}
 
 //TODO: arrays[start:stop:step]
 //TODO: dictionaries
