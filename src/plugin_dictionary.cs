@@ -102,6 +102,9 @@ namespace Toy {
 					}
 
 					public object Call(Interpreter interpreter, Token token, List arguments) {
+						if (self.container.ContainsKey(arguments[0])) {
+							throw new ErrorHandler.RuntimeError(token, "Can't insert a duplicate key");
+						}
 						self.container[arguments[0]] = arguments[1];
 						return null;
 					}

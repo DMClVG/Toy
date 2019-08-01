@@ -1,6 +1,6 @@
 # Libraries
 
-Several libraries are provided by default with Toy, and can be accessed via the `import` [keyword](tutorial.md#Import).
+Several libraries are provided by default with Toy, and can be accessed via the `import` [keyword](reference_language.md#Import).
 
 ```
 import "Standard";

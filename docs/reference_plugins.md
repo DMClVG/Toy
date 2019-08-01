@@ -4,7 +4,7 @@ This is a detailed look at the plugins that are bundled with the Toy lanugage. F
 
 # Array
 
-Instances of the array plugin hold arrays which are indexed by numbers, beginning from 0 and counting up. Arrays do not allow for "holes" i.e. missing elements.
+Instances of the Array plugin hold arrays which are indexed by numbers, beginning from 0 and counting up. Arrays do not allow for "holes" i.e. missing elements.
 
 ## Usage
 
@@ -103,3 +103,52 @@ This function deletes the value at the index i, shifting the remianing elements 
 This function returns a string representation of the array. Each element is converted to a string, and separated by commas. Finally, the whole string is surrounded by brackets.
 
 Nesting an array within it's own data structure will cause the inner reference to be printed as "\<circular reference\>".
+
+# Dictionary
+
+Instances of the Dictionary plugin hold dictionaries, which are are collections of key-value pairs.
+
+## Usage
+
+```
+import "Dictionary";
+
+var dictionary["key"] = "value";
+
+dictionary.Insert("foo", "bar");
+dictionary.Delete("key");
+
+print dictionary.Contains("foo"); //true
+```
+
+## Indexing
+
+Dictionaries can be indexed using traditional bracket notation. Existing elements can be accessed or overwritten, or new ones inserted if they don't already exist this way:
+
+```
+dictionary["foo"] = "bar";
+print dictionary["foo"];
+```
+
+## Insert(k, v)
+
+This function inserts a new key-value pair "k:v", or the program fails if that key already exists.
+
+## Delete(k)
+
+This function deletes the key-value pair with the key "k". Nothing happens if the key-value pair doesn't exist.
+
+## Length()
+
+This function returns the number of key-value pairs in a dictionary.
+
+## Contains(k)
+
+This function returns true if the dictionary contains a key "k", otherwise it returns false.
+
+## ToString()
+
+This function returns a string representation of the dictionary. Each key-value pair is converted to a string with a colon between the two, and each pair is separated by commas. Finally, the whole string is surrounded by braces.
+
+Nesting a dictionary within it's own data structure will cause the inner reference to be printed as "\<circular reference\>".
+

@@ -10,7 +10,7 @@ If you're familiar with JavaScript, you will see a lot of similarities. However,
 
 A full break down of the language's [grammar is available](grammar) for those who are interested.
 
-One of the more interesting features of Toy are the [plugins](plugins.md), which are detailed separately from the language. Array and Dictionary are included as examples for people who want to write their own.
+One of the more interesting features of Toy are the [plugins](reference_plugins.md), which are detailed separately from the language. Array and Dictionary are included as examples for people who want to write their own.
 
 # Basics
 
@@ -282,7 +282,7 @@ assert(true, 42); //The program won't run!
 
 `import` is used to load external libraries, plugins and external \*.toy files. Several libraries and two plugins are provided by default. The import keyword can only take a string literal as it's argument, followed by an optional `as alias`, and can only be used at the global scope; if either of these conditions are not met, it will cause an error before the program runs.
 
-You can see a list of [libraries](libraries.md) and [plugins](plugins.md) via those links.
+You can see a list of [libraries](reference_libraries.md) and [plugins](reference_plugins.md) via those links.
 
 ```
 import "Standard";

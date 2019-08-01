@@ -1,64 +1,10 @@
-import "Array";
 import "Dictionary";
-
-var foobar = "helloworld";
 
 var dictionary = Dictionary();
 
-dictionary.Insert("key", "value");
-
-print dictionary;
-print dictionary.Length();
-
-print dictionary.Contains("keyx");
-
-dictionary.Delete("key");
-
-print "Deleted";
-
-dictionary["key"] = "value";
-
-print dictionary["key"];
-
-print dictionary["none"];
-
-dictionary["key"] = "newvalue";
-
-print dictionary;
-
-
-
-var dictArray = Array();
-dictArray.Push(1);
-dictArray.Push(2);
-dictArray.Push(3);
-
-dictionary = Dictionary();
-
-dictionary.Insert(1, dictArray);
-dictionary.Insert(2, dictArray);
-dictionary.Insert(3, dictArray);
-
-print dictionary;
-
-dictArray.Push(4);
-
-print dictionary;
-
-var copy = dictionary[:];
-
-dictionary.Insert(4, dictArray);
-dictionary.Insert(5, dictArray);
-dictionary.Insert(6, dictArray);
-
-print dictionary;
-print copy;
-
-dictArray.Push(5);
-
-print dictionary;
-print copy;
-
-dictArray.Push(copy);
+dictionary.Insert(1, 1);
+dictionary.Insert(2, 2);
+dictionary.Insert(3, 3);
+dictionary.Delete(3);
 
 print dictionary;
