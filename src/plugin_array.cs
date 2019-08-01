@@ -47,6 +47,17 @@ namespace Toy {
 
 				//ICollection
 				public object Access(Interpreter interpreter, Token token, object first, object second, object third) {
+					//bounds checking
+					if (!(first is double) || ((double)first != double.NegativeInfinity && (double)first < 0) || ((double)first != double.NegativeInfinity && (double)first >= container.Count)) {
+						throw new ErrorHandler.RuntimeError(token, "First index must be a number and between 0 and Array.Length() -1 (inclusive)");
+					}
+
+					if (second != null) {
+						if (!(second is double) || ((double)second != double.PositiveInfinity && (double)second < 0) || ((double)second != double.PositiveInfinity && (double)second >= container.Count)) {
+							throw new ErrorHandler.RuntimeError(token, "Second index must be a number and between 0 and Array.Length() -1 (inclusive)");
+						}
+					}
+
 					//index
 					if (second == null) {
 						return new ArrayAssignableIndex(this.container, (int)(double)first);
@@ -236,7 +247,13 @@ namespace Toy {
 					}
 
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-						self.container.Insert(Convert.ToInt32(arguments[0]), arguments[1]);
+						int pos = Convert.ToInt32(arguments[0]);
+
+						if (pos < 0 || pos > self.container.Count) {
+							throw new ErrorHandler.RuntimeError(token, "Specified index is out of bounds");
+						}
+
+						self.container.Insert(pos, arguments[1]);
 						return null;
 					}
 
@@ -255,7 +272,13 @@ namespace Toy {
 					}
 
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-						self.container.RemoveAt(Convert.ToInt32(arguments[0]));
+						int pos = Convert.ToInt32(arguments[0]);
+
+						if (pos < 0 || pos >= self.container.Count) {
+							throw new ErrorHandler.RuntimeError(token, "Specified index is out of bounds");
+						}
+
+						self.container.RemoveAt(pos);
 						return null;
 					}
 

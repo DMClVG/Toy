@@ -130,14 +130,42 @@ arr[4].Push(arr);
 arr[4].Push(arr);
 
 print arr;
-print arr[4][1];
+print arr[4].Length();
+print arr[4][4:4];
 
 array.Push(arr);
 
 print array;
 
+print "-----TESTING DEPTH-----";
+
+var depth = Array();
+
+for (var i = 0; i < 10; i++) {
+	depth.Push(Array());
+}
+
+depth[0] = depth;
+
+print depth[0][0][0][0][0][0][0]; //interesting...
+
+
+print "-----TESTING POSITION-----";
+
+var position = Array();
+
+position.Push(1);
+position.Push(2);
+position.Push(3);
+position.Insert(4, 4);
+
+print position;
+
+position.Delete(5);
+
+//-----------------------------------------------------------------------------
 //TODO: import/module system (external toy files)
-//TODO: built in methods (or libraries) for string, array and dictionary manipulation
+//TODO: built in methods (or libraries) for string, array and dictionary manip.
 //TODO: type casting (number, string, array, etc.)
 //TODO: equality between arrays and dictionaries
 
