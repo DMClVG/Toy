@@ -186,8 +186,12 @@ namespace Toy {
 		}
 
 		public object Visit(Assign expr) {
-			ResolveLocal(expr.variable);
-			Resolve(expr.value);
+			if (expr.left is Variable) {
+				ResolveLocal(expr.left);
+			} else {
+				Resolve(expr.left);
+			}
+			Resolve(expr.right);
 			return null;
 		}
 

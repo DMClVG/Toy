@@ -43,4 +43,12 @@ namespace Toy {
 		//the return is returned in the script
 		object Property(Interpreter interpreter, Token token, object argument);
 	}
+
+	//helper class (for assigning to indexed values)
+	abstract class AssignableIndex {
+		public abstract object Value {
+			get;
+			set;
+		}
+	}
 }

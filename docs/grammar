@@ -48,7 +48,7 @@ exprStmt -> expression ";" ;
 
 expression -> assignment ;
 
-assignment -> IDENTIFIER ( "=" | "+=" | "-=" | "*=" | "/=" | "%=" ) expression | ternary ;
+assignment -> IDENTIFIER ( "[" primary "]" )* ( "=" | "+=" | "-=" | "*=" | "/=" | "%=" ) expression | ternary ;
 
 ternary -> or ( "?" expression ":" expression )? ;
 

@@ -19,6 +19,22 @@ namespace Toy {
 				return new ArrayInstance(new List<object>());
 			}
 
+			//the index assign helper class
+			class ArrayAssignableIndex : AssignableIndex {
+				List<object> container;
+				int index;
+
+				public ArrayAssignableIndex(List<object> container, int index) {
+					this.container = container;
+					this.index = index;
+				}
+
+				public override object Value {
+					get { return this.container[this.index]; }
+					set { this.container[this.index] = value; }
+				}
+			}
+
 			//the instance class
 			class ArrayInstance : ICollection, IBundle {
 				//container members
@@ -33,7 +49,7 @@ namespace Toy {
 				public object Access(Interpreter interpreter, Token token, object first, object second, object third) {
 					//index
 					if (second == null) {
-						return memberList[(int)(double)first];
+						return new ArrayAssignableIndex(this.memberList, (int)(double)first);
 					}
 
 					//default values for slice notation (begin and end are inclusive)

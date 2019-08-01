@@ -194,61 +194,15 @@ namespace Toy {
 		}
 
 		public object Visit(Assign expr) {
-			object originalValue = LookupVariable(expr.variable);
-			object value = Evaluate(expr.value);
-
-			switch(expr.oper.type) {
-				case EQUAL:
-					return AssignVariable(expr.variable, value);
-
-				case PLUS_EQUAL:
-					if (originalValue is double && value is double) {
-						return AssignVariable(expr.variable, (double)originalValue + (double)value);
-					} else if (originalValue is string && value is string) {
-						return AssignVariable(expr.variable, (string)originalValue + (string)value);
-					} else {
-						throw new ErrorHandler.RuntimeError(expr.oper, "Unexpected operand type (expected both numbers or both strings, got " + (originalValue != null ? originalValue : "null") + " and " + (value != null ? value : "null") + ")");
-					}
-
-				case MINUS_EQUAL:
-					if (!(originalValue is double)) {
-						throw new ErrorHandler.RuntimeError(expr.oper, "Can't decrement-assign a non-number variable");
-					}
-
-					return AssignVariable(expr.variable, (double)originalValue - (double)value);
-
-				case STAR_EQUAL:
-					if (!(originalValue is double)) {
-						throw new ErrorHandler.RuntimeError(expr.oper, "Can't multiply-assign a non-number variable");
-					}
-
-					return AssignVariable(expr.variable, (double)originalValue * (double)value);
-
-				case SLASH_EQUAL:
-					if (!(originalValue is double)) {
-						throw new ErrorHandler.RuntimeError(expr.oper, "Can't divide-assign a non-number variable");
-					}
-
-					if ((double)originalValue == 0) {
-						throw new ErrorHandler.RuntimeError(expr.oper, "Can't divide by 0");
-					}
-
-					return AssignVariable(expr.variable, (double)originalValue / (double)value);
-
-				case MODULO_EQUAL:
-					if (!(originalValue is double)) {
-						throw new ErrorHandler.RuntimeError(expr.oper, "Can't modulo-assign a non-number variable");
-					}
-
-					if ((double)originalValue == 0) {
-						throw new ErrorHandler.RuntimeError(expr.oper, "Can't modulo by 0");
-					}
-
-					return AssignVariable(expr.variable, (double)originalValue % (double)value);
-
-				default:
-					throw new ErrorHandler.RuntimeError(expr.oper, "Unknown operator");
+			if (expr.left is Variable) {
+				return VisitAssignToVariable(expr);
 			}
+
+			if (expr.left is Index) {
+				return VisitAssignToIndex(expr);
+			}
+
+			throw new ErrorHandler.RuntimeError(expr.oper, "Unknown assignment target (slipped by the parser)");
 		}
 
 		public object Visit(Increment expr) {
@@ -429,6 +383,111 @@ namespace Toy {
 		}
 
 		//helpers
+		public object VisitAssignToIndex(Assign expr) {
+			dynamic assignableIndex = expr.left.Accept(this);
+			object right = Evaluate(expr.right);
+
+			switch(expr.oper.type) {
+				case EQUAL:
+					assignableIndex.Value = right;
+					break;
+
+				case PLUS_EQUAL:
+					if (assignableIndex.Value is double && right is double) {
+						assignableIndex.Value = (double)assignableIndex.Value + (double)right;
+					} else if (assignableIndex.Value is string && right is string) {
+						assignableIndex.Value = (string)assignableIndex.Value + (string)right;
+					} else {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Unexpected operand type (expected both numbers or both strings, got " + (assignableIndex.Value != null ? assignableIndex.Value : "null") + " and " + (right != null ? right : "null") + ")");
+					}
+
+					break;
+
+				case MINUS_EQUAL:
+					CheckNumberOperands(expr.oper, assignableIndex.Value, right);
+					assignableIndex.Value -= (double)right;
+					break;
+
+				case STAR_EQUAL:
+					CheckNumberOperands(expr.oper, assignableIndex.Value, right);
+					assignableIndex.Value *= (double)right;
+					break;
+
+				case SLASH_EQUAL:
+					CheckNumberOperands(expr.oper, assignableIndex.Value, right);
+
+					if ((double)right == 0) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't divide by 0");
+					}
+
+					assignableIndex.Value /= (double)right;
+					break;
+
+				case MODULO_EQUAL:
+					CheckNumberOperands(expr.oper, assignableIndex.Value, right);
+
+					if ((double)right == 0) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't modulo by 0");
+					}
+
+					assignableIndex.Value %= (double)right;
+					break;
+
+				default:
+					throw new ErrorHandler.RuntimeError(expr.oper, "Unknown operator");
+			}
+
+			return assignableIndex.Value;
+		}
+
+		public object VisitAssignToVariable(Assign expr) {
+			object left = LookupVariable(expr.left);
+			object right = Evaluate(expr.right);
+
+			switch(expr.oper.type) {
+				case EQUAL:
+					return AssignVariable(expr.left, right);
+
+				case PLUS_EQUAL:
+					if (left is double && right is double) {
+						return AssignVariable(expr.left, (double)left + (double)right);
+					} else if (left is string && right is string) {
+						return AssignVariable(expr.left, (string)left + (string)right);
+					} else {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Unexpected operand type (expected both numbers or both strings, got " + (left != null ? left : "null") + " and " + (right != null ? right : "null") + ")");
+					}
+
+				case MINUS_EQUAL:
+					CheckNumberOperands(expr.oper, left, right);
+					return AssignVariable(expr.left, (double)left - (double)right);
+
+				case STAR_EQUAL:
+					CheckNumberOperands(expr.oper, left, right);
+					return AssignVariable(expr.left, (double)left * (double)right);
+
+				case SLASH_EQUAL:
+					CheckNumberOperands(expr.oper, left, right);
+
+					if ((double)right == 0) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't divide by 0");
+					}
+
+					return AssignVariable(expr.left, (double)left / (double)right);
+
+				case MODULO_EQUAL:
+					CheckNumberOperands(expr.oper, left, right);
+
+					if ((double)right == 0) {
+						throw new ErrorHandler.RuntimeError(expr.oper, "Can't modulo by 0");
+					}
+
+					return AssignVariable(expr.left, (double)left % (double)right);
+
+				default:
+					throw new ErrorHandler.RuntimeError(expr.oper, "Unknown operator");
+			}
+		}
+
 		public object Execute(Stmt stmt) {
 			return stmt.Accept(this);
 		}
@@ -459,7 +518,13 @@ namespace Toy {
 		}
 
 		public object Evaluate(Expr expr) {
-			return expr.Accept(this);
+			object res = expr.Accept(this);
+
+			while (res is AssignableIndex) {
+				res = ((AssignableIndex)res).Value;
+			}
+
+			return res;
 		}
 
 		public void Resolve(Expr expr, int depth) {

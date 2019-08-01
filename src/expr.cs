@@ -34,19 +34,19 @@ namespace Toy {
 	}
 
 	class Assign : Expr {
-		public Assign(Variable variable, Token oper, Expr value) {
-			this.variable = variable;
+		public Assign(Expr left, Token oper, Expr right) {
+			this.left = left;
 			this.oper = oper;
-			this.value = value;
+			this.right = right;
 		}
 
 		public override R Accept<R>(ExprVisitor<R> visitor) {
 			return visitor.Visit(this);
 		}
 
-		public Variable variable;
+		public Expr left;
 		public Token oper;
-		public Expr value;
+		public Expr right;
 	}
 
 	class Increment : Expr {
