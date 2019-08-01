@@ -168,6 +168,7 @@ position.Delete(5);
 //TODO: built in methods (or libraries) for string, array and dictionary manip.
 //TODO: type casting (number, string, array, etc.)
 //TODO: equality between arrays and dictionaries
+//TODO: function pipes |> and function concatenation ..
 
 //TODO: maths library
 //TODO: JSON library

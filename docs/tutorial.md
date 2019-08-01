@@ -227,7 +227,7 @@ when a function is declared with the arrow operator, if there is exactly 1 argum
 
 ```
 const caller = function(cb) {
-	return cb();
+	return cb("arg");
 }
 
 caller(x => x); //very concise identity function
