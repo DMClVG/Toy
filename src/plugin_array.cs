@@ -281,8 +281,14 @@ namespace Toy {
 				}
 
 				public override string ToString() {
-					string result = "";
+					//prevent circular references
+					if (ToStringHelper.passed.ContainsKey(this)) {
+						return "<circular reference>";
+					}
+					ToStringHelper.passed[this] = 0;
 
+					//build the result
+					string result = "";
 					foreach(object o in memberList) {
 						if (o is Literal) {
 							result += ((Literal)o).ToString();
@@ -293,10 +299,13 @@ namespace Toy {
 						result += ",";
 					}
 
+					//print the last ',' character
 					if (result.Length > 0 && result[result.Length - 1] == ',') {
 						result = result.Substring(0, result.Length - 1);
 					}
 
+					//cleanup and return
+					ToStringHelper.passed.Remove(this);
 					return "[" + result + "]";
 				}
 			}

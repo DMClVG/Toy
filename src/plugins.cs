@@ -51,4 +51,9 @@ namespace Toy {
 			set;
 		}
 	}
+
+	//helper class (for checking for self-referential data structures)
+	class ToStringHelper {
+		public static Dictionary<object, int> passed = new Dictionary<object, int>();
+	}
 }
