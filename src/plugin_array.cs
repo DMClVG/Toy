@@ -26,7 +26,7 @@ namespace Toy {
 				return 0;
 			}
 
-			public object Call(Interpreter Interpreter, Token token, List<object> arguments) {
+			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 				return new ArrayInstance(new List<object>());
 			}
 

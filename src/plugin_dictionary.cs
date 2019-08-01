@@ -27,7 +27,7 @@ namespace Toy {
 				return 0;
 			}
 
-			public object Call(Interpreter Interpreter, Token token, List arguments) {
+			public object Call(Interpreter interpreter, Token token, List arguments) {
 				return new DictionaryInstance(new Dict());
 			}
 

@@ -1,3 +1,8 @@
+import "Standard" as std;
+import "Toy";
+
+assert(Toy.version >= 0.1, "Bad version");
+
 //print the fibonacci numbers
 const fibonacci = (n) => {
 	if (n <= 1) return n;
@@ -89,8 +94,6 @@ array.Sort((a, b) => a - b); //NOTE: only works with number arrays
 print array;
 
 print array.ToString() + array.ToString();
-
-import "Standard" as std;
 
 print std.Clock();
 
