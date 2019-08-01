@@ -38,23 +38,23 @@ namespace Toy {
 			//the instance class
 			class ArrayInstance : ICollection, IBundle {
 				//container members
-				public List<object> memberList = new List<object>();
+				public List<object> container = null;
 
 				//methods
 				public ArrayInstance(List<object> arguments) {
-					memberList = arguments;
+					container = arguments;
 				}
 
 				//ICollection
 				public object Access(Interpreter interpreter, Token token, object first, object second, object third) {
 					//index
 					if (second == null) {
-						return new ArrayAssignableIndex(this.memberList, (int)(double)first);
+						return new ArrayAssignableIndex(this.container, (int)(double)first);
 					}
 
 					//default values for slice notation (begin and end are inclusive)
 					int begin = (double)first == double.NegativeInfinity ? 0 : (int)(double)first;
-					int end = (double)second == double.PositiveInfinity ? memberList.Count - 1 : (int)(double)second;
+					int end = (double)second == double.PositiveInfinity ? container.Count - 1 : (int)(double)second;
 					int step = third == null ? 1 : (int)(double)third;
 
 					//check for infinite loops
@@ -65,7 +65,7 @@ namespace Toy {
 					//build the new array
 					List<object> result = new List<object>();
 					for (int index = step > 0 ? begin : end; index >= begin && index <= end; index += step) {
-						result.Add(memberList[index]);
+						result.Add(container[index]);
 					}
 
 					//return a new array
@@ -104,7 +104,7 @@ namespace Toy {
 					}
 
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-						self.memberList.Add(arguments[0]);
+						self.container.Add(arguments[0]);
 						return null;
 					}
 
@@ -123,8 +123,8 @@ namespace Toy {
 					}
 
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-						object result = self.memberList[self.memberList.Count - 1];
-						self.memberList.RemoveAt(self.memberList.Count - 1);
+						object result = self.container[self.container.Count - 1];
+						self.container.RemoveAt(self.container.Count - 1);
 						return result;
 					}
 
@@ -143,7 +143,7 @@ namespace Toy {
 					}
 
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-						self.memberList.Insert(0, arguments[0]);
+						self.container.Insert(0, arguments[0]);
 						return null;
 					}
 
@@ -162,8 +162,8 @@ namespace Toy {
 					}
 
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-						object result = self.memberList[0];
-						self.memberList.RemoveAt(0);
+						object result = self.container[0];
+						self.container.RemoveAt(0);
 						return result;
 					}
 
@@ -182,7 +182,7 @@ namespace Toy {
 					}
 
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-						return self.memberList.Count;
+						return self.container.Count;
 					}
 
 					public override string ToString() { return "<Array function>"; }
@@ -207,7 +207,7 @@ namespace Toy {
 						this.interpreter = interpreter;
 						this.token = token;
 
-						self.memberList.Sort(SortComparison);
+						self.container.Sort(SortComparison);
 
 						return null;
 					}
@@ -236,7 +236,7 @@ namespace Toy {
 					}
 
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-						self.memberList.Insert(Convert.ToInt32(arguments[0]), arguments[1]);
+						self.container.Insert(Convert.ToInt32(arguments[0]), arguments[1]);
 						return null;
 					}
 
@@ -255,7 +255,7 @@ namespace Toy {
 					}
 
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-						self.memberList.RemoveAt(Convert.ToInt32(arguments[0]));
+						self.container.RemoveAt(Convert.ToInt32(arguments[0]));
 						return null;
 					}
 
@@ -289,7 +289,7 @@ namespace Toy {
 
 					//build the result
 					string result = "";
-					foreach(object o in memberList) {
+					foreach(object o in container) {
 						if (o is Literal) {
 							result += ((Literal)o).ToString();
 						} else {
@@ -299,7 +299,7 @@ namespace Toy {
 						result += ",";
 					}
 
-					//print the last ',' character
+					//trim the last ',' character
 					if (result.Length > 0 && result[result.Length - 1] == ',') {
 						result = result.Substring(0, result.Length - 1);
 					}

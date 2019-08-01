@@ -1,0 +1,62 @@
+import "Array";
+import "Dictionary";
+
+var dictionary = Dictionary();
+
+dictionary.Insert("key", "value");
+
+print dictionary;
+print dictionary.Length();
+
+print dictionary.Contains("keyx");
+
+dictionary.Delete("key");
+
+print "Deleted";
+
+dictionary["key"] = "value";
+
+print dictionary["key"];
+
+print dictionary["none"];
+
+dictionary["key"] = "newvalue";
+
+print dictionary;
+
+
+
+var array = Array();
+array.Push(1);
+array.Push(2);
+array.Push(3);
+
+dictionary = Dictionary();
+
+dictionary.Insert(1, array);
+dictionary.Insert(2, array);
+dictionary.Insert(3, array);
+
+print dictionary;
+
+array.Push(4);
+
+print dictionary;
+
+var copy = dictionary[:];
+
+dictionary.Insert(4, array);
+dictionary.Insert(5, array);
+dictionary.Insert(6, array);
+
+print dictionary;
+print copy;
+
+array.Push(5);
+
+print dictionary;
+print copy;
+
+array.Push(copy);
+
+print dictionary;
