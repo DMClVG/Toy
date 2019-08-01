@@ -102,4 +102,4 @@ This function deletes the value at the index i, shifting the remianing elements 
 
 This function returns a string representation of the array. Each element is converted to a string, and separated by commas. Finally, the whole string is surrounded by brackets.
 
-Nesting an array within it's own data structure will cause the inner reference to be printed as "<circular reference>".
+Nesting an array within it's own data structure will cause the inner reference to be printed as "\<circular reference\>".
