@@ -32,6 +32,30 @@ namespace Toy {
 			values[name.lexeme] = new Tuple<bool, object>(constant, value);
 		}
 
+		public void Define(string alias, Environment env, bool constant) {
+			if (alias == null) {
+				//merge each individual member
+				foreach(var kvp in env.values) {
+					//throw an error of the same key refers to different instances
+					if (values.ContainsKey(kvp.Key) && values[kvp.Key].Item2 != kvp.Value.Item2) {
+						throw new ErrorHandler.RuntimeError(new Token(EOF, kvp.Key, null, -1), "Name clash detected via import");
+					}
+
+					if (values.ContainsKey(kvp.Key) && values[kvp.Key].Item1 != kvp.Value.Item1) {
+						throw new ErrorHandler.RuntimeError(new Token(EOF, kvp.Key, null, -1), "Const clash detected via import");
+					}
+
+					values[kvp.Key] = kvp.Value; //moves const too
+				}
+			} else {
+				if (values.ContainsKey(alias)) {
+					throw new ErrorHandler.RuntimeError(new Token(EOF, alias, null, -1), "Can't redefine a variable via an alias");
+				}
+
+				values[alias] = new Tuple<bool, object>(constant, new AliasedFile(env));
+			}
+		}
+
 		public object Get(Token name) {
 			if (!values.ContainsKey(name.lexeme)) {
 				if (enclosing == null) {
@@ -74,6 +98,19 @@ namespace Toy {
 				env = env.enclosing;
 			}
 			return env;
+		}
+	}
+
+	//internal helper class (for aliasing files as IBundles)
+	class AliasedFile : IBundle {
+		Environment env = null;
+
+		public AliasedFile(Environment env) {
+			this.env = env;
+		}
+
+		public object Property(Interpreter interpreter, Token token, object argument) {
+			return env.Get(new Token(EOF, (string)argument, null, token.line));
 		}
 	}
 }

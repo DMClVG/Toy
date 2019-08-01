@@ -48,15 +48,26 @@ namespace Toy {
 		}
 
 		public object Visit(Import stmt) {
+			string libname = (string)((Literal)(stmt.library)).value;
+
+			//load another file instead
+			if (libname.Length > 4 && libname.Substring(libname.Length - 4) == ".toy") {
+				Environment env = Runner.RunFile(libname);
+
+				//merge the sub-environment into this one, possibly under an alias
+				environment.Define(stmt.alias != null ? ((Variable)stmt.alias).name.lexeme : null, env, true);
+				return null;
+			}
+
 			//try a bunch of different names
 			Type type = null;
 
 			if (type == null) {
-				type = Type.GetType("Toy.Plugin." + (string)((Literal)(stmt.library)).value);
+				type = Type.GetType("Toy.Plugin." + libname);
 			}
 
 			if (type == null) { //user plugins take precedence over built-in libraries
-				type = Type.GetType("Toy.Library." + (string)((Literal)(stmt.library)).value);
+				type = Type.GetType("Toy.Library." + libname);
 			}
 
 			//still not found
@@ -65,7 +76,7 @@ namespace Toy {
 			}
 
 			//create the library and cast it to the correct type
-			dynamic library = Convert.ChangeType(Activator.CreateInstance(type), type);
+			dynamic library = ((IPlugin)Convert.ChangeType(Activator.CreateInstance(type), type)).Singleton;
 
 			//initialize the library
 			library.Initialize(environment, stmt.alias != null ? ((Variable)stmt.alias).name.lexeme : null);

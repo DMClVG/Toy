@@ -7,6 +7,16 @@ namespace Toy {
 	namespace Plugin {
 		//the plugin class
 		class Dictionary : IPlugin, ICallable {
+			public IPlugin Singleton {
+				get {
+					if (singleton == null) {
+						return singleton = new Dictionary();
+					}
+					return singleton;
+				}
+			}
+			static Dictionary singleton = null;
+
 			//IPlugin
 			public void Initialize(Environment env, string alias) {
 				env.Define(String.IsNullOrEmpty(alias) ? "Dictionary" : alias, this, true);

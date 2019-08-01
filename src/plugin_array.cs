@@ -5,6 +5,17 @@ namespace Toy {
 	namespace Plugin {
 		//the plugin class
 		class Array : IPlugin, ICallable {
+			//singleton pattern
+			public IPlugin Singleton {
+				get {
+					if (singleton == null) {
+						return singleton = new Array();
+					}
+					return singleton;
+				}
+			}
+			static Array singleton = null;
+
 			//IPlugin
 			public void Initialize(Environment env, string alias) {
 				env.Define(String.IsNullOrEmpty(alias) ? "Array" : alias, this, true);

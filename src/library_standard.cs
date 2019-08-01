@@ -4,6 +4,17 @@ using System.Collections.Generic;
 namespace Toy {
 	namespace Library {
 		class Standard : IPlugin {
+			//singleton pattern
+			public IPlugin Singleton {
+				get {
+					if (singleton == null) {
+						return singleton = new Standard();
+					}
+					return singleton;
+				}
+			}
+			static Standard singleton = null;
+
 			//the persistent functors
 			static Clock clock = new Clock();
 			static Random random = new Random();

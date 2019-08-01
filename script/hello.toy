@@ -157,11 +157,15 @@ var position = Array();
 position.Push(1);
 position.Push(2);
 position.Push(3);
-position.Insert(4, 4);
+//position.Insert(4, 4);
 
 print position;
 
-position.Delete(5);
+//position.Delete(5);
+
+import "script/dictionary_test.toy" as Dict;
+
+print Dict.foobar;
 
 //-----------------------------------------------------------------------------
 //TODO: import/module system (external toy files)

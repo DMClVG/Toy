@@ -9,6 +9,9 @@ namespace Toy {
 		//the whole plugin should be renamed to the value of alias if it is not
 		//null
 		void Initialize(Environment env, string alias);
+
+		//plugins are singletons to prevent name clashes between files
+		IPlugin Singleton { get; }
 	}
 
 	//for any class that maps to a Toy function
