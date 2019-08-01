@@ -168,6 +168,7 @@ import "script/dictionary_test.toy" as Dict;
 print Dict.foobar;
 
 //-----------------------------------------------------------------------------
+//TODO: toy.version constant
 //TODO: built in methods (or libraries) for string, array and dictionary manip.
 //TODO: type casting (number, string, array, etc.)
 //TODO: equality between arrays and dictionaries
