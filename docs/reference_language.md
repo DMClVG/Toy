@@ -1,6 +1,6 @@
-# Tutorial
+# Toy Language
 
-Welcome to the tutorial for the Toy programming language!
+Welcome to the reference for the Toy programming language!
 
 I'm still developing this language and discovering all of it's incedental nooks and crannys, but hopefully the core of the language is solid enough that I can begin to teach people to use it. This guide on how to use the language will also double as the official documentation for the time being.
 
