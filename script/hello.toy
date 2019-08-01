@@ -136,7 +136,6 @@ array.Push(arr);
 
 print array;
 
-//TODO: dictionaries
 //TODO: import/module system (external toy files)
 //TODO: built in methods (or libraries) for string, array and dictionary manipulation
 //TODO: type casting (number, string, array, etc.)
@@ -144,13 +143,15 @@ print array;
 
 //TODO: maths library
 //TODO: JSON library
+//TODO: IO library?
 //TODO: foreach(var element in object) //foreach(var char in "string")
 //TODO: foreach(var index of object)
 
-//TODO: assert as a Standard function
+//TODO: assert as a "Standard" function
 //TODO: default arugments
 //TODO: rest/spread operator
-//TODO: destructuring
+//TODO: MAYBE initializer lists
+//TODO: MAYBE destructuring
 //TODO: MAYBE promises
 //TODO: MAYBE coroutines
 //TODO: MAYBE regex

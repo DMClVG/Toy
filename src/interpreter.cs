@@ -49,7 +49,7 @@ namespace Toy {
 
 		public object Visit(Import stmt) {
 			//try a bunch of different names
-			Type type = Type.GetType((string)((Literal)(stmt.library)).value);
+			Type type = null;
 
 			if (type == null) {
 				type = Type.GetType("Toy.Plugin." + (string)((Literal)(stmt.library)).value);
@@ -365,6 +365,7 @@ namespace Toy {
 		}
 
 		public object Visit(Property expr) {
+			//TODO: built-in properties for strings and numbers here?
 			IBundle bundle = (IBundle)Evaluate(expr.expression);
 			return bundle.Property(this, expr.name, expr.name.lexeme);
 		}
