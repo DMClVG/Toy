@@ -18,6 +18,7 @@ out/
 *.o
 *.a
 *.exe
+*.meta
 
 #Shell files
 *.bat

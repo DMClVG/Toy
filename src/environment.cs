@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using static Toy.TokenType;
 
 namespace Toy {
-	class Environment {
+	public class Environment {
 		//members
 		Environment enclosing;
 
@@ -102,7 +102,7 @@ namespace Toy {
 	}
 
 	//internal helper class (for aliasing files as IBundles)
-	class AliasedFile : IBundle {
+	public class AliasedFile : IBundle {
 		Environment env = null;
 
 		public AliasedFile(Environment env) {

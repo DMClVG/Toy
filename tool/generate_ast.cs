@@ -57,7 +57,7 @@ namespace Tool {
 			outStream.WriteLine("namespace Toy {");
 
 			//the base class
-			outStream.WriteLine("\tabstract class " + baseName + " {");
+			outStream.WriteLine("\tpublic abstract class " + baseName + " {");
 			outStream.WriteLine("\t\tpublic abstract R Accept<R>(" + baseName + "Visitor<R> visitor);");
 			outStream.WriteLine("\t}");
 			outStream.WriteLine("");
@@ -80,7 +80,7 @@ namespace Tool {
 		}
 
 		static void DefineType(StreamWriter outStream, string baseName, string className, string types) {
-			outStream.WriteLine("\tclass " + className + " : " + baseName + " {");
+			outStream.WriteLine("\tpublic class " + className + " : " + baseName + " {");
 
 			//get each field
 			string[] fields = types.Split(new char[] {','});
@@ -115,7 +115,7 @@ namespace Tool {
 
 		static void DefineVisitor(StreamWriter outStream, string baseName, string[] types) {
 			//the visitor interface
-			outStream.WriteLine("\tinterface " + baseName + "Visitor<R> {");
+			outStream.WriteLine("\tpublic interface " + baseName + "Visitor<R> {");
 
 			foreach(string type in types) {
 				string typeName = type.Split(new char[] {':'})[0].Trim();

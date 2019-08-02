@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 
 namespace Toy {
-	abstract class Stmt {
+	public abstract class Stmt {
 		public abstract R Accept<R>(StmtVisitor<R> visitor);
 	}
 
-	interface StmtVisitor<R> {
+	public interface StmtVisitor<R> {
 		R Visit(Print Stmt);
 		R Visit(Import Stmt);
 		R Visit(If Stmt);
@@ -23,7 +23,7 @@ namespace Toy {
 		R Visit(Expression Stmt);
 	}
 
-	class Print : Stmt {
+	public class Print : Stmt {
 		public Print(Expr expression) {
 			this.expression = expression;
 		}
@@ -35,7 +35,7 @@ namespace Toy {
 		public Expr expression;
 	}
 
-	class Import : Stmt {
+	public class Import : Stmt {
 		public Import(Token keyword, Expr library, Expr alias) {
 			this.keyword = keyword;
 			this.library = library;
@@ -51,7 +51,7 @@ namespace Toy {
 		public Expr alias;
 	}
 
-	class If : Stmt {
+	public class If : Stmt {
 		public If(Expr cond, Stmt thenBranch, Stmt elseBranch) {
 			this.cond = cond;
 			this.thenBranch = thenBranch;
@@ -67,7 +67,7 @@ namespace Toy {
 		public Stmt elseBranch;
 	}
 
-	class Do : Stmt {
+	public class Do : Stmt {
 		public Do(Stmt body, Expr cond) {
 			this.body = body;
 			this.cond = cond;
@@ -81,7 +81,7 @@ namespace Toy {
 		public Expr cond;
 	}
 
-	class While : Stmt {
+	public class While : Stmt {
 		public While(Expr cond, Stmt body) {
 			this.cond = cond;
 			this.body = body;
@@ -95,7 +95,7 @@ namespace Toy {
 		public Stmt body;
 	}
 
-	class For : Stmt {
+	public class For : Stmt {
 		public For(Stmt initializer, Expr cond, Expr increment, Stmt body) {
 			this.initializer = initializer;
 			this.cond = cond;
@@ -113,7 +113,7 @@ namespace Toy {
 		public Stmt body;
 	}
 
-	class Break : Stmt {
+	public class Break : Stmt {
 		public Break(Token keyword) {
 			this.keyword = keyword;
 		}
@@ -125,7 +125,7 @@ namespace Toy {
 		public Token keyword;
 	}
 
-	class Continue : Stmt {
+	public class Continue : Stmt {
 		public Continue(Token keyword) {
 			this.keyword = keyword;
 		}
@@ -137,7 +137,7 @@ namespace Toy {
 		public Token keyword;
 	}
 
-	class Return : Stmt {
+	public class Return : Stmt {
 		public Return(Token keyword, Expr value) {
 			this.keyword = keyword;
 			this.value = value;
@@ -151,7 +151,7 @@ namespace Toy {
 		public Expr value;
 	}
 
-	class Block : Stmt {
+	public class Block : Stmt {
 		public Block(List<Stmt> statements, bool breakable) {
 			this.statements = statements;
 			this.breakable = breakable;
@@ -165,7 +165,7 @@ namespace Toy {
 		public bool breakable;
 	}
 
-	class Var : Stmt {
+	public class Var : Stmt {
 		public Var(Token name, Expr initializer) {
 			this.name = name;
 			this.initializer = initializer;
@@ -179,7 +179,7 @@ namespace Toy {
 		public Expr initializer;
 	}
 
-	class Const : Stmt {
+	public class Const : Stmt {
 		public Const(Token name, Expr initializer) {
 			this.name = name;
 			this.initializer = initializer;
@@ -193,7 +193,7 @@ namespace Toy {
 		public Expr initializer;
 	}
 
-	class Assert : Stmt {
+	public class Assert : Stmt {
 		public Assert(Token keyword, Expr cond, Expr message) {
 			this.keyword = keyword;
 			this.cond = cond;
@@ -209,7 +209,7 @@ namespace Toy {
 		public Expr message;
 	}
 
-	class Pass : Stmt {
+	public class Pass : Stmt {
 		public Pass(Token keyword) {
 			this.keyword = keyword;
 		}
@@ -221,7 +221,7 @@ namespace Toy {
 		public Token keyword;
 	}
 
-	class Expression : Stmt {
+	public class Expression : Stmt {
 		public Expression(Expr expression) {
 			this.expression = expression;
 		}

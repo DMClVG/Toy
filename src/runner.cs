@@ -16,6 +16,10 @@ namespace Toy {
 		}
 
 		public static Environment Run(string source) {
+			return Run(new Environment(), source);
+		}
+
+		public static Environment Run(Environment env, string source) {
 			try {
 				Scanner scanner = new Scanner(source);
 				Parser parser = new Parser(scanner.ScanTokens());
@@ -25,7 +29,7 @@ namespace Toy {
 					return null;
 				}
 
-				Interpreter interpreter = new Interpreter();
+				Interpreter interpreter = new Interpreter(env == null ? new Environment() : env);
 
 				Resolver resolver = new Resolver(interpreter);
 				resolver.Resolve(stmtList);
@@ -40,20 +44,20 @@ namespace Toy {
 				return interpreter.environment;
 
 			} catch(ErrorHandler.AssertError) {
-				Console.WriteLine("Assert error caught at Run()");
-				Console.WriteLine("The program will now exit early");
+				ConsoleOutput.Log("Assert error caught at Run()");
+				ConsoleOutput.Log("The program will now exit early");
 			} catch (ErrorHandler.ParserError e) {
-				Console.WriteLine("Parser error caught at Run()");
-				Console.WriteLine("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
+				ConsoleOutput.Log("Parser error caught at Run()");
+				ConsoleOutput.Log("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
 			} catch (ErrorHandler.ResolverError e) {
-				Console.WriteLine("Resolver error caught at Run()");
-				Console.WriteLine("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
+				ConsoleOutput.Log("Resolver error caught at Run()");
+				ConsoleOutput.Log("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
 			} catch (ErrorHandler.RuntimeError e) {
-				Console.WriteLine("Runtime error caught at Run()");
-				Console.WriteLine("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
+				ConsoleOutput.Log("Runtime error caught at Run()");
+				ConsoleOutput.Log("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
 			} catch (Exception e) {
-				Console.WriteLine("Terminal error caught at Run()");
-				Console.WriteLine("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
+				ConsoleOutput.Log("Terminal error caught at Run()");
+				ConsoleOutput.Log("The following output is for internal debugging only, and will be removed from the final release:\n" + e.ToString());
 			}
 
 			return null;

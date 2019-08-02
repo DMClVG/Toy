@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Toy {
 	namespace Plugin {
 		//the plugin class
-		class Array : IPlugin, ICallable {
+		public class Array : IPlugin, ICallable {
 			//singleton pattern
 			public IPlugin Singleton {
 				get {
@@ -31,7 +31,7 @@ namespace Toy {
 			}
 
 			//the index assign helper class
-			class ArrayAssignableIndex : AssignableIndex {
+			public class ArrayAssignableIndex : AssignableIndex {
 				List<object> container;
 				int index;
 
@@ -47,7 +47,7 @@ namespace Toy {
 			}
 
 			//the instance class
-			class ArrayInstance : ICollection, IBundle {
+			public class ArrayInstance : ICollection, IBundle {
 				//container members
 				public List<object> container = null;
 
@@ -114,7 +114,7 @@ namespace Toy {
 					}
 				}
 
-				class Push : ICallable {
+				public class Push : ICallable {
 					ArrayInstance self = null;
 
 					public Push(ArrayInstance self) {
@@ -133,7 +133,7 @@ namespace Toy {
 					public override string ToString() { return "<Array function>"; }
 				}
 
-				class Pop : ICallable {
+				public class Pop : ICallable {
 					ArrayInstance self = null;
 
 					public Pop(ArrayInstance self) {
@@ -153,7 +153,7 @@ namespace Toy {
 					public override string ToString() { return "<Array function>"; }
 				}
 
-				class Unshift : ICallable {
+				public class Unshift : ICallable {
 					ArrayInstance self = null;
 
 					public Unshift(ArrayInstance self) {
@@ -172,7 +172,7 @@ namespace Toy {
 					public override string ToString() { return "<Array function>"; }
 				}
 
-				class Shift : ICallable {
+				public class Shift : ICallable {
 					ArrayInstance self = null;
 
 					public Shift(ArrayInstance self) {
@@ -192,7 +192,7 @@ namespace Toy {
 					public override string ToString() { return "<Array function>"; }
 				}
 
-				class Length : ICallable {
+				public class Length : ICallable {
 					ArrayInstance self = null;
 
 					public Length(ArrayInstance self) {
@@ -210,7 +210,7 @@ namespace Toy {
 					public override string ToString() { return "<Array function>"; }
 				}
 
-				class Sort : ICallable {
+				public class Sort : ICallable {
 					ArrayInstance self = null;
 					ScriptFunction comparator = null;
 					Interpreter interpreter = null;
@@ -246,7 +246,7 @@ namespace Toy {
 					public override string ToString() { return "<Array function>"; }
 				}
 
-				class Insert : ICallable {
+				public class Insert : ICallable {
 					ArrayInstance self = null;
 
 					public Insert(ArrayInstance self) {
@@ -271,7 +271,7 @@ namespace Toy {
 					public override string ToString() { return "<Array function>"; }
 				}
 
-				class Delete : ICallable {
+				public class Delete : ICallable {
 					ArrayInstance self = null;
 
 					public Delete(ArrayInstance self) {
@@ -296,7 +296,7 @@ namespace Toy {
 					public override string ToString() { return "<Array function>"; }
 				}
 
-				class ToStringCallable : ICallable {
+				public class ToStringCallable : ICallable {
 					ArrayInstance self = null;
 
 					public ToStringCallable(ArrayInstance self) {

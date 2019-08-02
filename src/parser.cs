@@ -255,7 +255,7 @@ namespace Toy {
 				Token token = Previous();
 				Expr value = AssignmentRule();
 
-				if (expr is Variable || expr is Index) {
+				if (expr is Variable || expr is Index || expr is Property) {
 					return new Assign(expr, token, value);
 				}
 

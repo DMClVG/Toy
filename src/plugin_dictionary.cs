@@ -6,7 +6,7 @@ using Pair = System.Collections.Generic.KeyValuePair<object, object>;
 namespace Toy {
 	namespace Plugin {
 		//the plugin class
-		class Dictionary : IPlugin, ICallable {
+		public class Dictionary : IPlugin, ICallable {
 			public IPlugin Singleton {
 				get {
 					if (singleton == null) {
@@ -32,7 +32,7 @@ namespace Toy {
 			}
 
 			//the index assign helper class
-			class DictionaryAssignableIndex : AssignableIndex {
+			public class DictionaryAssignableIndex : AssignableIndex {
 				Dict container;
 				object index;
 
@@ -55,7 +55,7 @@ namespace Toy {
 			}
 
 			//the instance class
-			class DictionaryInstance : ICollection, IBundle {
+			public class DictionaryInstance : ICollection, IBundle {
 				//container members
 				Dict container = null;
 
@@ -90,7 +90,7 @@ namespace Toy {
 					}
 				}
 
-				class Insert : ICallable {
+				public class Insert : ICallable {
 					DictionaryInstance self = null;
 
 					public Insert(DictionaryInstance self) {
@@ -112,7 +112,7 @@ namespace Toy {
 					public override string ToString() { return "<Dictionary function>"; }
 				}
 
-				class Delete : ICallable {
+				public class Delete : ICallable {
 					DictionaryInstance self = null;
 
 					public Delete(DictionaryInstance self) {
@@ -131,7 +131,7 @@ namespace Toy {
 					public override string ToString() { return "<Dictionary function>"; }
 				}
 
-				class Length : ICallable {
+				public class Length : ICallable {
 					DictionaryInstance self = null;
 
 					public Length(DictionaryInstance self) {
@@ -149,7 +149,7 @@ namespace Toy {
 					public override string ToString() { return "<Dictionary function>"; }
 				}
 
-				class Contains : ICallable {
+				public class Contains : ICallable {
 					DictionaryInstance self = null;
 
 					public Contains(DictionaryInstance self) {
@@ -167,7 +167,7 @@ namespace Toy {
 					public override string ToString() { return "<Dictionary function>"; }
 				}
 
-				class ToStringCallable : ICallable {
+				public class ToStringCallable : ICallable {
 					DictionaryInstance self = null;
 
 					public ToStringCallable(DictionaryInstance self) {

@@ -4,14 +4,21 @@ using System.Collections.Generic;
 using static Toy.TokenType;
 
 namespace Toy {
-	class Interpreter : ExprVisitor<object>, StmtVisitor<object> {
+	public class Interpreter : ExprVisitor<object>, StmtVisitor<object> {
 		//members
-		public Environment globals = new Environment();
+		public Environment globals;
 		public Environment environment;
 		Dictionary<Expr, int> locals = new Dictionary<Expr, int>();
 
 		public Interpreter() {
+			globals = new Environment();
 			environment = globals;
+		}
+
+		public Interpreter(Environment env) {
+			//use an existing environment
+			globals = env;
+			environment = env;
 		}
 
 		//access
@@ -37,11 +44,11 @@ namespace Toy {
 
 			//unescape a string
 			if (value is string) {
-				Console.WriteLine(System.Text.RegularExpressions.Regex.Unescape((string)value));
+				ConsoleOutput.Log(System.Text.RegularExpressions.Regex.Unescape((string)value));
 			} else if (value is null) {
-				Console.WriteLine("null");
+				ConsoleOutput.Log("null");
 			} else {
-				Console.WriteLine(value);
+				ConsoleOutput.Log(value);
 			}
 
 			return null;
@@ -210,6 +217,10 @@ namespace Toy {
 			}
 
 			if (expr.left is Index) {
+				return VisitAssignToIndex(expr);
+			}
+
+			if (expr.left is Property) {
 				return VisitAssignToIndex(expr);
 			}
 

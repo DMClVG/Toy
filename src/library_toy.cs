@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Toy {
 	namespace Library {
-		class Toy : IPlugin, IBundle {
+		public class Toy : IPlugin, IBundle {
 			//singleton pattern
 			public IPlugin Singleton {
 				get {
@@ -46,7 +46,7 @@ namespace Toy {
 				}
 			}
 
-			class VersionGreater : ICallable {
+			public class VersionGreater : ICallable {
 				Toy self;
 
 				public VersionGreater(Toy self) {
@@ -69,7 +69,7 @@ namespace Toy {
 				}
 			}
 
-			class VersionEqual : ICallable {
+			public class VersionEqual : ICallable {
 				Toy self;
 
 				public VersionEqual(Toy self) {
@@ -92,7 +92,7 @@ namespace Toy {
 				}
 			}
 
-			class VersionLess : ICallable {
+			public class VersionLess : ICallable {
 				Toy self;
 
 				public VersionLess(Toy self) {

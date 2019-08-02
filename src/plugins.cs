@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Toy {
 	//for any class that maps to a library
-	interface IPlugin {
+	public interface IPlugin {
 		//this is called when the script calls: import "plugin"
 		//inside, the environment object can be loaded with objects deriving
 		//from the interfaces below
@@ -15,7 +15,7 @@ namespace Toy {
 	}
 
 	//for any class that maps to a Toy function
-	interface ICallable {
+	public interface ICallable {
 		//the number of arguments it takes
 		int Arity();
 
@@ -25,7 +25,7 @@ namespace Toy {
 	}
 
 	//for any class that maps to bracket access
-	interface ICollection {
+	public interface ICollection {
 		//called when the bracket syntax is used
 		//arguments are in the format [first:second:third]
 		//these normally represent "beginning", "end" and "step"
@@ -40,7 +40,7 @@ namespace Toy {
 	}
 
 	//for any class that maps to a type
-	interface IBundle {
+	public interface IBundle {
 		//called when a property is accessed
 		//the argument is the property name
 		//the return is returned in the script
@@ -48,7 +48,7 @@ namespace Toy {
 	}
 
 	//helper class (for assigning to indexed values)
-	abstract class AssignableIndex {
+	public abstract class AssignableIndex {
 		public abstract object Value {
 			get;
 			set;
@@ -56,7 +56,7 @@ namespace Toy {
 	}
 
 	//helper class (for checking for self-referential data structures)
-	class ToStringHelper {
+	public class ToStringHelper {
 		public static Dictionary<object, int> passed = new Dictionary<object, int>();
 	}
 }

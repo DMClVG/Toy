@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 
 namespace Toy {
-	abstract class Expr {
+	public abstract class Expr {
 		public abstract R Accept<R>(ExprVisitor<R> visitor);
 	}
 
-	interface ExprVisitor<R> {
+	public interface ExprVisitor<R> {
 		R Visit(Variable Expr);
 		R Visit(Assign Expr);
 		R Visit(Increment Expr);
@@ -21,7 +21,7 @@ namespace Toy {
 		R Visit(Ternary Expr);
 	}
 
-	class Variable : Expr {
+	public class Variable : Expr {
 		public Variable(Token name) {
 			this.name = name;
 		}
@@ -33,7 +33,7 @@ namespace Toy {
 		public Token name;
 	}
 
-	class Assign : Expr {
+	public class Assign : Expr {
 		public Assign(Expr left, Token oper, Expr right) {
 			this.left = left;
 			this.oper = oper;
@@ -49,7 +49,7 @@ namespace Toy {
 		public Expr right;
 	}
 
-	class Increment : Expr {
+	public class Increment : Expr {
 		public Increment(Token oper, Variable variable, bool prefix) {
 			this.oper = oper;
 			this.variable = variable;
@@ -65,7 +65,7 @@ namespace Toy {
 		public bool prefix;
 	}
 
-	class Literal : Expr {
+	public class Literal : Expr {
 		public Literal(object value) {
 			this.value = value;
 		}
@@ -77,7 +77,7 @@ namespace Toy {
 		public object value;
 	}
 
-	class Logical : Expr {
+	public class Logical : Expr {
 		public Logical(Expr left, Token oper, Expr right) {
 			this.left = left;
 			this.oper = oper;
@@ -93,7 +93,7 @@ namespace Toy {
 		public Expr right;
 	}
 
-	class Unary : Expr {
+	public class Unary : Expr {
 		public Unary(Token oper, Expr right) {
 			this.oper = oper;
 			this.right = right;
@@ -107,7 +107,7 @@ namespace Toy {
 		public Expr right;
 	}
 
-	class Binary : Expr {
+	public class Binary : Expr {
 		public Binary(Expr left, Token oper, Expr right) {
 			this.left = left;
 			this.oper = oper;
@@ -123,7 +123,7 @@ namespace Toy {
 		public Expr right;
 	}
 
-	class Call : Expr {
+	public class Call : Expr {
 		public Call(Expr callee, Token paren, List<Expr> arguments) {
 			this.callee = callee;
 			this.paren = paren;
@@ -139,7 +139,7 @@ namespace Toy {
 		public List<Expr> arguments;
 	}
 
-	class Index : Expr {
+	public class Index : Expr {
 		public Index(Expr callee, Expr first, Expr second, Expr third, Token bracket) {
 			this.callee = callee;
 			this.first = first;
@@ -159,7 +159,7 @@ namespace Toy {
 		public Token bracket;
 	}
 
-	class Function : Expr {
+	public class Function : Expr {
 		public Function(List<Expr> parameters, List<Stmt> body) {
 			this.parameters = parameters;
 			this.body = body;
@@ -173,7 +173,7 @@ namespace Toy {
 		public List<Stmt> body;
 	}
 
-	class Property : Expr {
+	public class Property : Expr {
 		public Property(Expr expression, Token name) {
 			this.expression = expression;
 			this.name = name;
@@ -187,7 +187,7 @@ namespace Toy {
 		public Token name;
 	}
 
-	class Grouping : Expr {
+	public class Grouping : Expr {
 		public Grouping(Expr expression) {
 			this.expression = expression;
 		}
@@ -199,7 +199,7 @@ namespace Toy {
 		public Expr expression;
 	}
 
-	class Ternary : Expr {
+	public class Ternary : Expr {
 		public Ternary(Expr cond, Expr left, Expr right) {
 			this.cond = cond;
 			this.left = left;

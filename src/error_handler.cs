@@ -50,7 +50,7 @@ namespace Toy {
 		}
 
 		private static void Report(int line, string where, string message) {
-			Console.Error.WriteLine($"[line {line}] Error {where}: {message}");
+			ConsoleOutput.Log($"[line {line}] Error {where}: {message}");
 			HadError = true;
 		}
 

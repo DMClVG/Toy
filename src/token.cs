@@ -1,5 +1,5 @@
 namespace Toy {
-	class Token {
+	public class Token {
 		//members
 		public readonly TokenType type;
 		public readonly string lexeme;

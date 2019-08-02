@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Toy {
 	namespace Library {
-		class Standard : IPlugin {
+		public class Standard : IPlugin {
 			//singleton pattern
 			public IPlugin Singleton {
 				get {
@@ -32,7 +32,7 @@ namespace Toy {
 			}
 
 			//member class - the library as a bundle (for the alias)
-			class Bundle : IBundle {
+			public class Bundle : IBundle {
 				public object Property(Interpreter interpreter, Token token, object argument) {
 					string propertyName = (string)argument;
 
@@ -48,7 +48,7 @@ namespace Toy {
 			}
 
 			//member classes representing functions
-			class Clock : ICallable {
+			public class Clock : ICallable {
 				public int Arity() {
 					return 0;
 				}
@@ -60,7 +60,7 @@ namespace Toy {
 				public override string ToString() { return "<native function>"; }
 			}
 
-			class Random : ICallable {
+			public class Random : ICallable {
 				System.Random rand = null;
 
 				public Random(int seed = int.MinValue) {
@@ -85,7 +85,7 @@ namespace Toy {
 				public override string ToString() { return "<native function>"; }
 			}
 
-			class RandomSeed : ICallable {
+			public class RandomSeed : ICallable {
 				public int Arity() {
 					return 1;
 				}

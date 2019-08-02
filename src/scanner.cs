@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using static Toy.TokenType;
 
 namespace Toy {
-	class Scanner {
+	public class Scanner {
 		//members
 		readonly string source;
 		List<Token> tokenList = new List<Token>();
