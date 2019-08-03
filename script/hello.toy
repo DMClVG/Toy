@@ -172,17 +172,38 @@ print Dict.foobar;
 
 //-----------------------------------------------------------------------------
 //TODO: built in methods (or libraries) for string, array and dictionary manip.
-//TODO: type casting (number, string, array, etc.)
-//TODO: equality between arrays and dictionaries
-//TODO: function pipes |> and function concatenation ..
+	//ContainsKey(x) //not available for Array
+	//ContainsValue(x)
+	//Every(cb) //true if all calls are true
+	//Any(cb) //true if any call is true
+	//Filter(cb(x))
+	//ForEach(cb(x))
+	//Map(cb(x))
+	//Reduce(cb(acc, x), default)
+	//Concat(x) //return a new array/dictionary, concatenated with x
+	//Clear() //removes contents
+	//Equals(x) //compare contents
+
+//TODO: Standard | built-in notation
+	//string[x] //get char as string
+	//string[x:y] //get substring
+	//ToLowerCase(str)
+	//ToUpperCase(str)
+	//ToNumber(str | boolean)
+	//ToString(number | boolean)
+	//ToBoolean(str | number)
+	//IsSame(x, y) //compare instances are the same
+//GetType(x) // string representing type: number | string | function | boolean | null | plugin | instance
+//TODO: function pipes |>, function cascading .., function concatenation + (cascading with a single variable)
+
 
 //TODO: maths library
 //TODO: JSON library
-//TODO: IO library?
+//TODO: IO library
 //TODO: foreach(var element in object) //foreach(var char in "string")
 //TODO: foreach(var index of object)
 
-//TODO: assert as a "Standard" function
+//TODO: assert as a "Standard" function?
 //TODO: default arugments
 //TODO: rest/spread operator
 //TODO: MAYBE initializer lists

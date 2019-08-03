@@ -39,7 +39,7 @@ namespace Toy {
 		object Access(Interpreter interpreter, Token token, object first, object second, object third);
 	}
 
-	//for any class that maps to a type
+	//for any class that has properties
 	public interface IBundle {
 		//called when a property is accessed
 		//the argument is the property name
