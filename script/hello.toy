@@ -168,7 +168,7 @@ print position;
 
 import "script/dictionary_test.toy" as Dict;
 
-print Dict.dictionary["foobar"];
+//print Dict.dictionary["foobar"];
 
 //-----------------------------------------------------------------------------
 //TODO: String | built-in notation
@@ -179,21 +179,14 @@ print Dict.dictionary["foobar"];
 	//Length(str)
 	//Replace(str, oldStr, newStr)
 	//Trim(str, char)
-	//split(str, char) //how?
+	//split(str, char) //how? Into an array?
 	//indexOf(str, substr)
 	//lastIndexOf(str, substr)
 
-	//ToNumber(str | boolean)
-	//ToString(number | boolean | null | etc.)
-	//ToBoolean(str | number)
-//TODO: Standard
-	//IsSame(x, y) //compare instances are the same
-	//GetType(x) // string representing type: number | string | function | boolean | null | aliasedFile | plugin | instance
-
 //TODO: function pipes |>, function cascading .., function concatenation + (cascading with a single variable)
-//IsArray(x)
-//IsDictionary(x)
 
+//TODO: capitalized True and False needs to be fixed
+//TODO: sanity check using assert, testing the language so far
 
 //TODO: maths library
 //TODO: JSON library

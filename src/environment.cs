@@ -112,5 +112,7 @@ namespace Toy {
 		public object Property(Interpreter interpreter, Token token, object argument) {
 			return env.Get(new Token(EOF, (string)argument, null, token.line));
 		}
+
+		public override string ToString() { return "<alias>"; }
 	}
 }
