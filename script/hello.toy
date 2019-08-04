@@ -172,17 +172,11 @@ print Dict.dictionary["foobar"];
 
 //-----------------------------------------------------------------------------
 //TODO: built in methods (or libraries) for string, array and dictionary manip.
-	//ContainsKey(x) //not available for Array
-	//ContainsValue(x)
-	//Every(cb(x)) //true if all calls are true
-	//Any(cb(x)) //true if any call is true
-	//Filter(cb(x))
-	//ForEach(cb(x))
-	//Map(cb(x))
-	//Reduce(defaultAccumulator, cb(acc, x))
-	//Concat(x) //return a new array/dictionary, concatenated with x
-	//Clear() //removes contents
-	//Equals(x) //compare contents
+	//IncludedIn(x)
+	//ExcludedIn(x)
+	//Includes(x) -> return bool
+	//Excludes(x) -> return bool
+	//TODO: disallow numbers and booleans as dictionary keys
 
 //TODO: Standard | built-in notation
 	//string[x] //get char as string

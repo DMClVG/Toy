@@ -82,7 +82,19 @@ namespace Toy {
 						case "Insert": return new Insert(this);
 						case "Delete": return new Delete(this);
 						case "Length": return new Length(this);
-						case "Contains": return new Contains(this);
+
+						case "ContainsKey": return new ContainsKey(this);
+						case "ContainsValue": return new ContainsValue(this);
+						case "Every": return new Every(this);
+						case "Any": return new Any(this);
+						case "Filter": return new Filter(this);
+						case "ForEach": return new ForEach(this);
+						case "Map": return new Map(this);
+						case "Reduce": return new Reduce(this);
+						case "Concat": return new Concat(this);
+						case "Clear": return new Clear(this);
+						case "Equals": return new EqualsCallable(this);
+
 						case "ToString": return new ToStringCallable(this);
 
 						default:
@@ -149,10 +161,10 @@ namespace Toy {
 					public override string ToString() { return "<Dictionary function>"; }
 				}
 
-				public class Contains : ICallable {
+				public class ContainsKey : ICallable {
 					DictionaryInstance self = null;
 
-					public Contains(DictionaryInstance self) {
+					public ContainsKey(DictionaryInstance self) {
 						this.self = self;
 					}
 
@@ -162,6 +174,298 @@ namespace Toy {
 
 					public object Call(Interpreter interpreter, Token token, List arguments) {
 						return self.container.ContainsKey(arguments[0]);
+					}
+
+					public override string ToString() { return "<Dictionary function>"; }
+				}
+
+				public class ContainsValue : ICallable {
+					DictionaryInstance self = null;
+
+					public ContainsValue(DictionaryInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List arguments) {
+						return self.container.ContainsValue(arguments[0]);
+					}
+
+					public override string ToString() { return "<Dictionary function>"; }
+				}
+
+				public class Every : ICallable {
+					DictionaryInstance self = null;
+
+					public Every(DictionaryInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List arguments) {
+						ScriptFunction callback = (ScriptFunction)arguments[0];
+
+						if (callback.Arity() != 2) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 2, found " + callback.Arity() + ")");
+						}
+
+						foreach(Pair kvp in self.container) {
+							object result = callback.Call(interpreter, token, new List() { kvp.Key, kvp.Value });
+							if (!interpreter.CheckIsTruthy(result)) {
+								return false;
+							}
+						}
+
+						return true;
+					}
+
+					public override string ToString() { return "<Dictionary function>"; }
+				}
+
+				public class Any : ICallable {
+					DictionaryInstance self = null;
+
+					public Any(DictionaryInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List arguments) {
+						ScriptFunction callback = (ScriptFunction)arguments[0];
+
+						if (callback.Arity() != 2) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 2, found " + callback.Arity() + ")");
+						}
+
+						foreach(Pair kvp in self.container) {
+							object result = callback.Call(interpreter, token, new List() { kvp.Key, kvp.Value });
+							if (interpreter.CheckIsTruthy(result)) {
+								return true;
+							}
+						}
+
+						return false;
+					}
+
+					public override string ToString() { return "<Dictionary function>"; }
+				}
+
+				public class Filter : ICallable {
+					DictionaryInstance self = null;
+
+					public Filter(DictionaryInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List arguments) {
+						ScriptFunction callback = (ScriptFunction)arguments[0];
+						Dict resultsContainer = new Dict();
+
+						if (callback.Arity() != 2) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 2, found " + callback.Arity() + ")");
+						}
+
+						foreach(Pair kvp in self.container) {
+							object result = callback.Call(interpreter, token, new List() { kvp.Key, kvp.Value });
+							if (interpreter.CheckIsTruthy(result)) {
+								resultsContainer[kvp.Key] = kvp.Value;
+							}
+						}
+
+						return new DictionaryInstance(resultsContainer);
+					}
+
+					public override string ToString() { return "<Dictionary function>"; }
+				}
+
+				public class ForEach : ICallable {
+					DictionaryInstance self = null;
+
+					public ForEach(DictionaryInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List arguments) {
+						ScriptFunction callback = (ScriptFunction)arguments[0];
+
+						if (callback.Arity() != 2) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 2, found " + callback.Arity() + ")");
+						}
+
+						foreach(Pair kvp in self.container) {
+							callback.Call(interpreter, token, new List() { kvp.Key, kvp.Value });
+						}
+
+						return null;
+					}
+
+					public override string ToString() { return "<Dictionary function>"; }
+				}
+
+				public class Map : ICallable {
+					DictionaryInstance self = null;
+
+					public Map(DictionaryInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List arguments) {
+						ScriptFunction callback = (ScriptFunction)arguments[0];
+						Dict resultsContainer = new Dict();
+
+						if (callback.Arity() != 2) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 2, found " + callback.Arity() + ")");
+						}
+
+						foreach(Pair kvp in self.container) {
+							object result = callback.Call(interpreter, token, new List() { kvp.Key, kvp.Value });
+							resultsContainer[kvp.Key] = result;
+						}
+
+						return new DictionaryInstance(resultsContainer);
+					}
+
+					public override string ToString() { return "<Dictionary function>"; }
+				}
+
+				public class Reduce : ICallable {
+					DictionaryInstance self = null;
+
+					public Reduce(DictionaryInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 2;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List arguments) {
+						object accumulator = arguments[0];
+						ScriptFunction callback = (ScriptFunction)arguments[1];
+
+						if (callback.Arity() != 3) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 3, found " + callback.Arity() + ")");
+						}
+
+						foreach(Pair kvp in self.container) {
+							accumulator = callback.Call(interpreter, token, new List() { accumulator, kvp.Key, kvp.Value });
+						}
+
+						return accumulator;
+					}
+
+					public override string ToString() { return "<Dictionary function>"; }
+				}
+
+				public class Concat : ICallable {
+					DictionaryInstance self = null;
+
+					public Concat(DictionaryInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List arguments) {
+						if (!(arguments[0] is DictionaryInstance)) {
+							throw new ErrorHandler.RuntimeError(token, "Expected a Dictionary instance");
+						}
+
+						DictionaryInstance rhs = (DictionaryInstance)arguments[0];
+
+						Dict resultsDict = new Dict();
+
+						foreach(Pair kvp in self.container) {
+							resultsDict[kvp.Key] = kvp.Value;
+						}
+
+						foreach(Pair kvp in rhs.container) {
+							if (!resultsDict.ContainsKey(kvp.Key)) {
+								resultsDict[kvp.Key] = kvp.Value;
+							}
+						}
+
+						return new DictionaryInstance(resultsDict);
+					}
+
+					public override string ToString() { return "<Dictionary function>"; }
+				}
+
+				public class Clear : ICallable {
+					DictionaryInstance self = null;
+
+					public Clear(DictionaryInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 0;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List arguments) {
+						self.container.Clear();
+						return null;
+					}
+
+					public override string ToString() { return "<Dictionary function>"; }
+				}
+
+				public class EqualsCallable : ICallable {
+					DictionaryInstance self = null;
+
+					public EqualsCallable(DictionaryInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List arguments) {
+						if (!(arguments[0] is DictionaryInstance)) {
+							throw new ErrorHandler.RuntimeError(token, "Expected a Dictionary instance");
+						}
+
+						DictionaryInstance rhs = (DictionaryInstance)arguments[0];
+
+						if (self.container.Count != rhs.container.Count) {
+							return false;
+						}
+
+						foreach(Pair kvp in self.container) { //NOTE: I'm a little worried about key comparison
+							if (!rhs.container.ContainsKey(kvp.Key)) {
+								return false;
+							}
+
+							if (!interpreter.CheckIsEqual(kvp.Value, rhs.container[kvp.Key])) {
+								return false;
+							}
+						}
+
+						return true;
 					}
 
 					public override string ToString() { return "<Dictionary function>"; }
