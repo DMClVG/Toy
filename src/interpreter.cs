@@ -570,14 +570,14 @@ namespace Toy {
 			}
 		}
 
-		bool CheckIsTruthy(object obj) {
+		public bool CheckIsTruthy(object obj) {
 			if (obj == null) return false;
 			if (obj is bool) return (bool)obj;
 			if (obj is double) return (double)obj != 0;
 			return true;
 		}
 
-		bool CheckIsEqual(object left, object right) {
+		public bool CheckIsEqual(object left, object right) {
 			if (left == null && right == null) {
 				return true;
 			}

@@ -107,6 +107,18 @@ namespace Toy {
 						case "Sort": return new Sort(this);
 						case "Insert": return new Insert(this);
 						case "Delete": return new Delete(this);
+
+						case "ContainsValue": return new ContainsValue(this);
+						case "Every": return new Every(this);
+						case "Any": return new Any(this);
+						case "Filter": return new Filter(this);
+						case "ForEach": return new ForEach(this);
+						case "Map": return new Map(this);
+						case "Reduce": return new Reduce(this);
+						case "Concat": return new Concat(this);
+						case "Clear": return new Clear(this);
+						case "Equals": return new EqualsCallable(this);
+
 						case "ToString": return new ToStringCallable(this);
 
 						default:
@@ -229,6 +241,10 @@ namespace Toy {
 						this.interpreter = interpreter;
 						this.token = token;
 
+						if (this.comparator.Arity() != 2) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 2, found " + this.comparator.Arity() + ")");
+						}
+
 						self.container.Sort(SortComparison);
 
 						return null;
@@ -309,6 +325,292 @@ namespace Toy {
 
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 						return self.ToString();
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				public class ContainsValue : ICallable {
+					ArrayInstance self = null;
+
+					public ContainsValue(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						return self.container.Contains(arguments[0]);
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				public class Every : ICallable {
+					ArrayInstance self = null;
+
+					public Every(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						ScriptFunction callback = (ScriptFunction)arguments[0];
+
+						if (callback.Arity() != 1) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 1, found " + callback.Arity() + ")");
+						}
+
+						foreach(object element in self.container) {
+							object result = callback.Call(interpreter, token, new List<object>() { element });
+							if (!interpreter.CheckIsTruthy(result)) {
+								return false;
+							}
+						}
+
+						return true;
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				public class Any : ICallable {
+					ArrayInstance self = null;
+
+					public Any(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						ScriptFunction callback = (ScriptFunction)arguments[0];
+
+						if (callback.Arity() != 1) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 1, found " + callback.Arity() + ")");
+						}
+
+						foreach(object element in self.container) {
+							object result = callback.Call(interpreter, token, new List<object>() { element });
+							if (interpreter.CheckIsTruthy(result)) {
+								return true;
+							}
+						}
+
+						return false;
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				public class Filter : ICallable {
+					ArrayInstance self = null;
+
+					public Filter(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						ScriptFunction callback = (ScriptFunction)arguments[0];
+						List<object> resultsContainer = new List<object>();
+
+						if (callback.Arity() != 1) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 1, found " + callback.Arity() + ")");
+						}
+
+						foreach(object element in self.container) {
+							object result = callback.Call(interpreter, token, new List<object>() { element });
+							if (interpreter.CheckIsTruthy(result)) {
+								resultsContainer.Add(element);
+							}
+						}
+
+						return new ArrayInstance(resultsContainer);
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				public class ForEach : ICallable {
+					ArrayInstance self = null;
+
+					public ForEach(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						ScriptFunction callback = (ScriptFunction)arguments[0];
+
+						if (callback.Arity() != 1) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 1, found " + callback.Arity() + ")");
+						}
+
+						foreach(object element in self.container) {
+							callback.Call(interpreter, token, new List<object>() { element });
+						}
+
+						return null;
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				public class Map : ICallable {
+					ArrayInstance self = null;
+
+					public Map(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						ScriptFunction callback = (ScriptFunction)arguments[0];
+						List<object> resultsContainer = new List<object>();
+
+						if (callback.Arity() != 1) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 1, found " + callback.Arity() + ")");
+						}
+
+						foreach(object element in self.container) {
+							object result = callback.Call(interpreter, token, new List<object>() { element });
+							resultsContainer.Add(result);
+						}
+
+						return new ArrayInstance(resultsContainer);
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				public class Reduce : ICallable {
+					ArrayInstance self = null;
+
+					public Reduce(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 2;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						object accumulator = arguments[0];
+						ScriptFunction callback = (ScriptFunction)arguments[1];
+
+						if (callback.Arity() != 2) {
+							throw new ErrorHandler.RuntimeError(token, "Callback has an incorrect number of parameters (expected 2, found " + callback.Arity() + ")");
+						}
+
+						foreach(object element in self.container) {
+							accumulator = callback.Call(interpreter, token, new List<object>() { accumulator, element });
+						}
+
+						return accumulator;
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				public class Concat : ICallable {
+					ArrayInstance self = null;
+
+					public Concat(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						if (!(arguments[0] is ArrayInstance)) {
+							throw new ErrorHandler.RuntimeError(token, "Expected an Array instance");
+						}
+
+						ArrayInstance rhs = (ArrayInstance)arguments[0];
+
+						List<object> resultsList = new List<object>();
+
+						foreach(object element in self.container) {
+							resultsList.Add(element);
+						}
+
+						foreach(object element in rhs.container) {
+							resultsList.Add(element);
+						}
+
+						return new ArrayInstance(resultsList);
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				public class Clear : ICallable {
+					ArrayInstance self = null;
+
+					public Clear(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 0;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						self.container.Clear();
+						return null;
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				public class EqualsCallable : ICallable {
+					ArrayInstance self = null;
+
+					public EqualsCallable(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 1;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						if (!(arguments[0] is ArrayInstance)) {
+							throw new ErrorHandler.RuntimeError(token, "Expected an Array instance");
+						}
+
+						ArrayInstance rhs = (ArrayInstance)arguments[0];
+
+						if (self.container.Count != rhs.container.Count) {
+							return false;
+						}
+
+						for (int i = 0; i < self.container.Count; i++) {
+							if (!interpreter.CheckIsEqual(self.container[i], rhs.container[i])) {
+								return false;
+							}
+						}
+
+						return true;
 					}
 
 					public override string ToString() { return "<Array function>"; }

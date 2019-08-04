@@ -8,3 +8,5 @@ dictionary.Insert(3, 3);
 dictionary.Delete(3);
 
 print dictionary;
+
+dictionary.Insert("foobar", "foobarx");

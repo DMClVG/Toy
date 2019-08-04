@@ -30,7 +30,7 @@ array[1] = "foo"; //assign to an element
 Arrays can be indexed in several ways. Elements can be accessed using traditional bracket notation:
 
 ```
-array[x]
+array[x];
 ```
 
 However, "slice notation" is also available:
@@ -60,25 +60,25 @@ print array[::-2][::-1]; //output: [2,4,6,8,10]
 
 ## Push(x)
 
-This function inserts the value of x at the end of the array.
+This function inserts the value of "x" at the end of the array.
 
 ## Pop()
 
-This function deletes the value at the end of the array, and returns the value.
+This function deletes the value at the end of the array, and returns that value.
 
 ## Unshift(x)
 
-This function inserts the value of x at the beginning of the array.
+This function inserts the value of "x" at the beginning of the array.
 
 ## Shift()
 
-This function deletes the value at the beginning of the array, and returns the result.
+This function deletes the value at the beginning of the array, and returns that result.
 
 ## Length()
 
 This function returns the length of the array.
 
-## Sort(cb)
+## Sort(cb(a, b))
 
 This function sorts the elements according to the callback "cb". "cb" may be called any number of times during the sorting process.
 
@@ -92,11 +92,51 @@ array.Sort((a, b) => a - b);
 
 ## Insert(i, x)
 
-This function inserts the value of x at the index i, shifting the remaining elements up 1 index.
+This function inserts the value of "x" at the index "i", shifting the remaining elements up 1 index.
 
 ## Delete(i)
 
-This function deletes the value at the index i, shifting the remianing elements down 1 index.
+This function deletes the value at the index "i", shifting the remianing elements down 1 index.
+
+## ContainsValue(x)
+
+This function returns true if the array contains the value of "x".
+
+## Every(cb(x))
+
+This function calls "cb" once for every element in the array, with that element passed in as "x". If any call to "cb" returns false, then the function exits early and returns false. Otherwise the function returns true.
+
+## Any(cb(x))
+
+This function calls "cb" once for every element in the array, with that element passed in as "x". If any call to "cb" returns true, then the function exits early and returns true. Otherwise the function returns false.
+
+## Filter(cb(x))
+
+This function calls "cb" once for every element in the array, with that element passed in as "x". This returns a new array instance that contains every element for which the call to "cb" returned true.
+
+## ForEach(cb(x))
+
+This function calls "cb" once for every element in the array, with that element passed in as "x".
+
+## Map(cb(x))
+
+This function calls "cb" once for every element in the array, with that element passed in as "x". It returns a new array instance with the result of each call to "cb" as it's elements.
+
+## Reduce(default, cb(acc, x))
+
+This function calls "cb" once for every element in the array, with that element passed in as "x", and the value of the previous call passed in as "acc". For the first call to "cb", "default" is used for "acc".
+
+## Concat(x)
+
+This function requires an array instance as "x". This function returns a new array instance which contains the contents of the current array followed by the contents of "x".
+
+## Clear()
+
+This function removes the contents of the array instance, leaving an empty array.
+
+## Equals(x)
+
+This function requires an array instance as "x". It returns false if the current array and "x" have a different number of elements. Then, it iterates over each pair of elements from the current array and "x" and compares them, returning false on the first mismatch found. Otherwise it returns true.
 
 ## ToString()
 

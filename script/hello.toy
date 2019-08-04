@@ -168,18 +168,18 @@ print position;
 
 import "script/dictionary_test.toy" as Dict;
 
-print Dict.foobar;
+print Dict.dictionary["foobar"];
 
 //-----------------------------------------------------------------------------
 //TODO: built in methods (or libraries) for string, array and dictionary manip.
 	//ContainsKey(x) //not available for Array
 	//ContainsValue(x)
-	//Every(cb) //true if all calls are true
-	//Any(cb) //true if any call is true
+	//Every(cb(x)) //true if all calls are true
+	//Any(cb(x)) //true if any call is true
 	//Filter(cb(x))
 	//ForEach(cb(x))
 	//Map(cb(x))
-	//Reduce(cb(acc, x), default)
+	//Reduce(defaultAccumulator, cb(acc, x))
 	//Concat(x) //return a new array/dictionary, concatenated with x
 	//Clear() //removes contents
 	//Equals(x) //compare contents
@@ -193,7 +193,7 @@ print Dict.foobar;
 	//ToString(number | boolean)
 	//ToBoolean(str | number)
 	//IsSame(x, y) //compare instances are the same
-//GetType(x) // string representing type: number | string | function | boolean | null | plugin | instance
+//GetType(x) // string representing type: number | string | function | boolean | null | aliasedFile | plugin | instance
 //TODO: function pipes |>, function cascading .., function concatenation + (cascading with a single variable)
 
 
