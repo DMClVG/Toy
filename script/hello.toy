@@ -182,7 +182,7 @@ print Dict.dictionary["foobar"];
 	//IsSame(x, y) //compare instances are the same
 //GetType(x) // string representing type: number | string | function | boolean | null | aliasedFile | plugin | instance
 //TODO: function pipes |>, function cascading .., function concatenation + (cascading with a single variable)
-
+//Casting between strings and other types
 
 //TODO: maths library
 //TODO: JSON library
