@@ -171,13 +171,6 @@ import "script/dictionary_test.toy" as Dict;
 print Dict.dictionary["foobar"];
 
 //-----------------------------------------------------------------------------
-//TODO: built in methods (or libraries) for string, array and dictionary manip.
-	//IncludedIn(x)
-	//ExcludedIn(x)
-	//Includes(x) -> return bool
-	//Excludes(x) -> return bool
-	//TODO: disallow numbers and booleans as dictionary keys
-
 //TODO: Standard | built-in notation
 	//string[x] //get char as string
 	//string[x:y] //get substring
