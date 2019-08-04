@@ -6,7 +6,7 @@ using Pair = System.Collections.Generic.KeyValuePair<object, object>;
 namespace Toy {
 	namespace Plugin {
 		//the plugin class
-		public class Dictionary : IPlugin, ICallable {
+		public class Dictionary : IPlugin, ICallable, IBundle {
 			public IPlugin Singleton {
 				get {
 					if (singleton == null) {
@@ -29,6 +29,37 @@ namespace Toy {
 
 			public object Call(Interpreter interpreter, Token token, List arguments) {
 				return new DictionaryInstance(new Dict());
+			}
+
+			//IBundle
+			public object Property(Interpreter interpreter, Token token, object argument) {
+				string propertyName = (string)argument;
+
+				switch(propertyName) {
+					case "IsDictionary": return new IsDictionaryInstance(this);
+
+					default:
+						throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
+				}
+			}
+
+			//callable properties
+			public class IsDictionaryInstance : ICallable {
+				Dictionary self = null;
+
+				public IsDictionaryInstance(Dictionary self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 1;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List arguments) {
+					return arguments[0] is DictionaryInstance;
+				}
+
+				public override string ToString() { return "<Dictionary property>"; }
 			}
 
 			//the index assign helper class

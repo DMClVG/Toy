@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Toy {
 	namespace Plugin {
 		//the plugin class
-		public class Array : IPlugin, ICallable {
+		public class Array : IPlugin, ICallable, IBundle {
 			//singleton pattern
 			public IPlugin Singleton {
 				get {
@@ -30,8 +30,39 @@ namespace Toy {
 				return new ArrayInstance(new List<object>());
 			}
 
+			//IBundle
+			public object Property(Interpreter interpreter, Token token, object argument) {
+				string propertyName = (string)argument;
+
+				switch(propertyName) {
+					case "IsArray": return new IsArrayInstance(this);
+
+					default:
+						throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
+				}
+			}
+
+			//callable properties
+			public class IsArrayInstance : ICallable {
+				Array self = null;
+
+				public IsArrayInstance(Array self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 1;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					return arguments[0] is ArrayInstance;
+				}
+
+				public override string ToString() { return "<Array property>"; }
+			}
+
 			//the index assign helper class
-			public class ArrayAssignableIndex : AssignableIndex {
+			public class ArrayAssignableIndex : AssignableIndex { //TODO: should be called element assign?
 				List<object> container;
 				int index;
 
@@ -307,24 +338,6 @@ namespace Toy {
 
 						self.container.RemoveAt(pos);
 						return null;
-					}
-
-					public override string ToString() { return "<Array function>"; }
-				}
-
-				public class ToStringCallable : ICallable {
-					ArrayInstance self = null;
-
-					public ToStringCallable(ArrayInstance self) {
-						this.self = self;
-					}
-
-					public int Arity() {
-						return 0;
-					}
-
-					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-						return self.ToString();
 					}
 
 					public override string ToString() { return "<Array function>"; }
@@ -611,6 +624,24 @@ namespace Toy {
 						}
 
 						return true;
+					}
+
+					public override string ToString() { return "<Array function>"; }
+				}
+
+				public class ToStringCallable : ICallable {
+					ArrayInstance self = null;
+
+					public ToStringCallable(ArrayInstance self) {
+						this.self = self;
+					}
+
+					public int Arity() {
+						return 0;
+					}
+
+					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+						return self.ToString();
 					}
 
 					public override string ToString() { return "<Array function>"; }

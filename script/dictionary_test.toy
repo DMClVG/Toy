@@ -26,18 +26,5 @@ dict2.Insert("eight", 8);
 dict2.Insert("nine", 9);
 dict2.Insert("ten", 10);
 
-print dict.Equals(dict2);
-
-/*
-dict2.Insert("eleven", 11);
-dict2.Insert("twelve", 12);
-dict2.Insert("thirteen", 13);
-dict2.Insert("fourteen", 14);
-dict2.Insert("fifteen", 15);
-dict2.Insert("sixteen", 16);
-dict2.Insert("seventeen", 17);
-dict2.Insert("eighteen", 18);
-dict2.Insert("nineteen", 19);
-dict2.Insert("twenty", 20);
-dict2.Insert("ten", "xxx");
-*/
+print Dictionary.IsDictionary(dict);
+print Dictionary.IsDictionary(0);

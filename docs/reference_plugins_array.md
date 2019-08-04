@@ -1,6 +1,6 @@
 # Array
 
-Instances of the Array plugin hold arrays which are indexed by numbers, beginning from 0 and counting up. Arrays do not allow for "holes" i.e. missing elements.
+Instances of the Array plugin are indexed by numbers, beginning from 0 and counting up. Arrays do not allow for "holes" i.e. missing elements.
 
 ## Usage
 
@@ -19,7 +19,17 @@ var copy = array[:]; //copy an array
 var backwards = array[::-1]; //reverse the array
 
 array[1] = "foo"; //assign to an element
+
+print Array.IsArray(array); //true
 ```
+
+## IsArray(x)
+
+This returns true if "x" is an instance of Array, otherwise it returns false.
+
+# Instances
+
+Instances are the result of calling `Array()`.
 
 ## Indexing
 

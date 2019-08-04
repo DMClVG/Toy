@@ -1,6 +1,6 @@
 # Dictionary
 
-Instances of the Dictionary plugin hold dictionaries, which are are collections of key-value pairs.
+Instances of the Dictionary plugin are collections of key-value pairs.
 
 ## Usage
 
@@ -12,8 +12,18 @@ var dictionary["key"] = "value";
 dictionary.Insert("foo", "bar");
 dictionary.Delete("key");
 
-print dictionary.Contains("foo"); //true
+print dictionary.ContainsKey("foo"); //true
+
+print Dictionary.IsDictionary(dictionary); //true
 ```
+
+## IsDictionary(x)
+
+This returns true if "x" is an instance of Dictionary, otherwise it returns false.
+
+# Instances
+
+Instances are the result of calling `Dictionary()`.
 
 ## Indexing
 

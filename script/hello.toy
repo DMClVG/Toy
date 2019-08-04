@@ -171,18 +171,29 @@ import "script/dictionary_test.toy" as Dict;
 print Dict.dictionary["foobar"];
 
 //-----------------------------------------------------------------------------
-//TODO: Standard | built-in notation
+//TODO: String | built-in notation
 	//string[x] //get char as string
 	//string[x:y] //get substring
-	//ToLowerCase(str)
-	//ToUpperCase(str)
+	//ToLower(str)
+	//ToUpper(str)
+	//Length(str)
+	//Replace(str, oldStr, newStr)
+	//Trim(str, char)
+	//split(str, char) //how?
+	//indexOf(str, substr)
+	//lastIndexOf(str, substr)
+
 	//ToNumber(str | boolean)
-	//ToString(number | boolean)
+	//ToString(number | boolean | null | etc.)
 	//ToBoolean(str | number)
+//TODO: Standard
 	//IsSame(x, y) //compare instances are the same
-//GetType(x) // string representing type: number | string | function | boolean | null | aliasedFile | plugin | instance
+	//GetType(x) // string representing type: number | string | function | boolean | null | aliasedFile | plugin | instance
+
 //TODO: function pipes |>, function cascading .., function concatenation + (cascading with a single variable)
-//Casting between strings and other types
+//IsArray(x)
+//IsDictionary(x)
+
 
 //TODO: maths library
 //TODO: JSON library

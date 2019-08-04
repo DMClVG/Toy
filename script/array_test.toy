@@ -27,4 +27,5 @@ arr.Push(8);
 arr.Push(9);
 arr.Push(10);
 
-print array.Equals(arr);
+print Array.IsArray(arr);
+print Array.IsArray(0);
