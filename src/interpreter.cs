@@ -45,7 +45,7 @@ namespace Toy {
 			//unescape a string
 			if (value is string) {
 				ConsoleOutput.Log(System.Text.RegularExpressions.Regex.Unescape((string)value));
-			} else if (value is null) {
+			} else if (value == null) {
 				ConsoleOutput.Log("null");
 			} else {
 				ConsoleOutput.Log(value);

@@ -2,10 +2,18 @@
 SRC=$(wildcard *.cs)
 
 #config
+ifeq ($(OS),Windows_NT)
 CSC=csc
+else
+CSC=mcs
+endif
 
 #output
+ifeq ($(OS),Windows_NT)
 OUTFILE=interpreter.exe
+else
+OUTFILE=interpreter
+endif
 OUTDIR=../out
 OUT=$(addprefix $(OUTDIR)/,$(OUTFILE))
 

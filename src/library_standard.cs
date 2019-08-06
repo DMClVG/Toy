@@ -152,7 +152,7 @@ namespace Toy {
 						return interpreter.CheckIsTruthy(arguments[0]) ? "true" : "false";
 					}
 
-					if (arguments[0] is null) {
+					if (arguments[0] == null) {
 						return "null";
 					}
 
@@ -206,7 +206,7 @@ namespace Toy {
 						return "function";
 					}
 
-					if (arguments[0] is null) {
+					if (arguments[0] == null) {
 						return "null";
 					}
 

@@ -1,5 +1,9 @@
 #config
+ifeq ($(OS),Windows_NT)
 CSC=csc
+else
+CSC=mcs #mono
+endif
 
 #output
 OUTDIR=../out
@@ -8,8 +12,13 @@ OUTDIR=../out
 all: generate_ast
 
 generate_ast:
+ifeq ($(OS),Windows_NT)
 	$(CSC) -out:$(OUTDIR)/generate_ast.exe generate_ast.cs
 	$(OUTDIR)/generate_ast.exe ../src
+else
+	$(CSC) -out:$(OUTDIR)/generate_ast generate_ast.cs
+	mono $(OUTDIR)/generate_ast ../src
+endif
 
 clean:
 ifeq ($(OS),Windows_NT)
