@@ -7,24 +7,40 @@ namespace Toy {
 			//get the app's name
 			string appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
 
-			if (args.Length > 1) {
-				Console.Write($"Usage: {appName} [script]");
-			} else if (args.Length == 1) {
-				if (Runner.RunFile(args[0]) == null) {
-					System.Environment.Exit(-1);
-				}
-			} else {
-				RunPrompt();
+			switch(args.Length) {
+				case 0:
+					RunPrompt();
+					break;
+
+				case 1:
+					if (Runner.RunFile(args[0]) == null) {
+						System.Environment.Exit(-1);
+					}
+					break;
+
+				case 2:
+					if (args[0] == "run") {
+						if (Runner.Run(args[1]) == null) {
+							System.Environment.Exit(-1);
+						}
+					}
+					break;
+
+				default:
+					Console.Write($"Usage: {appName} [<file name> | run \"<toy code>\"]");
+					break;
 			}
 		}
 
 		static void RunPrompt() {
 			string input;
 
+			Environment env = new Environment();
+
 			while(true) {
 				Console.Write(">");
 				input = Console.ReadLine();
-				Runner.Run(input);
+				Runner.Run(env, input);
 
 				//ignore errors in prompt mode
 				if (ErrorHandler.HadError) {
