@@ -183,12 +183,13 @@ import "script/dictionary_test.toy" as Dict;
 	//indexOf(str, substr)
 	//lastIndexOf(str, substr)
 
+
 //TODO: function pipes |>, function cascading .., function concatenation + (cascading with a single variable)
 
 //TODO: capitalized True and False needs to be fixed
 //TODO: sanity check using assert, testing the language so far
 
-//TODO: maths library
+
 //TODO: JSON library
 //TODO: IO library
 //TODO: foreach(var element in object) //foreach(var char in "string")
@@ -197,7 +198,7 @@ import "script/dictionary_test.toy" as Dict;
 
 //TODO: assert as a "Standard" function?
 //TODO: default arugments
-//TODO: rest/spread operator
+//TODO: rest/spread operator; Min(...) Max(...)
 //TODO: MAYBE initializer lists
 //TODO: MAYBE destructuring
 //TODO: MAYBE promises
