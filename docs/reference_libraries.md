@@ -11,6 +11,7 @@ The functions provided are implemented in native code, rather than written in To
 
 * [Toy](reference_libraries_toy.md)
 * [Standard](reference_libraries_standard.md)
+* [Math](reference_libraries_math.md)
 
 Coming Soon: Math library!
 Coming Soon: JSON library!
