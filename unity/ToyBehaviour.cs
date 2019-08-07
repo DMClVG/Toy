@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Toy {
+	[RequireComponent(typeof(SpriteRenderer))]
+	[RequireComponent(typeof(Rigidbody2D))]
+	[RequireComponent(typeof(BoxCollider2D))]
 	public class ToyBehaviour : MonoBehaviour, IBundle {
 		//Toy members
 		[SerializeField]
@@ -13,7 +16,7 @@ namespace Toy {
 
 		//creation/destruction methods
 		void Awake() {
-			environment = Runner.RunFile("Assets/" + toyScript + ".toy");
+			environment = Runner.RunFile("Assets/StreamingAssets/" + toyScript + ".toy");
 			Runner.Run(environment, $"const __instance = Unity.Fetch(\"{this.gameObject.name}\");");
 			Runner.Run(environment, "__instance.Awake();");
 		}
@@ -113,6 +116,9 @@ namespace Toy {
 			string propertyName = (string)argument;
 
 			switch(propertyName) {
+				case "Rigidbody2D":
+					return new RigidbodyWrapper(GetComponent<Rigidbody2D>());
+
 				case "Awake":
 				case "Start":
 				case "OnDestroy":

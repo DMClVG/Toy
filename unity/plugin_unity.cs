@@ -26,14 +26,23 @@ namespace Toy {
 				string propertyName = (string)argument;
 
 				switch(propertyName) {
+					//access members
 					case "Fetch": return new Fetch(this);
+
+					//virtual input members
+					case "GetAxis": return new GetAxis(this);
+					case "GetButton": return new GetButton(this);
+					case "GetButtonDown": return new GetButtonDown(this);
+					case "GetButtonUp": return new GetButtonUp(this);
+
+					//TODO: real input members
 
 					default:
 						throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
 				}
 			}
 
-			//callable types
+			//access members
 			public class Fetch : ICallable {
 				Unity self = null;
 
@@ -47,6 +56,71 @@ namespace Toy {
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return GameObject.Find((string)arguments[0]).GetComponent<ToyBehaviour>();
+				}
+			}
+
+			//virtual input members
+			class GetAxis : ICallable {
+				Unity self = null;
+
+				public GetAxis(Unity self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 1;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					return Input.GetAxis((string)arguments[0]);
+				}
+			}
+
+			class GetButton : ICallable {
+				Unity self = null;
+
+				public GetButton(Unity self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 1;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					return Input.GetButton((string)arguments[0]);
+				}
+			}
+
+			class GetButtonDown : ICallable {
+				Unity self = null;
+
+				public GetButtonDown(Unity self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 1;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					return Input.GetButtonDown((string)arguments[0]);
+				}
+			}
+
+			class GetButtonUp : ICallable {
+				Unity self = null;
+
+				public GetButtonUp(Unity self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 1;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					return Input.GetButtonUp((string)arguments[0]);
 				}
 			}
 		}
