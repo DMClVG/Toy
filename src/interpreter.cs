@@ -8,7 +8,7 @@ namespace Toy {
 		//members
 		public Environment globals;
 		public Environment environment;
-		Dictionary<Expr, int> locals = new Dictionary<Expr, int>();
+		static Dictionary<Expr, int> locals = new Dictionary<Expr, int>();
 
 		public Interpreter() {
 			globals = new Environment();
@@ -370,7 +370,7 @@ namespace Toy {
 			object callee = Evaluate(expr.callee);
 
 			if (!(callee is ICollection)) {
-				throw new ErrorHandler.RuntimeError(expr.bracket, "Expected indexable type");
+				throw new ErrorHandler.RuntimeError(expr.bracket, "Expected indexable type (found " + (callee == null ? "null" : callee.ToString()) + ")");
 			}
 
 			ICollection called = (ICollection)callee;

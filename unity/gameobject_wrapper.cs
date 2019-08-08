@@ -27,6 +27,7 @@ namespace Toy {
 				case "Destroy": return new DestroyCallable(this);
 
 				//game obeject components
+				//TODO: transform access
 				case "Rigidbody2D": return new Rigidbody2DWrapper(self.GetComponent<Rigidbody2D>());
 				case "ToyBehaviour": return self.GetComponent<ToyBehaviour>();
 

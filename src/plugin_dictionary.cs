@@ -186,7 +186,7 @@ namespace Toy {
 					}
 
 					public object Call(Interpreter interpreter, Token token, List arguments) {
-						return self.container.Count;
+						return (double)self.container.Count;
 					}
 
 					public override string ToString() { return "<Dictionary function>"; }

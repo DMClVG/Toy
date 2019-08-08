@@ -156,6 +156,7 @@ namespace Toy {
 				Resolve(stmt.initializer);
 			}
 			Define(stmt.name);
+
 			return null;
 		}
 
@@ -298,15 +299,15 @@ namespace Toy {
 			}
 		}
 
-		public void BeginScope() {
+		void BeginScope() {
 			scopes.Push(new Dictionary<string, bool>());
 		}
 
-		public void EndScope() {
+		void EndScope() {
 			scopes.Pop();
 		}
 
-		public void Declare(Token name) {
+		void Declare(Token name) {
 			if (scopes.Count == 0) return;
 
 			if (scopes.Peek().ContainsKey(name.lexeme)) {
@@ -316,7 +317,7 @@ namespace Toy {
 			scopes.Peek()[name.lexeme] = false;
 		}
 
-		public void Define(Token name) {
+		void Define(Token name) {
 			if (scopes.Count == 0) return;
 
 			scopes.Peek()[name.lexeme] = true;

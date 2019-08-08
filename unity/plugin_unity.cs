@@ -28,6 +28,7 @@ namespace Toy {
 				switch(propertyName) {
 					//access members
 					case "Fetch": return new Fetch(this);
+					case "Load": return new Load(this);
 
 					//virtual input members
 					case "GetAxis": return new GetAxis(this);
@@ -56,6 +57,22 @@ namespace Toy {
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return GameObject.Find((string)arguments[0]).GetComponent<ToyBehaviour>();
+				}
+			}
+
+			public class Load : ICallable {
+				Unity self = null;
+
+				public Load(Unity self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 1;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					return new GameObjectWrapper(GameObject.Instantiate(Resources.Load((string)arguments[0]) as GameObject));
 				}
 			}
 
