@@ -31,8 +31,5 @@ namespace Toy {
 		}
 
 		public override string ToString() { return "<function>"; }
-
-		//build an empty function, 0 parameters, PASS statement (for use in unity)
-		public static ScriptFunction NOOP = new ScriptFunction(new Function(new List<Expr>(), new List<Stmt>() { new Pass(new Token(TokenType.PASS, "", null, -1)) }), null);
 	}
 }

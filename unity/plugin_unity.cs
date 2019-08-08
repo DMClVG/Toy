@@ -60,7 +60,7 @@ namespace Toy {
 			}
 
 			//virtual input members
-			class GetAxis : ICallable {
+			public class GetAxis : ICallable {
 				Unity self = null;
 
 				public GetAxis(Unity self) {
@@ -74,9 +74,11 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return Input.GetAxis((string)arguments[0]);
 				}
+
+				public override string ToString() { return "<Unity function>"; }
 			}
 
-			class GetButton : ICallable {
+			public class GetButton : ICallable {
 				Unity self = null;
 
 				public GetButton(Unity self) {
@@ -90,9 +92,11 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return Input.GetButton((string)arguments[0]);
 				}
+
+				public override string ToString() { return "<Unity function>"; }
 			}
 
-			class GetButtonDown : ICallable {
+			public class GetButtonDown : ICallable {
 				Unity self = null;
 
 				public GetButtonDown(Unity self) {
@@ -106,9 +110,11 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return Input.GetButtonDown((string)arguments[0]);
 				}
+
+				public override string ToString() { return "<Unity function>"; }
 			}
 
-			class GetButtonUp : ICallable {
+			public class GetButtonUp : ICallable {
 				Unity self = null;
 
 				public GetButtonUp(Unity self) {
@@ -122,7 +128,11 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return Input.GetButtonUp((string)arguments[0]);
 				}
+
+				public override string ToString() { return "<Unity function>"; }
 			}
+
+			public override string ToString() { return "<Unity plugin>"; }
 		}
 	}
 }

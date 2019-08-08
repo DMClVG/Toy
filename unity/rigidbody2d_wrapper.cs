@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Toy {
-	public class RigidbodyWrapper : IBundle {
+	public class Rigidbody2DWrapper : IBundle {
 		Rigidbody2D self = null;
 
-		public RigidbodyWrapper(Rigidbody2D self) {
+		public Rigidbody2DWrapper(Rigidbody2D self) {
 			this.self = self;
 		}
 
@@ -23,6 +23,11 @@ namespace Toy {
 
 				//callable members
 				case "AddForce": return new AddForce(this);
+
+				//game obeject references
+				case "GameObject": return new GameObjectWrapper(self.gameObject);
+				case "Rigidbody2D": return new Rigidbody2DWrapper(self.gameObject.GetComponent<Rigidbody2D>());
+				case "ToyBehaviour": return self.gameObject.GetComponent<ToyBehaviour>();
 
 				default:
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
@@ -50,9 +55,9 @@ namespace Toy {
 		}
 
 		public class AddForce : ICallable {
-			RigidbodyWrapper self = null;
+			Rigidbody2DWrapper self = null;
 
-			public AddForce(RigidbodyWrapper self) {
+			public AddForce(Rigidbody2DWrapper self) {
 				this.self = self;
 			}
 
@@ -75,6 +80,10 @@ namespace Toy {
 
 				return null;
 			}
+
+			public override string ToString() { return "<Unity function>"; }
 		}
+
+		public override string ToString() { return "<Unity instance>"; }
 	}
 }
