@@ -195,6 +195,7 @@ import "script/dictionary_test.toy" as Dict;
 //TODO: foreach(var element in object) //foreach(var char in "string")
 //TODO: foreach(var index of object)
 //TODO: switch-case
+//TODO: in-game console
 
 //TODO: assert as a "Standard" function?
 //TODO: default arugments

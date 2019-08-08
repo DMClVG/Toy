@@ -26,8 +26,6 @@ namespace Toy {
 
 				//game obeject references
 				case "GameObject": return new GameObjectWrapper(self.gameObject);
-				case "Rigidbody2D": return new Rigidbody2DWrapper(self.gameObject.GetComponent<Rigidbody2D>());
-				case "ToyBehaviour": return self.gameObject.GetComponent<ToyBehaviour>();
 
 				default:
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
