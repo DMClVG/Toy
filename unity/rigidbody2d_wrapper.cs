@@ -82,6 +82,6 @@ namespace Toy {
 			public override string ToString() { return "<Unity function>"; }
 		}
 
-		public override string ToString() { return "<Unity instance>"; }
+		public override string ToString() { return "<Unity Rigidbody2D>"; }
 	}
 }

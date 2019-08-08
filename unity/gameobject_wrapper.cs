@@ -14,13 +14,19 @@ namespace Toy {
 		public object Property(Interpreter interpreter, Token token, object argument) {
 			string propertyName = (string)argument;
 
+			if (self == null) {
+				throw new ErrorHandler.RuntimeError(token, "Can't access property of null Unity GameObject");
+			}
+
 			switch(propertyName) {
 				//simple members
 				case "name": return self.name;
 				case "tag": return self.tag;
 
-				//game obeject references
-				case "GameObject": return new GameObjectWrapper(self);
+				//control members
+				case "Destroy": return new DestroyCallable(this);
+
+				//game obeject components
 				case "Rigidbody2D": return new Rigidbody2DWrapper(self.GetComponent<Rigidbody2D>());
 				case "ToyBehaviour": return self.GetComponent<ToyBehaviour>();
 
@@ -28,5 +34,27 @@ namespace Toy {
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
 			}
 		}
+
+		public class DestroyCallable : ICallable {
+			GameObjectWrapper self = null;
+
+			public DestroyCallable(GameObjectWrapper self) {
+				this.self = self;
+			}
+
+			public int Arity() {
+				return 0;
+			}
+
+			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+				UnityEngine.Object.Destroy(self.self);
+				self.self = null;
+				return null;
+			}
+
+			public override string ToString() { return "<Unity function>"; }
+		}
+
+		public override string ToString() { return "<Unity GameObject>"; }
 	}
 }

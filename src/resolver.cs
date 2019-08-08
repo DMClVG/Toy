@@ -298,15 +298,15 @@ namespace Toy {
 			}
 		}
 
-		void BeginScope() {
+		public void BeginScope() {
 			scopes.Push(new Dictionary<string, bool>());
 		}
 
-		void EndScope() {
+		public void EndScope() {
 			scopes.Pop();
 		}
 
-		void Declare(Token name) {
+		public void Declare(Token name) {
 			if (scopes.Count == 0) return;
 
 			if (scopes.Peek().ContainsKey(name.lexeme)) {
@@ -316,7 +316,7 @@ namespace Toy {
 			scopes.Peek()[name.lexeme] = false;
 		}
 
-		void Define(Token name) {
+		public void Define(Token name) {
 			if (scopes.Count == 0) return;
 
 			scopes.Peek()[name.lexeme] = true;

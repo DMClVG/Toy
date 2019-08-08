@@ -30,6 +30,11 @@ namespace Toy {
 			return null;
 		}
 
+		//for the runner
+		public Function GetDeclaration() {
+			return declaration;
+		}
+
 		public override string ToString() { return "<function>"; }
 	}
 }

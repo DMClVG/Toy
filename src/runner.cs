@@ -39,6 +39,20 @@ namespace Toy {
 				//build a new interpreter
 				Interpreter interpreter = new Interpreter(env);
 
+				Resolver resolver = new Resolver(interpreter);
+
+				resolver.BeginScope();
+
+				//declare the parameters in the resolver
+				for(int i = 0; i < ((ScriptFunction)callable).GetDeclaration().parameters.Count; i++) {
+					resolver.Declare(((Variable)((ScriptFunction)callable).GetDeclaration().parameters[i]).name);
+					resolver.Define (((Variable)((ScriptFunction)callable).GetDeclaration().parameters[i]).name);
+				}
+
+				//resolve the rest of the references
+				resolver.Resolve(((ScriptFunction)callable).GetDeclaration().body);
+				resolver.EndScope();
+
 				//call the ICallable, returning the result
 				return interpreter.Visit(call);
 
