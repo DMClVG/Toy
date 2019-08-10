@@ -27,8 +27,9 @@ namespace Toy {
 
 				switch(propertyName) {
 					//access members
-					case "Fetch": return new Fetch(this);
-					case "Load": return new Load(this);
+					case "FetchGameObject": return new FetchGameObject(this);
+					case "LoadGameObject": return new LoadGameObject(this);
+					case "LoadGameObjectAt": return new LoadGameObjectAt(this);
 
 					//virtual input members
 					case "GetAxis": return new GetAxis(this);
@@ -36,18 +37,57 @@ namespace Toy {
 					case "GetButtonDown": return new GetButtonDown(this);
 					case "GetButtonUp": return new GetButtonUp(this);
 
+					//time members
+					case "Time": return (double)Time.time;
+					case "DeltaTime": return (double)Time.deltaTime;
+
+					case "FixedTime": return (double)Time.fixedTime;
+					case "FixedDeltaTime": return (double)Time.fixedDeltaTime;
+
+					case "UnscaledTime": return (double)Time.unscaledTime;
+					case "UnscaledDeltaTime": return (double)Time.unscaledDeltaTime;
+
+					case "FixedUnscaledTime": return (double)Time.fixedUnscaledTime;
+					case "FixedUnscaledDeltaTime": return (double)Time.fixedUnscaledDeltaTime;
+
+					case "TimeScale": return new AssignableProperty((val) => Time.timeScale = (float)(double)val, (x) => (double)Time.timeScale);
+
 					//TODO: real input members
+
+					//TODO: UI
+
+					//TODO: get child
 
 					default:
 						throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
 				}
 			}
 
+			//assignable properties
+			public class AssignableProperty : AssignableIndex {
+				Func<object, object> Set = null;
+				Func<object, object> Get = null;
+
+				public AssignableProperty(Func<object, object> Set, Func<object, object> Get) {
+					this.Set = Set;
+					this.Get = Get;
+				}
+
+				public override object Value {
+					set {
+						Set(value);
+					}
+					get {
+						return Get(null);
+					}
+				}
+			}
+
 			//access members
-			public class Fetch : ICallable {
+			public class FetchGameObject : ICallable {
 				Unity self = null;
 
-				public Fetch(Unity self) {
+				public FetchGameObject(Unity self) {
 					this.self = self;
 				}
 
@@ -60,10 +100,10 @@ namespace Toy {
 				}
 			}
 
-			public class Load : ICallable {
+			public class LoadGameObject : ICallable {
 				Unity self = null;
 
-				public Load(Unity self) {
+				public LoadGameObject(Unity self) {
 					this.self = self;
 				}
 
@@ -73,6 +113,32 @@ namespace Toy {
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return new GameObjectWrapper(GameObject.Instantiate(Resources.Load((string)arguments[0]) as GameObject));
+				}
+			}
+
+			public class LoadGameObjectAt : ICallable {
+				Unity self = null;
+
+				public LoadGameObjectAt(Unity self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 1 + 3 + 3;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					Vector3 position;
+					position.x = (float)(double)arguments[1];
+					position.y = (float)(double)arguments[2];
+					position.z = (float)(double)arguments[3];
+
+					Vector3 rotation;
+					rotation.x = (float)(double)arguments[4];
+					rotation.y = (float)(double)arguments[5];
+					rotation.z = (float)(double)arguments[6];
+
+					return new GameObjectWrapper(GameObject.Instantiate(Resources.Load((string)arguments[0]) as GameObject, position, Quaternion.Euler(rotation.x, rotation.y, rotation.z)));
 				}
 			}
 
