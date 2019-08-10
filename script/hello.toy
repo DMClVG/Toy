@@ -179,7 +179,6 @@ import "script/dictionary_test.toy" as Dict;
 	//Length(str)
 	//Replace(str, oldStr, newStr)
 	//Trim(str, char)
-	//split(str, char) //how? Into an array?
 	//indexOf(str, substr)
 	//lastIndexOf(str, substr)
 
@@ -188,6 +187,8 @@ import "script/dictionary_test.toy" as Dict;
 
 //TODO: capitalized True and False needs to be fixed
 //TODO: sanity check using assert, testing the language so far
+//TODO: split(str, char) //how? Into an array?
+//TODO: Format(string, args...) //array as an argument?
 
 
 //TODO: JSON library
