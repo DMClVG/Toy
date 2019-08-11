@@ -1,5 +1,3 @@
-import "String";
-
 print "hello world"[0];
 print "hello world"[1:2:-1];
 
@@ -17,10 +15,23 @@ print str;
 
 print "-------------------------";
 
-print String.Length(str);
-print String.ToLower(str);
-print String.ToUpper(str);
-print String.Replace(str, "world", "Kayne");
-print String.Trim(str, "d");
-print String.IndexOf(str, "oo");
-print String.LastIndexOf(str, "oo");
+str = "Hello world";
+
+print str.Length();
+print str.ToLower();
+print str.ToUpper();
+print str.Replace("world", "Kayne");
+print str.Trim("d");
+print str.IndexOf("ll");
+print str.LastIndexOf("ll");
+
+print "-------------------------";
+
+print "Hello world".Length();
+print "Hello world".ToLower();
+print "Hello world".ToUpper();
+print "Hello world".Replace( "world", "Kayne");
+print "Hello world".Trim("d");
+print "Hello world".IndexOf("ll");
+print "Hello world".LastIndexOf("ll");
+

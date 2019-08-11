@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Toy {
 	namespace Library {
-		class String : IPlugin, IBundle {
+		class String : IPlugin {
 			//singleton pattern
 			public IPlugin Singleton {
 				get {
@@ -20,7 +20,7 @@ namespace Toy {
 				env.Define(CSString.IsNullOrEmpty(alias) ? "String" : alias, this, true);
 			}
 
-			//static members
+			//static indexing members
 			public static object SliceNotationLiteral(Expr callee, Token token, object first, object second, object third) {
 				//bounds checking
 				if (!(first is double) || ((double)first != double.NegativeInfinity && (double)first < 0) || ((double)first != double.NegativeInfinity && (double)first >= ((string)((Literal)callee).value).Length)) {
@@ -177,64 +177,111 @@ namespace Toy {
 				}
 			}
 
-			//IBundle
-			public object Property(Interpreter interpreter, Token token, object argument) {
-				string propertyName = (string)argument;
-
-				switch(propertyName) {
-					case "Length": return new Length(this);
-					case "ToLower": return new ToLower(this);
-					case "ToUpper": return new ToUpper(this);
-					case "Replace": return new Replace(this);
-					case "Trim": return new Trim(this);
-					case "IndexOf": return new IndexOf(this);
-					case "LastIndexOf": return new LastIndexOf(this);
+			//static property members
+			public static object LiteralProperty(string str, Token name, string lexeme) {
+				switch(lexeme) {
+					case "Length": return new Length(str);
+					case "ToLower": return new ToLower(str);
+					case "ToUpper": return new ToUpper(str);
+					case "Replace": return new Replace(str);
+					case "Trim": return new Trim(str);
+					case "IndexOf": return new IndexOf(str);
+					case "LastIndexOf": return new LastIndexOf(str);
 
 					default:
-						throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
+						throw new ErrorHandler.RuntimeError(name, "Unknown property '" + lexeme + "'");
 				}
 			}
 
-			public class Length : ICallable {
-				String self = null;
+			public static object VariableProperty(Variable expr, Interpreter interpreter, Token name, string lexeme) {
+				string str = (string)interpreter.LookupVariable(expr);
 
-				public Length(String self) {
+				switch(lexeme) {
+					case "Length": return new Length(str);
+					case "ToLower": return new ToLower(str);
+					case "ToUpper": return new ToUpper(str);
+					case "Replace": return new Replace(str);
+					case "Trim": return new Trim(str);
+					case "IndexOf": return new IndexOf(str);
+					case "LastIndexOf": return new LastIndexOf(str);
+
+					default:
+						throw new ErrorHandler.RuntimeError(name, "Unknown property '" + lexeme + "'");
+				}
+			}
+
+			//callable members
+			public class Length : ICallable {
+				string self;
+
+				public Length(string self) {
 					this.self = self;
 				}
 
 				public int Arity() {
-					return 1;
+					return 0;
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					string str = (string)arguments[0];
-
-					return str.Length;
+					return self.Length;
 				}
 			}
 
 			public class ToLower : ICallable {
-				String self = null;
+				string self;
 
-				public ToLower(String self) {
+				public ToLower(string self) {
 					this.self = self;
 				}
 
 				public int Arity() {
-					return 1;
+					return 0;
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					string str = (string)arguments[0];
-
-					return str.ToLower();
+					return self.ToLower();
 				}
 			}
 
 			public class ToUpper : ICallable {
-				String self = null;
+				string self;
 
-				public ToUpper(String self) {
+				public ToUpper(string self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 0;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					return self.ToUpper();
+				}
+			}
+
+			public class Replace : ICallable {
+				string self;
+
+				public Replace(string self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 2;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					string pat = (string)arguments[0];
+					string rep = (string)arguments[1];
+
+					return self.Replace(pat, rep);
+				}
+			}
+
+			public class Trim : ICallable {
+				string self;
+
+				public Trim(string self) {
 					this.self = self;
 				}
 
@@ -243,86 +290,45 @@ namespace Toy {
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					string str = (string)arguments[0];
+					string chars = (string)arguments[0];
 
-					return str.ToUpper();
-				}
-			}
-
-			public class Replace : ICallable {
-				String self = null;
-
-				public Replace(String self) {
-					this.self = self;
-				}
-
-				public int Arity() {
-					return 3;
-				}
-
-				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					string str = (string)arguments[0];
-					string pat = (string)arguments[1];
-					string rep = (string)arguments[2];
-
-					return str.Replace(pat, rep);
-				}
-			}
-
-			public class Trim : ICallable {
-				String self = null;
-
-				public Trim(String self) {
-					this.self = self;
-				}
-
-				public int Arity() {
-					return 2;
-				}
-
-				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					string str = (string)arguments[0];
-					string chs = (string)arguments[1];
-
-					return str.Trim(chs.ToCharArray());
+					return self.Trim(chars.ToCharArray());
 				}
 			}
 
 			public class IndexOf : ICallable {
-				String self = null;
+				string self;
 
-				public IndexOf(String self) {
+				public IndexOf(string self) {
 					this.self = self;
 				}
 
 				public int Arity() {
-					return 2;
+					return 1;
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					string str = (string)arguments[0];
-					string other = (string)arguments[1];
+					string other = (string)arguments[0];
 
-					return str.IndexOf(other);
+					return self.IndexOf(other);
 				}
 			}
 
 			public class LastIndexOf : ICallable {
-				String self = null;
+				string self;
 
-				public LastIndexOf(String self) {
+				public LastIndexOf(string self) {
 					this.self = self;
 				}
 
 				public int Arity() {
-					return 2;
+					return 1;
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					string str = (string)arguments[0];
-					string other = (string)arguments[1];
+					string other = (string)arguments[0];
 
-					return str.LastIndexOf(other);
+					return self.LastIndexOf(other);
 				}
 			}
 		}

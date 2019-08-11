@@ -403,9 +403,23 @@ namespace Toy {
 		}
 
 		public object Visit(Property expr) {
-			//TODO: built-in properties for strings and numbers here?
-			IBundle bundle = (IBundle)Evaluate(expr.expression);
-			return bundle.Property(this, expr.name, expr.name.lexeme);
+			//built-in properties for strings and numbers here
+
+			object result = Evaluate(expr.expression);
+
+			if (result is IBundle) {
+				return ((IBundle)result).Property(this, expr.name, expr.name.lexeme);
+			}
+
+			if (result is string) {
+				return Toy.Library.String.LiteralProperty((string)result, expr.name, expr.name.lexeme);
+			}
+
+			if (result is Variable) {
+				return Toy.Library.String.VariableProperty((Variable)result, this, expr.name, expr.name.lexeme);
+			}
+
+			throw new ErrorHandler.RuntimeError(expr.name, "Expected type with properties (found " + (result == null ? "null" : result.ToString()) + ")");
 		}
 
 		public object Visit(Grouping expr) {
