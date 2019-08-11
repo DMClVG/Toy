@@ -1,4 +1,5 @@
 using System;
+using CSString = System.String;
 using System.Collections.Generic;
 
 namespace Toy {
@@ -26,7 +27,7 @@ namespace Toy {
 			static IsSame isSame = new IsSame();
 
 			public void Initialize(Environment env, string alias) {
-				if (String.IsNullOrEmpty(alias)) {
+				if (CSString.IsNullOrEmpty(alias)) {
 					//no alias, put these in the global scope
 					env.Define("Clock", clock, true);
 					env.Define("Random", random, true);

@@ -1,4 +1,5 @@
 using CSMath = System.Math;
+using CSString = System.String;
 using System;
 using System.Collections.Generic;
 
@@ -18,7 +19,7 @@ namespace Toy {
 
 			//IPlugin
 			public void Initialize(Environment env, string alias) {
-				env.Define(String.IsNullOrEmpty(alias) ? "Math" : alias, this, true);
+				env.Define(CSString.IsNullOrEmpty(alias) ? "Math" : alias, this, true);
 			}
 
 			//IBundle

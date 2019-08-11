@@ -369,17 +369,33 @@ namespace Toy {
 		public object Visit(Index expr) {
 			object callee = Evaluate(expr.callee);
 
-			if (!(callee is ICollection)) {
-				throw new ErrorHandler.RuntimeError(expr.bracket, "Expected indexable type (found " + (callee == null ? "null" : callee.ToString()) + ")");
+			if (callee is ICollection) {
+				ICollection called = (ICollection)callee;
+
+				object first = Evaluate(expr.first);
+				object second = expr.second != null ? Evaluate(expr.second) : null;
+				object third = expr.third != null ? Evaluate(expr.third) : null;
+
+				return called.Access(this, expr.bracket, first, second, third);
 			}
 
-			ICollection called = (ICollection)callee;
+			if (callee is string) {
+				string str = (string)callee;
 
-			object first = Evaluate(expr.first);
-			object second = expr.second != null ? Evaluate(expr.second) : null;
-			object third = expr.third != null ? Evaluate(expr.third) : null;
+				object first = Evaluate(expr.first);
+				object second = expr.second != null ? Evaluate(expr.second) : null;
+				object third = expr.third != null ? Evaluate(expr.third) : null;
 
-			return called.Access(this, expr.bracket, first, second, third);
+				if (expr.callee is Literal) {
+					return Toy.Library.String.SliceNotationLiteral(expr.callee, expr.bracket, first, second, third);
+				}
+
+				if (expr.callee is Variable) {
+					return Toy.Library.String.SliceNotationVariable(expr.callee, expr.bracket, this, first, second, third);
+				}
+			}
+
+			throw new ErrorHandler.RuntimeError(expr.bracket, "Expected indexable type (found " + (callee == null ? "null" : callee.ToString()) + ")");
 		}
 
 		public object Visit(Function expr) {
@@ -554,7 +570,7 @@ namespace Toy {
 			locals[expr] = depth;
 		}
 
-		object LookupVariable(Expr expr) {
+		public object LookupVariable(Expr expr) {
 			if (locals.ContainsKey(expr)) {
 				return environment.GetAt(locals[expr], ((Variable)expr).name);
 			} else {
@@ -562,7 +578,7 @@ namespace Toy {
 			}
 		}
 
-		object AssignVariable(Expr expr, object value) {
+		public object AssignVariable(Expr expr, object value) {
 			if (locals.ContainsKey(expr)) {
 				return environment.SetAt(locals[expr], ((Variable)expr).name, value);
 			} else {

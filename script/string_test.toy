@@ -1,0 +1,16 @@
+import "String";
+
+print "hello world"[0];
+print "hello world"[1:2:-1];
+
+var str = "Hello world";
+
+print str;
+
+print str[0];
+
+print str[0:4:-1];
+
+str[0:4] = "goodnight";
+
+print str;

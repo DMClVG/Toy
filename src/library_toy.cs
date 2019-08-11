@@ -1,4 +1,5 @@
 using System;
+using CSString = System.String;
 using System.Collections.Generic;
 
 namespace Toy {
@@ -22,12 +23,12 @@ namespace Toy {
 
 			//IPlugin
 			public void Initialize(Environment env, string alias) {
-				env.Define(String.IsNullOrEmpty(alias) ? "Toy" : alias, this, true);
+				env.Define(CSString.IsNullOrEmpty(alias) ? "Toy" : alias, this, true);
 			}
 
 			//IBundle
 			public object Property(Interpreter interpreter, Token token, object argument) {
-				string propertyName = (String)argument;
+				string propertyName = (string)argument;
 
 				switch(propertyName) {
 					case "version": return $"{major}.{minor}.{patch}";
