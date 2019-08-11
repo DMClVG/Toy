@@ -15,6 +15,7 @@ namespace Toy {
 		R Visit(Binary Expr);
 		R Visit(Call Expr);
 		R Visit(Index Expr);
+		R Visit(Pipe Expr);
 		R Visit(Function Expr);
 		R Visit(Property Expr);
 		R Visit(Grouping Expr);
@@ -157,6 +158,22 @@ namespace Toy {
 		public Expr second;
 		public Expr third;
 		public Token bracket;
+	}
+
+	public class Pipe : Expr {
+		public Pipe(Expr callee, Token pipe, Expr following) {
+			this.callee = callee;
+			this.pipe = pipe;
+			this.following = following;
+		}
+
+		public override R Accept<R>(ExprVisitor<R> visitor) {
+			return visitor.Visit(this);
+		}
+
+		public Expr callee;
+		public Token pipe;
+		public Expr following;
 	}
 
 	public class Function : Expr {

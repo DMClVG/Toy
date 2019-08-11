@@ -70,7 +70,7 @@ prefix -> ( "++" | "--" ) IDENTIFIER | postfix ;
 
 postfix -> IDENTIFIER ( "++" | "--" ) | call ;
 
-call -> primary ( "(" arguments? ")" | "[" slice "]" | "." IDENTIFIER )* ;
+call -> primary ( "(" arguments? ")" | "[" slice "]" | "." IDENTIFIER | "|>" primary )* ;
 
 arguments -> expression ( "," expression )* ;
 

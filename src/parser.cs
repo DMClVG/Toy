@@ -393,6 +393,8 @@ namespace Toy {
 				} else if (Match(DOT)) {
 					Token name = Consume(IDENTIFIER, "Expected property name after '.'");
 					expr = new Property(expr, name);
+				} else if (Match(OR_GREATER)) {
+					expr = FinishPipe(expr);
 				} else {
 					break;
 				}
@@ -448,6 +450,14 @@ namespace Toy {
 			Token bracket = Consume(RIGHT_BRACKET, "Expected ']' after index");
 
 			return new Index(callee, first, second, third, bracket);
+		}
+
+		Expr FinishPipe(Expr callee) {
+			Token pipe = Previous();
+
+			Expr following = ExpressionRule();
+
+			return new Pipe(callee, pipe, following);
 		}
 
 		Expr PrimaryRule() {

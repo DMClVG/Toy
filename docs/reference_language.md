@@ -75,7 +75,17 @@ Likewise, the following logical operators are available:
 
 All of the mathematical operators can be used on numbers, while `+` and `+=` can be used on strings for concatenation. Also, `==` and `!=` can be used on strings and numbers to compare them; comparing numbers to booleans will use their truthiness. Plugin instances are equal to themselves, but not others of the same type (unless specifically coded that way with the Equals() method, see [plugins](plugins.md)). Functions only equal themselves.
 
-Remember: `&&` is more tightly bound than `||`.
+Remember, `&&` is more tightly bound than `||`.
+
+There is also the pipe operator: `|>`, which is syntactic sugar for nesting calls:
+
+```
+//replace this:
+print increment(double(increment(double(5)))); //23
+
+//with this:
+print 5 |> double |> increment |> double |> increment; //23
+```
 
 ## Var and Const
 

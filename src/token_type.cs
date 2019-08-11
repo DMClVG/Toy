@@ -21,6 +21,7 @@ namespace Toy {
 		//these can ONLY be doubles
 		AND_AND,
 		OR_OR,
+		OR_GREATER,
 
 		//these can single OR triple
 		DOT, DOT_DOT_DOT,

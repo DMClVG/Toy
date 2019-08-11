@@ -140,8 +140,10 @@ namespace Toy {
 				case '|':
 					if (Match('|')) {
 						AddToken(OR_OR);
+					} else if (Match('>')) {
+						AddToken(OR_GREATER);
 					} else {
-						ErrorHandler.Error(line, "Unexpected character (Expected '|')");
+						ErrorHandler.Error(line, "Unexpected character (Expected '|' or '>')");
 					}
 					break;
 

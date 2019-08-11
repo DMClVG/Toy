@@ -45,6 +45,8 @@ namespace Toy {
 			//unescape a string
 			if (value is string) {
 				ConsoleOutput.Log(System.Text.RegularExpressions.Regex.Unescape((string)value));
+			} else if (value is bool) {
+				ConsoleOutput.Log(value.ToString().ToLower());
 			} else if (value == null) {
 				ConsoleOutput.Log("null");
 			} else {
@@ -396,6 +398,28 @@ namespace Toy {
 			}
 
 			throw new ErrorHandler.RuntimeError(expr.bracket, "Expected indexable type (found " + (callee == null ? "null" : callee.ToString()) + ")");
+		}
+
+		public object Visit(Pipe expr) {
+			object callee = Evaluate(expr.callee);
+
+			//iterate along manually rather than using the tree
+			for (object iter = (Pipe)expr; iter is Pipe; iter = ((Pipe)iter).following) {
+				//get the following callable
+				ICallable callable;
+
+				object following = ((Pipe)iter).following;
+
+				if (following is Pipe) {
+					callable = (ICallable)Evaluate( ((Pipe)following).callee );
+				} else {
+					callable = (ICallable)Evaluate( (Expr)following ); //variable
+				}
+
+				callee = callable.Call(this, ((Pipe)iter).pipe, new List<object>() { callee });
+			}
+
+			return callee;
 		}
 
 		public object Visit(Function expr) {
