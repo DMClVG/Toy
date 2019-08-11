@@ -171,18 +171,6 @@ import "script/dictionary_test.toy" as Dict;
 //print Dict.dictionary["foobar"];
 
 //-----------------------------------------------------------------------------
-//TODO: String | built-in notation
-	//string[x] //get char as string
-	//string[x:y] //get substring
-	//ToLower(str)
-	//ToUpper(str)
-	//Length(str)
-	//Replace(str, oldStr, newStr)
-	//Trim(str, char)
-	//indexOf(str, substr)
-	//lastIndexOf(str, substr)
-
-
 //TODO: function pipes |>, function cascading .., function concatenation + (cascading with a single variable)
 
 //TODO: capitalized True and False needs to be fixed
