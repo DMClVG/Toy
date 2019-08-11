@@ -11,6 +11,16 @@ print str[0];
 
 print str[0:4:-1];
 
-str[0:4] = "goodnight";
+str[0:4] = "Goodnight";
 
 print str;
+
+print "-------------------------";
+
+print String.Length(str);
+print String.ToLower(str);
+print String.ToUpper(str);
+print String.Replace(str, "world", "Kayne");
+print String.Trim(str, "d");
+print String.IndexOf(str, "oo");
+print String.LastIndexOf(str, "oo");

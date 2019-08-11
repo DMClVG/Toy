@@ -1,8 +1,9 @@
 using CSString = System.String;
+using System.Collections.Generic;
 
 namespace Toy {
 	namespace Library {
-		class String : IPlugin {
+		class String : IPlugin, IBundle {
 			//singleton pattern
 			public IPlugin Singleton {
 				get {
@@ -18,8 +19,6 @@ namespace Toy {
 			public void Initialize(Environment env, string alias) {
 				env.Define(CSString.IsNullOrEmpty(alias) ? "String" : alias, this, true);
 			}
-
-			//TODO: string.Length()
 
 			//static members
 			public static object SliceNotationLiteral(Expr callee, Token token, object first, object second, object third) {
@@ -175,6 +174,155 @@ namespace Toy {
 						mutable = mutable.Insert(begin, (string)value);
 						interpreter.AssignVariable(callee, (object)mutable);
 					}
+				}
+			}
+
+			//IBundle
+			public object Property(Interpreter interpreter, Token token, object argument) {
+				string propertyName = (string)argument;
+
+				switch(propertyName) {
+					case "Length": return new Length(this);
+					case "ToLower": return new ToLower(this);
+					case "ToUpper": return new ToUpper(this);
+					case "Replace": return new Replace(this);
+					case "Trim": return new Trim(this);
+					case "IndexOf": return new IndexOf(this);
+					case "LastIndexOf": return new LastIndexOf(this);
+
+					default:
+						throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
+				}
+			}
+
+			public class Length : ICallable {
+				String self = null;
+
+				public Length(String self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 1;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					string str = (string)arguments[0];
+
+					return str.Length;
+				}
+			}
+
+			public class ToLower : ICallable {
+				String self = null;
+
+				public ToLower(String self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 1;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					string str = (string)arguments[0];
+
+					return str.ToLower();
+				}
+			}
+
+			public class ToUpper : ICallable {
+				String self = null;
+
+				public ToUpper(String self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 1;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					string str = (string)arguments[0];
+
+					return str.ToUpper();
+				}
+			}
+
+			public class Replace : ICallable {
+				String self = null;
+
+				public Replace(String self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 3;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					string str = (string)arguments[0];
+					string pat = (string)arguments[1];
+					string rep = (string)arguments[2];
+
+					return str.Replace(pat, rep);
+				}
+			}
+
+			public class Trim : ICallable {
+				String self = null;
+
+				public Trim(String self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 2;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					string str = (string)arguments[0];
+					string chs = (string)arguments[1];
+
+					return str.Trim(chs.ToCharArray());
+				}
+			}
+
+			public class IndexOf : ICallable {
+				String self = null;
+
+				public IndexOf(String self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 2;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					string str = (string)arguments[0];
+					string other = (string)arguments[1];
+
+					return str.IndexOf(other);
+				}
+			}
+
+			public class LastIndexOf : ICallable {
+				String self = null;
+
+				public LastIndexOf(String self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 2;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					string str = (string)arguments[0];
+					string other = (string)arguments[1];
+
+					return str.LastIndexOf(other);
 				}
 			}
 		}
