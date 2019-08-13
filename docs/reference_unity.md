@@ -2,11 +2,11 @@
 
 This is the guide for setting up the Toy programming language to run in the Unity game engine.
 
-This guide was tested in Unity 2019.2.0f1 with Toy version 0.1.0.
+This guide was tested in Unity 2019.2.0f1 with Toy version 0.1.1.
 
 ## Setup
 
-Clone or copy/paste the toy code to the Assets directory in a new project. If you see an error such as this:
+Clone or copy/paste the Toy repo to the Assets directory in a new project. If you see an error such as this:
 
 ```
 error CS0656: Missing compiler required member
@@ -19,4 +19,8 @@ You must also define "TOY_UNITY" under player settings -> player -> other settin
 ## Important Notes
 
 TODO
+
+## Tutorial
+
+Coming Soon!
 

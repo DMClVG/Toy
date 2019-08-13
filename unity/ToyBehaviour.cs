@@ -88,15 +88,15 @@ namespace Toy {
 
 		//input methods
 		void OnMouseEnter() {
-			//TODO
+			Runner.Run(environment, GetPropertyMethod("OnMouseEnter", 0), new List<object>());
 		}
 
 		void OnMouseOver() {
-			//TODO
+			Runner.Run(environment, GetPropertyMethod("OnMouseOver", 0), new List<object>());
 		}
 
 		void OnMouseExit() {
-			//TODO
+			Runner.Run(environment, GetPropertyMethod("OnMouseExit", 0), new List<object>());
 		}
 
 		//assignable properties
@@ -135,6 +135,10 @@ namespace Toy {
 				case "Update":
 				case "LateUpdate":
 
+				case "OnMouseEnter":
+				case "OnMouseOver":
+				case "OnMouseExit":
+
 				return new AssignableProperty(this, propertyName, 0);
 
 				case "OnCollisionEnter2D":
@@ -148,7 +152,8 @@ namespace Toy {
 					return new AssignableProperty(this, propertyName, 1);
 
 				//game obeject references
-				case "GameObject": return new GameObjectWrapper(gameObject);
+				case "GameObject": return new GameObjectWrapper(gameObject); //TODO: using new here will break IsSame()
+				case "Transform": return new TransformWrapper(gameObject.GetComponent<Transform>());
 				case "Rigidbody2D": return new Rigidbody2DWrapper(gameObject.GetComponent<Rigidbody2D>());
 
 				default:

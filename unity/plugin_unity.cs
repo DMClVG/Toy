@@ -96,7 +96,7 @@ namespace Toy {
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					return GameObject.Find((string)arguments[0]).GetComponent<ToyBehaviour>();
+					return new GameObjectWrapper(GameObject.Find((string)arguments[0]));
 				}
 			}
 
