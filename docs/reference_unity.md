@@ -18,9 +18,19 @@ You must also define "TOY_UNITY" under player settings -> player -> other settin
 
 ## Important Notes
 
-TODO
+The Unity components are not exposed to the raw language - instead, wrappers are used so that the language can interface with each component. Keep this in mind when working with the plugin in C#.
+
+## Reference
+
+Here are a set of references for each component of the Unity API.
+
+* [Unity Plugin](reference_unity_plugin.md)
+* [Unity GameObject](reference_unity_gameobject.md)
+* [Unity Toy Behaviour](reference_unity_behaviour.md)
+* [Unity Transform](reference_unity_transform.md)
+* [Unity Rigidbody 2D](reference_unity_rigidbody2d.md)
 
 ## Tutorial
 
-Coming Soon!
-
+* [Toy Unity Tutorial](tutorial_unity.md)
+* [Working With The Plugin](reference_unity_implementation.md)

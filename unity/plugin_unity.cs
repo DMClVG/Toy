@@ -98,7 +98,13 @@ namespace Toy {
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					return new GameObjectWrapper(GameObject.Find((string)arguments[0]));
+					GameObject go = GameObject.Find((string)arguments[0]);
+
+					if (go == null) {
+						throw new ErrorHandler.RuntimeError(token, "No GameObject named '" + (string)arguments[0] + "' could be found");
+					}
+
+					return new GameObjectWrapper(go);
 				}
 			}
 
@@ -114,7 +120,13 @@ namespace Toy {
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					return new GameObjectWrapper(GameObject.Instantiate(Resources.Load((string)arguments[0]) as GameObject));
+					GameObject go = Resources.Load((string)arguments[0]) as GameObject;
+
+					if (go == null) {
+						throw new ErrorHandler.RuntimeError(token, "Failed to load that resource");
+					}
+
+					return new GameObjectWrapper(GameObject.Instantiate(go));
 				}
 			}
 
@@ -140,7 +152,13 @@ namespace Toy {
 					rotation.y = (float)(double)arguments[5];
 					rotation.z = (float)(double)arguments[6];
 
-					return new GameObjectWrapper(GameObject.Instantiate(Resources.Load((string)arguments[0]) as GameObject, position, Quaternion.Euler(rotation.x, rotation.y, rotation.z)));
+					GameObject go = Resources.Load((string)arguments[0]) as GameObject;
+
+					if (go == null) {
+						throw new ErrorHandler.RuntimeError(token, "Failed to load that resource");
+					}
+
+					return new GameObjectWrapper(GameObject.Instantiate(go, position, Quaternion.Euler(rotation.x, rotation.y, rotation.z)));
 				}
 			}
 
@@ -157,7 +175,7 @@ namespace Toy {
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					return Input.GetAxis((string)arguments[0]);
+					return (double)Input.GetAxis((string)arguments[0]);
 				}
 
 				public override string ToString() { return "<Unity function>"; }

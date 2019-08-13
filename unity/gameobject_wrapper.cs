@@ -27,9 +27,9 @@ namespace Toy {
 				case "Destroy": return new DestroyCallable(this);
 
 				//game obeject components
+				case "Behaviour": return self.GetComponent<ToyBehaviour>();
 				case "Transform": return new TransformWrapper(self.GetComponent<Transform>());
 				case "Rigidbody2D": return new Rigidbody2DWrapper(self.GetComponent<Rigidbody2D>());
-				case "Behaviour": return self.GetComponent<ToyBehaviour>();
 
 				default:
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");

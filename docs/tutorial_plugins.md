@@ -1,4 +1,0 @@
-# Plugins Tutorial
-
-Coming Soon!
-
