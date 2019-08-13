@@ -29,7 +29,7 @@ namespace Toy {
 				//game obeject components
 				case "Transform": return new TransformWrapper(self.GetComponent<Transform>());
 				case "Rigidbody2D": return new Rigidbody2DWrapper(self.GetComponent<Rigidbody2D>());
-				case "ToyBehaviour": return self.GetComponent<ToyBehaviour>();
+				case "Behaviour": return self.GetComponent<ToyBehaviour>();
 
 				default:
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Toy {
 	namespace Plugin {
@@ -52,11 +53,12 @@ namespace Toy {
 
 					case "TimeScale": return new AssignableProperty((val) => Time.timeScale = (float)(double)val, (x) => (double)Time.timeScale);
 
+					//scene management
+					case "LoadScene": return new LoadScene(this);
+
 					//TODO: real input members
 
-					//TODO: UI
-
-					//TODO: get child
+					//TODO: separate UI behaviour
 
 					default:
 						throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
@@ -210,6 +212,43 @@ namespace Toy {
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return Input.GetButtonUp((string)arguments[0]);
+				}
+
+				public override string ToString() { return "<Unity function>"; }
+			}
+
+			public class LoadScene : ICallable {
+				Unity self = null;
+
+				public LoadScene(Unity self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 2;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					string sceneName = (string)arguments[0];
+					string sceneMode = (string)arguments[1];
+
+					LoadSceneMode mode;
+
+					switch(sceneMode) {
+						case "Single":
+							mode = LoadSceneMode.Single;
+							break;
+
+						case "Additive":
+							mode = LoadSceneMode.Additive;
+							break;
+
+						default:
+							throw new ErrorHandler.RuntimeError(token, "Unexpected scene mode " + sceneMode);
+					}
+
+					SceneManager.LoadScene(sceneName, mode);
+					return null;
 				}
 
 				public override string ToString() { return "<Unity function>"; }
