@@ -26,7 +26,7 @@ This is the rotation of the Rigidbody2D as an angle. It can be changed.
 
 This is Unity's [Rigidbody2D.AddForce()](https://docs.unity3d.com/ScriptReference/Rigidbody2D.AddForce.html).
 
-This function takes three parameters. The first two are the X and Y values of the force, and the third is the force mode. Acceptable arguments for "mode" are "Force" and "Impulse".
+This function takes three parameters. The first two are the X and Y values of the force, and the third is the force mode. Acceptable arguments for "mode" are "force" and "impulse".
 
 ## GameObject
 

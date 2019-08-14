@@ -66,9 +66,9 @@ namespace Toy {
 			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 				ForceMode2D mode;
 
-				if ((string)arguments[2] == "Force") {
+				if ((string)arguments[2] == "force") {
 					mode = ForceMode2D.Force;
-				} else if ((string)arguments[2] == "Impulse") {
+				} else if ((string)arguments[2] == "impulse") {
 					mode = ForceMode2D.Impulse;
 				} else {
 					throw new ErrorHandler.RuntimeError(token, "Unknown force mode: " + (string)arguments[2]);
