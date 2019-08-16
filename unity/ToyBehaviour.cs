@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -92,7 +93,11 @@ namespace Toy {
 
 		//creation/destruction methods (unity glue functions)
 		void Awake() {
-			environment = Runner.RunFile("Assets/StreamingAssets/" + toyScript + ".toy");
+			if (!String.IsNullOrEmpty(toyScript)) {
+				environment = Runner.RunFile("Assets/StreamingAssets/" + toyScript + ".toy");
+			} else {
+				environment = new Environment();
+			}
 
 			Runner.Run(environment, GetPropertyMethod("Awake", 0), new List<object>());
 		}

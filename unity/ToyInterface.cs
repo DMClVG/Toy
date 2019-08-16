@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using TMPro;
 
 namespace Toy {
 	public class ToyInterface : MonoBehaviour,
@@ -107,6 +109,7 @@ namespace Toy {
 				//game obeject references
 				case "GameObject": return new GameObjectWrapper(gameObject); //TODO: using new here will break IsSame()
 				case "Transform": return new TransformWrapper(gameObject.GetComponent<Transform>());
+				case "TextMesh": return new TextMeshWrapper(gameObject.GetComponent<TextMeshProUGUI>());
 
 				default:
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
@@ -117,7 +120,11 @@ namespace Toy {
 
 		//creation/destruction methods (unity glue functions)
 		void Awake() {
-			environment = Runner.RunFile("Assets/StreamingAssets/" + toyScript + ".toy");
+			if (!String.IsNullOrEmpty(toyScript)) {
+				environment = Runner.RunFile("Assets/StreamingAssets/" + toyScript + ".toy");
+			} else {
+				environment = new Environment();
+			}
 		}
 
 		//Unity UI members
