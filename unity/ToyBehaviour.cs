@@ -12,6 +12,7 @@ namespace Toy {
 		public Dictionary<string, ScriptFunction> propertyMethods = new Dictionary<string, ScriptFunction>();
 
 		ScriptFunction GetPropertyMethod(string propertyName, int argCount) {
+			//this function not overwritten
 			if (!propertyMethods.ContainsKey(propertyName)) {
 				//dummy args
 				List<Expr> args = new List<Expr>();
@@ -25,7 +26,71 @@ namespace Toy {
 			return propertyMethods[propertyName];
 		}
 
-		//creation/destruction methods
+		//assignable properties
+		public class AssignableProperty : AssignableIndex {
+			ToyBehaviour self = null;
+			string propertyName;
+			int argCount = -1;
+
+			public AssignableProperty(ToyBehaviour self, string propertyName, int argCount) {
+				this.self = self;
+				this.propertyName = propertyName;
+				this.argCount = argCount;
+			}
+
+			public override object Value {
+				set {
+					self.propertyMethods[propertyName] = (ScriptFunction)value;
+				}
+				get {
+					return self.GetPropertyMethod(propertyName, argCount);
+				}
+			}
+		}
+
+		//IBundle
+		public object Property(Interpreter interpreter, Token token, object argument) {
+			string propertyName = (string)argument;
+
+			switch(propertyName) {
+				case "Awake":
+				case "Start":
+				case "OnDestroy":
+				case "OnEnable":
+				case "OnDisable":
+				case "FixedUpdate":
+				case "Update":
+				case "LateUpdate":
+
+				case "OnMouseEnter":
+				case "OnMouseOver":
+				case "OnMouseExit":
+
+				return new AssignableProperty(this, propertyName, 0);
+
+				case "OnCollisionEnter2D":
+				case "OnCollisionStay2D":
+				case "OnCollisionExit2D":
+
+				case "OnTriggerEnter2D":
+				case "OnTriggerStay2D":
+				case "OnTriggerExit2D":
+
+					return new AssignableProperty(this, propertyName, 1);
+
+				//game obeject references
+				case "GameObject": return new GameObjectWrapper(gameObject); //TODO: using new here will break IsSame()
+				case "Transform": return new TransformWrapper(gameObject.GetComponent<Transform>());
+				case "Rigidbody2D": return new Rigidbody2DWrapper(gameObject.GetComponent<Rigidbody2D>());
+
+				default:
+					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
+			}
+		}
+
+		public override string ToString() { return "<Unity ToyBehaviour>"; }
+
+		//creation/destruction methods (unity glue functions)
 		void Awake() {
 			environment = Runner.RunFile("Assets/StreamingAssets/" + toyScript + ".toy");
 
@@ -98,69 +163,5 @@ namespace Toy {
 		void OnMouseExit() {
 			Runner.Run(environment, GetPropertyMethod("OnMouseExit", 0), new List<object>());
 		}
-
-		//assignable properties
-		public class AssignableProperty : AssignableIndex {
-			ToyBehaviour self = null;
-			string propertyName;
-			int argCount = -1;
-
-			public AssignableProperty(ToyBehaviour self, string propertyName, int argCount) {
-				this.self = self;
-				this.propertyName = propertyName;
-				this.argCount = argCount;
-			}
-
-			public override object Value {
-				set {
-					self.propertyMethods[propertyName] = (ScriptFunction)value;
-				}
-				get {
-					return self.GetPropertyMethod(propertyName, argCount);
-				}
-			}
-		}
-
-		//IBundle
-		public object Property(Interpreter interpreter, Token token, object argument) {
-			string propertyName = (string)argument;
-
-			switch(propertyName) {
-				case "Awake":
-				case "Start":
-				case "OnDestroy":
-				case "OnEnable":
-				case "OnDisable":
-				case "FixedUpdate":
-				case "Update":
-				case "LateUpdate":
-
-				case "OnMouseEnter":
-				case "OnMouseOver":
-				case "OnMouseExit":
-
-				return new AssignableProperty(this, propertyName, 0);
-
-				case "OnCollisionEnter2D":
-				case "OnCollisionStay2D":
-				case "OnCollisionExit2D":
-
-				case "OnTriggerEnter2D":
-				case "OnTriggerStay2D":
-				case "OnTriggerExit2D":
-
-					return new AssignableProperty(this, propertyName, 1);
-
-				//game obeject references
-				case "GameObject": return new GameObjectWrapper(gameObject); //TODO: using new here will break IsSame()
-				case "Transform": return new TransformWrapper(gameObject.GetComponent<Transform>());
-				case "Rigidbody2D": return new Rigidbody2DWrapper(gameObject.GetComponent<Rigidbody2D>());
-
-				default:
-					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
-			}
-		}
-
-		public override string ToString() { return "<Unity ToyBehaviour>"; }
 	}
 }

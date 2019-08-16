@@ -28,6 +28,7 @@ namespace Toy {
 
 				//game obeject components
 				case "Behaviour": return self.GetComponent<ToyBehaviour>();
+				case "Interface": return self.GetComponent<ToyInterface>();
 				case "Transform": return new TransformWrapper(self.GetComponent<Transform>());
 				case "Rigidbody2D": return new Rigidbody2DWrapper(self.GetComponent<Rigidbody2D>());
 
