@@ -81,8 +81,6 @@ namespace Toy {
 
 				//game obeject references
 				case "GameObject": return new GameObjectWrapper(gameObject); //TODO: using new here will break IsSame()
-				case "Transform": return new TransformWrapper(gameObject.GetComponent<Transform>());
-				case "Rigidbody2D": return new Rigidbody2DWrapper(gameObject.GetComponent<Rigidbody2D>());
 
 				default:
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");

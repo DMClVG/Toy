@@ -20,7 +20,7 @@ namespace Toy {
 				case "GetText": return new GetText(this);
 
 				//game obeject references
-				case "Interface": return self.GetComponent<ToyInterface>();
+				case "GameObject": return new GameObjectWrapper(self.gameObject);
 
 				default:
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");

@@ -18,6 +18,10 @@ This destroys the current game object, and sets the wrapper to null. Accessing p
 
 This is the [Behaviour component](reference_unity_behaviour.md).
 
+## Interface
+
+This is the [Interface component](reference_unity_interface.md).
+
 ## Transform
 
 This is the [Transform component](reference_unity_transform.md).
@@ -25,3 +29,8 @@ This is the [Transform component](reference_unity_transform.md).
 ## Rigidbody2D
 
 This is the [Rigidbody2d component](reference_unity_rigidbody2d.md).
+
+## TextMesh
+
+This is the [TextMeshProUGUI component](reference_unity_textmesh.md).
+

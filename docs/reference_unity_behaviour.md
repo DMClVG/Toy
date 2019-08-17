@@ -108,10 +108,3 @@ This function takes the other GameObject as an argument, and can be overwritten.
 
 This is the [Unity GameObject](reference_unity_gameobject.md).
 
-## Transform
-
-This is the [Transform component](reference_unity_transform.md).
-
-## Rigidbody2D
-
-This is the [Rigidbody2d component](reference_unity_rigidbody2d.md).
