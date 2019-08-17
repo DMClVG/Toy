@@ -223,7 +223,7 @@ namespace Toy {
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					return self.Length;
+					return (double)self.Length;
 				}
 			}
 
@@ -310,7 +310,7 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					string other = (string)arguments[0];
 
-					return self.IndexOf(other);
+					return (double)self.IndexOf(other);
 				}
 			}
 
@@ -328,7 +328,7 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					string other = (string)arguments[0];
 
-					return self.LastIndexOf(other);
+					return (double)self.LastIndexOf(other);
 				}
 			}
 		}
