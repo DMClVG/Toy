@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 namespace Toy {
 	class GameObjectWrapper : IBundle {
@@ -31,6 +32,7 @@ namespace Toy {
 				case "Interface": return self.GetComponent<ToyInterface>();
 				case "Transform": return new TransformWrapper(self.GetComponent<Transform>());
 				case "Rigidbody2D": return new Rigidbody2DWrapper(self.GetComponent<Rigidbody2D>());
+				case "TextMesh": return new TextMeshWrapper(self.GetComponent<TextMeshProUGUI>());
 
 				default:
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
