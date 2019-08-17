@@ -21,8 +21,8 @@ namespace Toy {
 
 			switch(propertyName) {
 				//simple members
-				case "name": return self.name;
-				case "tag": return self.tag;
+				case "Name": return self.name;
+				case "Tag": return self.tag;
 
 				//control members
 				case "Destroy": return new DestroyCallable(this);

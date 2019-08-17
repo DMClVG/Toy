@@ -2,11 +2,11 @@
 
 This is an overview of the unity GameObject via Toy. If you want to learn how to work with or extend the plugin yourself, please see [this tutorial here](tutorial_unity.md).
 
-## name
+## Name
 
 This is the name of the Unity game object.
 
-## tag
+## Tag
 
 This is the tag of the unity game object.
 
