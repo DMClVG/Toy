@@ -32,7 +32,7 @@ namespace Toy {
 				case "Interface": return self.GetComponent<ToyInterface>();
 				case "Transform": return new TransformWrapper(self.GetComponent<Transform>());
 				case "Rigidbody2D": return new Rigidbody2DWrapper(self.GetComponent<Rigidbody2D>());
-				case "Rigidbody": return new Rigidbody3DWrapper(self.GetComponent<Rigidbody>());
+				case "Rigidbody": return new RigidbodyWrapper(self.GetComponent<Rigidbody>());
 				case "TextMesh": return new TextMeshWrapper(self.GetComponent<TextMeshProUGUI>());
 
 				default:

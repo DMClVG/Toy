@@ -4,28 +4,28 @@ using UnityEngine;
 
 namespace Toy {
 	public class RigidbodyWrapper : IBundle {
-		Rigidbody2D self = null;
+		Rigidbody self = null;
 
-		public RigidbodyWrapper(Rigidbody2D self) {
+		public RigidbodyWrapper(Rigidbody self) {
 			this.self = self;
 		}
 
 		public object Property(Interpreter interpreter, Token token, object argument) {
 			string propertyName = (string)argument;
 
-			switch(propertyName) { //TODO: MovePosition
+			switch(propertyName) { //NOTE: All in local-space
 				//simple members
-				case "PositionX": return new AssignableProperty((val) => self.position = new Vector3((float)(double)val, self.position.y, self.position.z), (x) => (double)self.position.x);
-				case "PositionY": return new AssignableProperty((val) => self.position = new Vector3(self.position.x, (float)(double)val, self.position.z), (x) => (double)self.position.y);
-				case "PositionZ": return new AssignableProperty((val) => self.position = new Vector3(self.position.x, self.position.y, (float)(double)val), (x) => (double)self.position.z);
+				case "PositionX": return new AssignableProperty((val) => { self.MovePosition( self.position + self.gameObject.transform.TransformDirection(new Vector3((float)(double)val - self.position.x, 0, 0)) ); return null; }, (x) => (double)self.position.x);
+				case "PositionY": return new AssignableProperty((val) => { self.MovePosition( self.position + self.gameObject.transform.TransformDirection(new Vector3(0, (float)(double)val - self.position.y, 0)) ); return null; }, (x) => (double)self.position.y);
+				case "PositionZ": return new AssignableProperty((val) => { self.MovePosition( self.position + self.gameObject.transform.TransformDirection(new Vector3(0, 0, (float)(double)val - self.position.z)) ); return null; }, (x) => (double)self.position.z);
 
-				case "VelocityX": return new AssignableProperty((val) => self.velocity = new Vector3((float)(double)val, self.velocity.y, self.velocity.z), (x) => (double)self.velocity.x);
-				case "VelocityY": return new AssignableProperty((val) => self.velocity = new Vector3(self.velocity.x, (float)(double)val, self.velocity.z), (x) => (double)self.velocity.y);
-				case "VelocityZ": return new AssignableProperty((val) => self.velocity = new Vector3(self.velocity.x, self.velocity.y, (float)(double)val), (x) => (double)self.velocity.z);
+				case "VelocityX": return new AssignableProperty((val) => { self.velocity += self.gameObject.transform.TransformDirection(new Vector3((float)(double)val - self.velocity.x, 0, 0)); return null; }, (x) => (double)self.velocity.x);
+				case "VelocityY": return new AssignableProperty((val) => { self.velocity += self.gameObject.transform.TransformDirection(new Vector3(0, (float)(double)val - self.velocity.y, 0)); return null; }, (x) => (double)self.velocity.y);
+				case "VelocityZ": return new AssignableProperty((val) => { self.velocity += self.gameObject.transform.TransformDirection(new Vector3(0, 0, (float)(double)val - self.velocity.z)); return null; }, (x) => (double)self.velocity.z);
 
-				case "RotationX": return new AssignableProperty((val) => self.rotation = new Quaternion.Euler((float)(double)val, self.rotation.y, self.rotation.z), (x) => (double)self.rotation.x);
-				case "RotationY": return new AssignableProperty((val) => self.rotation = new Quaternion.Euler(self.rotation.x, (float)(double)val, self.rotation.z), (x) => (double)self.rotation.y);
-				case "RotationZ": return new AssignableProperty((val) => self.rotation = new Quaternion.Euler(self.rotation.x, self.rotation.y, (float)(double)val), (x) => (double)self.rotation.z);
+				case "RotationX": return new AssignableProperty((val) => { self.MoveRotation(self.rotation * Quaternion.Euler((float)(double)val - self.rotation.x, 0, 0)); return null; }, (x) => (double)self.rotation.x);
+				case "RotationY": return new AssignableProperty((val) => { self.MoveRotation(self.rotation * Quaternion.Euler(0, (float)(double)val - self.rotation.y, 0)); return null; }, (x) => (double)self.rotation.y);
+				case "RotationZ": return new AssignableProperty((val) => { self.MoveRotation(self.rotation * Quaternion.Euler(0, 0, (float)(double)val - self.rotation.z)); return null; }, (x) => (double)self.rotation.z);
 
 				//callable members
 				case "AddForce": return new AddForce(this);
@@ -145,6 +145,6 @@ namespace Toy {
 			public override string ToString() { return "<Unity function>"; }
 		}
 
-		public override string ToString() { return "<Unity Rigidbody2D>"; }
+		public override string ToString() { return "<Unity Rigidbody>"; }
 	}
 }
