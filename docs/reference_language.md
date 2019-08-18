@@ -14,6 +14,8 @@ A list of [available libraries](reference_libraries.md) are included.
 
 One of the more interesting features of Toy are the [plugins](reference_plugins.md), which are detailed separately from the language. Array and Dictionary are included as examples for people who want to write their own.
 
+If you want to use Toy with the Unity game engine, start with the [Unity reference](reference_unity.md), or the [Unity tutorial](tutorial_unity.md).
+
 # Basics
 
 ## Print
@@ -309,7 +311,4 @@ import "external.toy"; //runs the external file, and merges the environemnt into
 
 import "external2.toy" as External2; //runs the external file, then stores the environment into a variable
 ```
-
-Coming Soon: Loading external .toy files!
-Coming Soon: Completed Array and Dictionary plugins!
 
