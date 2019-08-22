@@ -27,8 +27,12 @@ Here are a set of references for each component of the Unity API.
 * [Unity Plugin](reference_unity_plugin.md)
 * [Unity GameObject](reference_unity_gameobject.md)
 * [Unity Toy Behaviour](reference_unity_behaviour.md)
+* [Unity Toy Interface](reference_unity_interface.md)
 * [Unity Transform](reference_unity_transform.md)
 * [Unity Rigidbody 2D](reference_unity_rigidbody2d.md)
+* [Unity Rigidbody](reference_unity_rigidbody.md)
+* [Unity Animator](reference_unity_animator.md)
+* [Unity TextMesh](reference_unity_textmesh.md)
 
 ## Tutorial
 

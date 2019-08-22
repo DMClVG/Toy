@@ -30,6 +30,14 @@ This is the [Transform component](reference_unity_transform.md).
 
 This is the [Rigidbody2d component](reference_unity_rigidbody2d.md).
 
+## Rigidbody
+
+This is the [Rigidbody component](reference_unity_rigidbody.md).
+
+## Animator
+
+This is the [Animator component](reference_unity_animator.md).
+
 ## TextMesh
 
 This is the [TextMeshProUGUI component](reference_unity_textmesh.md).
