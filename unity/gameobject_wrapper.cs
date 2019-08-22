@@ -33,6 +33,7 @@ namespace Toy {
 				case "Transform": return new TransformWrapper(self.GetComponent<Transform>());
 				case "Rigidbody2D": return new Rigidbody2DWrapper(self.GetComponent<Rigidbody2D>());
 				case "Rigidbody": return new RigidbodyWrapper(self.GetComponent<Rigidbody>());
+				case "Animator": return new AnimatorWrapper(self.GetComponent<Animator>());
 				case "TextMesh": return new TextMeshWrapper(self.GetComponent<TextMeshProUGUI>());
 
 				default:
