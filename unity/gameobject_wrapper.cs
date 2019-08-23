@@ -61,6 +61,10 @@ namespace Toy {
 			public override string ToString() { return "<Unity function>"; }
 		}
 
+		public GameObject GetSelf() {
+			return self;
+		}
+
 		public override string ToString() { return "<Unity GameObject>"; }
 	}
 }

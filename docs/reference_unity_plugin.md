@@ -16,6 +16,10 @@ This function takes a filepath as an argument, and returns a newly instantiated 
 
 The parameters "x", "y" and "z" indicate the location to instantiate the GameObject, and "rx", "ry" and "rz" are the rotations to use.
 
+## IsSameGameObject(first, second)
+
+This function is a replacement for Standard's IsSame() function, as the latter doesn't work with unity types. It returns true if "first" and "second" refer to the same GameObject.
+
 # Virtual Input Members
 
 ## GetAxis(name)

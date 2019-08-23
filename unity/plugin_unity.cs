@@ -31,6 +31,7 @@ namespace Toy {
 					case "FetchGameObject": return new FetchGameObject(this);
 					case "LoadGameObject": return new LoadGameObject(this);
 					case "LoadGameObjectAt": return new LoadGameObjectAt(this);
+					case "IsSameGameObject": return new IsSameGameObject(this);
 
 					//virtual input members
 					case "GetAxis": return new GetAxis(this);
@@ -159,6 +160,25 @@ namespace Toy {
 					}
 
 					return new GameObjectWrapper(GameObject.Instantiate(go, position, Quaternion.Euler(rotation.x, rotation.y, rotation.z)));
+				}
+			}
+
+			public class IsSameGameObject : ICallable {
+				Unity self = null;
+
+				public IsSameGameObject(Unity self) {
+					this.self = self;
+				}
+
+				public int Arity() {
+					return 2;
+				}
+
+				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
+					GameObjectWrapper goLeft = (GameObjectWrapper)arguments[0];
+					GameObjectWrapper goRight = (GameObjectWrapper)arguments[1];
+
+					return System.Object.ReferenceEquals(goLeft.GetSelf(), goRight.GetSelf());
 				}
 			}
 
