@@ -115,12 +115,31 @@ namespace Toy {
 
 		public override string ToString() { return "<Unity ToyInterface>"; }
 
+		//public script files
+		public void RunFile(string fileName) {
+			environment = Runner.RunFile(environment, "Assets/StreamingAssets/" + fileName + ".toy");
+
+			if (environment == null) {
+				throw new NullReferenceException("Environment is null in ToyInterface.RunFile()");
+			}
+		}
+
+		public void Run(string script) {
+			environment = Runner.Run(environment, script);
+
+			if (environment == null) {
+				throw new NullReferenceException("Environment is null in ToyInterface.Run()");
+			}
+		}
+
 		//creation/destruction methods (unity glue functions)
 		void Awake() {
+			environment = new Environment();
+
+			environment.Define("this", new GameObjectWrapper(this.gameObject), true);
+
 			if (!String.IsNullOrEmpty(toyScript)) {
-				environment = Runner.RunFile("Assets/StreamingAssets/" + toyScript + ".toy");
-			} else {
-				environment = new Environment();
+				RunFile(toyScript);
 			}
 		}
 

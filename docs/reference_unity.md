@@ -20,6 +20,8 @@ You must also define "TOY_UNITY" under player settings -> player -> other settin
 
 The Unity components are not exposed to the raw language - instead, wrappers are used so that the language can interface with each component. Keep this in mind when working with the plugin in C#.
 
+The GameObject that calls a .toy script file will be passed into that file's environment as `this`.
+
 ## Reference
 
 Here are a set of references for each component of the Unity API.

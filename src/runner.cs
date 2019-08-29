@@ -15,6 +15,16 @@ namespace Toy {
 			return env;
 		}
 
+		public static Environment RunFile(Environment environment, string filename) {
+			Environment env = Run(environment, File.ReadAllText(filename, Encoding.UTF8));
+
+			if (ErrorHandler.HadError) {
+				return null;
+			}
+
+			return env;
+		}
+
 		public static Environment Run(string source) {
 			return Run(new Environment(), source);
 		}
