@@ -19,9 +19,9 @@ namespace Toy {
 				case "PositionY": return new AssignableProperty((val) => { self.MovePosition( self.position + self.gameObject.transform.TransformDirection(new Vector3(0, (float)(double)val - self.position.y, 0)) ); return null; }, (x) => (double)self.position.y);
 				case "PositionZ": return new AssignableProperty((val) => { self.MovePosition( self.position + self.gameObject.transform.TransformDirection(new Vector3(0, 0, (float)(double)val - self.position.z)) ); return null; }, (x) => (double)self.position.z);
 
-				case "VelocityX": return new AssignableProperty((val) => { self.velocity += self.gameObject.transform.TransformDirection(new Vector3((float)(double)val - self.velocity.x, 0, 0)); return null; }, (x) => (double)self.velocity.x);
-				case "VelocityY": return new AssignableProperty((val) => { self.velocity += self.gameObject.transform.TransformDirection(new Vector3(0, (float)(double)val - self.velocity.y, 0)); return null; }, (x) => (double)self.velocity.y);
-				case "VelocityZ": return new AssignableProperty((val) => { self.velocity += self.gameObject.transform.TransformDirection(new Vector3(0, 0, (float)(double)val - self.velocity.z)); return null; }, (x) => (double)self.velocity.z);
+				case "VelocityX": return new AssignableProperty((val) => { self.velocity = new Vector3((float)(double)val, self.velocity.y, self.velocity.z); return null; }, (x) => (double)self.velocity.x);
+				case "VelocityY": return new AssignableProperty((val) => { self.velocity = new Vector3(self.velocity.x, (float)(double)val, self.velocity.z); return null; }, (x) => (double)self.velocity.y);
+				case "VelocityZ": return new AssignableProperty((val) => { self.velocity = new Vector3(self.velocity.x, self.velocity.y, (float)(double)val); return null; }, (x) => (double)self.velocity.z);
 
 				case "AngularVelocityX": return new AssignableProperty((val) => { self.angularVelocity += new Vector3((float)(double)val - self.angularVelocity.x, 0, 0); return null; }, (x) => (double)self.angularVelocity.x);
 				case "AngularVelocityY": return new AssignableProperty((val) => { self.angularVelocity += new Vector3(0, (float)(double)val - self.angularVelocity.y, 0); return null; }, (x) => (double)self.angularVelocity.y);
