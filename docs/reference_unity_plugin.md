@@ -72,9 +72,9 @@ This is Unity's [Time.fixedUnscaledTime](https://docs.unity3d.com/ScriptReferenc
 
 This is Unity's [Time.fixedUnscaledDeltaTime](https://docs.unity3d.com/ScriptReference/Time-fixedUnscaledDeltaTime.html) as a number.
 
-## as a number.
+## TimeScale
 
-This is Unity's [Time.timeScale](https://docs.unity3d.com/ScriptReference/Time-timeScale.html) as a number.
+This is Unity's [Time.timeScale](https://docs.unity3d.com/ScriptReference/Time-timeScale.html) as a number. It can be changed.
 
 # Scene Management
 
