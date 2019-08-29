@@ -23,6 +23,10 @@ namespace Toy {
 				case "VelocityY": return new AssignableProperty((val) => { self.velocity += self.gameObject.transform.TransformDirection(new Vector3(0, (float)(double)val - self.velocity.y, 0)); return null; }, (x) => (double)self.velocity.y);
 				case "VelocityZ": return new AssignableProperty((val) => { self.velocity += self.gameObject.transform.TransformDirection(new Vector3(0, 0, (float)(double)val - self.velocity.z)); return null; }, (x) => (double)self.velocity.z);
 
+				case "AngularVelocityX": return new AssignableProperty((val) => { self.angularVelocity += new Vector3((float)(double)val - self.angularVelocity.x, 0, 0); return null; }, (x) => (double)self.angularVelocity.x);
+				case "AngularVelocityY": return new AssignableProperty((val) => { self.angularVelocity += new Vector3(0, (float)(double)val - self.angularVelocity.y, 0); return null; }, (x) => (double)self.angularVelocity.y);
+				case "AngularVelocityZ": return new AssignableProperty((val) => { self.angularVelocity += new Vector3(0, 0, (float)(double)val - self.angularVelocity.z); return null; }, (x) => (double)self.angularVelocity.z);
+
 				case "RotationX": return new AssignableProperty((val) => { self.MoveRotation(self.rotation * Quaternion.Euler((float)(double)val - self.rotation.x, 0, 0)); return null; }, (x) => (double)self.rotation.x);
 				case "RotationY": return new AssignableProperty((val) => { self.MoveRotation(self.rotation * Quaternion.Euler(0, (float)(double)val - self.rotation.y, 0)); return null; }, (x) => (double)self.rotation.y);
 				case "RotationZ": return new AssignableProperty((val) => { self.MoveRotation(self.rotation * Quaternion.Euler(0, 0, (float)(double)val - self.rotation.z)); return null; }, (x) => (double)self.rotation.z);

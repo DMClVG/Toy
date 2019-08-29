@@ -69,6 +69,14 @@ namespace Toy {
 
 				return new AssignableProperty(this, propertyName, 0);
 
+				case "OnCollisionEnter":
+				case "OnCollisionStay":
+				case "OnCollisionExit":
+
+				case "OnTriggerEnter":
+				case "OnTriggerStay":
+				case "OnTriggerExit":
+
 				case "OnCollisionEnter2D":
 				case "OnCollisionStay2D":
 				case "OnCollisionExit2D":
@@ -130,6 +138,30 @@ namespace Toy {
 		}
 
 		//physics methods
+		void OnCollisionEnter(Collision collision) {
+			Runner.Run(environment, GetPropertyMethod("OnCollisionEnter", 1), new List<object>() { new GameObjectWrapper(collision.gameObject) });
+		}
+
+		void OnCollisiionStay(Collision collision) {
+			Runner.Run(environment, GetPropertyMethod("OnCollisionStay", 1), new List<object>() { new GameObjectWrapper(collision.gameObject) });
+		}
+
+		void OnCollisionExit(Collision collision) {
+			Runner.Run(environment, GetPropertyMethod("OnCollisionExit", 1), new List<object>() { new GameObjectWrapper(collision.gameObject) });
+		}
+
+		void OnTriggerEnter(Collider collider) {
+			Runner.Run(environment, GetPropertyMethod("OnTriggerEnter", 1), new List<object>() { new GameObjectWrapper(collider.gameObject) });
+		}
+
+		void OnTriggerStay(Collider collider) {
+			Runner.Run(environment, GetPropertyMethod("OnTriggerStay", 1), new List<object>() { new GameObjectWrapper(collider.gameObject) });
+		}
+
+		void OnTriggerExit(Collider collider) {
+			Runner.Run(environment, GetPropertyMethod("OnTriggerExit", 1), new List<object>() { new GameObjectWrapper(collider.gameObject) });
+		}
+
 		void OnCollisionEnter2D(Collision2D collision) {
 			Runner.Run(environment, GetPropertyMethod("OnCollisionEnter2D", 1), new List<object>() { new GameObjectWrapper(collision.gameObject) });
 		}

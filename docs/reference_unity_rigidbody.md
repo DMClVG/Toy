@@ -26,6 +26,18 @@ This is the Y velocity of the Rigidbody in local space. It can be changed.
 
 This is the Z velocity of the Rigidbody in local space. It can be changed.
 
+## AngularVelocityX
+
+This is the X angular velocity of the Rigidbody in local space. It can be changed.
+
+## AngularVelocityY
+
+This is the Y angular velocity of the Rigidbody in local space. It can be changed.
+
+## AngularVelocityZ
+
+This is the Z angular velocity of the Rigidbody in local space. It can be changed.
+
 ## RotationX
 
 This is the X rotation of the Rigidbody in local space. It can be changed.

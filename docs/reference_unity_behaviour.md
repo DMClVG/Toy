@@ -68,6 +68,42 @@ This is called from Unity's [MonoBehaviour.OnMouseExit()](https://docs.unity3d.c
 
 This function can be overwritten.
 
+## OnCollisionEnter(other)
+
+This is called from Unity's [MonoBehaviour.OnCollisionEnter()](https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnCollisionEnter.html).
+
+This function takes the other GameObject as an argument, and can be overwritten.
+
+## OnCollisionStay(other)
+
+This function is called from Unity's [MonoBehaviour.OnCollisionStay()](https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnCollisionStay.html).
+
+This function takes the other GameObject as an argument, and can be overwritten.
+
+## OnCollisionExit(other)
+
+This function is called from Unity's [MonoBehaviour.OnCollisionExit()])(https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnCollisionExit.html).
+
+This function takes the other GameObject as an argument, and can be overwritten.
+
+## OnTriggerEnter(other)
+
+This function is called from Unity's [MonoBehaviour.OnTriggerEnter()](https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnTriggerEnter.html).
+
+This function takes the other GameObject as an argument, and can be overwritten.
+
+## OnTriggerStay(other)
+
+This function is called from Unity's [MonoBehaviour.OnTriggerStay()](https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnTriggerStay.html).
+
+This function takes the other GameObject as an argument, and can be overwritten.
+
+## OnTriggerExit(other)
+
+This function is called from Unity's [MonoBehaviour.OnTriggerExit()](https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnTriggerExit.html).
+
+This function takes the other GameObject as an argument, and can be overwritten.
+
 ## OnCollisionEnter2D(other)
 
 This is called from Unity's [MonoBehaviour.OnCollisionEnter2D()](https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnCollisionEnter2D.html).
