@@ -77,7 +77,7 @@ namespace Toy {
 			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 				ForceMode mode;
 
-				switch(arguments[3]) {
+				switch((string)arguments[3]) {
 					case "force":
 						mode = ForceMode.Force;
 						break;
@@ -120,7 +120,7 @@ namespace Toy {
 			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 				ForceMode mode;
 
-				switch(arguments[3]) {
+				switch((string)arguments[3]) {
 					case "force":
 						mode = ForceMode.Force;
 						break;
