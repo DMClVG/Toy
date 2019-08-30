@@ -11,7 +11,7 @@ Please ensure that Globals is in the global environment of the ToyBehaviour or T
 import "Globals";
 
 this.Behaviour.FixedUpdate = () => {
-	/...
+	//...
 	if (attack) {
 		Globals["score"] = Globals["score"] + 1;
 	}
@@ -64,7 +64,7 @@ This accesses the value with the associated key "key" if it exists, otherwise it
 
 This creates or overwrites the key-value pair with they key "key". The object "val" will be set as it's new value.
 
-<span style="color:red">WARNING</span>
+WARNING
 
 This function lacks internal type-checking. Please ensure that the value of "val" is a valid object in Toy (most notably, toy only uses doubles for numbers - it never uses floats. Also, GameObjects and certain components can only be processed within wrappers).
 
