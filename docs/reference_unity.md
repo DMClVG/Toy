@@ -36,7 +36,7 @@ Here are a set of references for each component of the Unity API.
 * [Unity Animator](reference_unity_animator.md)
 * [Unity TextMesh](reference_unity_textmesh.md)
 
-## Tutorial
+## Tutorials
 
 * [Toy Unity Tutorial](tutorial_unity.md)
 * [Working With The Unity Plugin](reference_unity_implementation.md)
