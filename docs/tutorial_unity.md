@@ -21,7 +21,7 @@ Save it into a folder called "Prefabs".
 
 ![Just passed this one](img/example_02.png)
 
-Finally, tag anything that you'll collide with as "Wall", the floor, ceiling and moving walls (the child objects in the prefab would be tagged this way, not the parent).
+Finally, tag anything that you'll collide with as "Wall", such as the floor, ceiling and moving walls (the child objects in the prefab would be tagged this way, not the parent).
 
 Let's get Toy ready. Add a `ToyBehaviour` to The Birb object, and enter a file name (I'm using `Birb`). Then, create a folder called in Assets called "StreamingAssets" - this is a special Unity folder where Toy scripts need to live, so you can mod your games later (you can use subfolders if you specify them in the `ToyBehaviour`). Right click on StreamingAssets, go to the "Create" menu and select "Toy Script", and give it the same file name you entered above.
 
@@ -51,15 +51,15 @@ Next, you'll see the `this` variable used, which is automatically declared by th
 
 Update doesn't take any parameters, so leave the parameter list as `()` followed by the arrow operator (which is what really signifies a function). Finally, the function body is written between a pair of brackets, and ends with a semicolon (Always remember the semi-colon after writing a function - one of the wonderful quirks of Toy!)
 
-Inside the function, we see some familiar looking code. We access `GetButtonDown` from `Unity` and check for the button registered as "Fire1" - by default this is the left mouse button. If this has been pressed, then we use `this` again, this time accessing `Rigidbody2D` (which we attached to the GameObject earlier) and call `AddForce`. This function takes three parameters: the X direction, the Y direction and the force mode as a string (valid force modes are "force" and "impulse"). In this case, we cause a single impulse upwards along the Y axis.
+Inside the function, we see some familiar looking code. We access `GetButtonDown` from `Unity` and check for the button registered as "Fire1" - by default this is the left mouse button. If this has been pressed, then we use `this` again, this time accessing `Rigidbody2D` (which we attached to the GameObject earlier) and call `AddForce`. This function takes three parameters: the X direction, the Y direction and the force mode as a string (valid force modes are `force` and `impulse`). In this case, we cause a single impulse upwards along the Y axis.
 
-Now that we have our simple jump, lets add some collision behaviour. This time, we'll access the Behaviour's `OnCollisionEnter2D`. This time, the function takes one parameter, named `other` (in Toy, the parenthesis can be omitted if there is exactly one parameter. The braces can also be omitted if there is only an expression as the body, which returns the result of that expression). This time, we'll check the Tag of `other` and, if it's equal to `"Wall"`, then we'll set the TimeScale to 0, which will essentially pause the game. We'll use this to check for a game loss later.
+Now that we have our simple jump, lets add some collision behaviour. This time, we'll access the Behaviour's `OnCollisionEnter2D`. This time, the function takes one parameter, named `other` (in Toy, the parenthesis can be omitted if there is exactly one parameter. The braces can also be omitted if there is only an expression as the body, which returns the result of that expression). This time, we'll check the Tag of `other` and, if it's equal to `"Wall"`, then we'll set the `Unity.TimeScale` to 0, which will essentially pause the game. We'll use this to check for a game loss later.
 
 ## ScoreText.toy
 
-Go back to the Unity scene, and add two TextMeshPro texts to a canvas - one called "Score Text" and the other named "Lose Text", and place them where they're visible. You can leave them both blank for now.
+Go back to the Unity scene, and add two TextMeshPro texts to a canvas - one named "Score Text" and the other named "Lose Text", and place them where they're visible. You can leave them both blank for now.
 
-Attach a new `ToyBehaviour` to Score Text, and link it to a new file (like ScoreText.toy). Put the following into it:
+Attach a new `ToyBehaviour` to Score Text, and link it to a new file (like `ScoreText.toy`). Put the following into it:
 
 ```
 import "Standard";
