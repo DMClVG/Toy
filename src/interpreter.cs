@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 
+#if TOY_UNITY
+using UnityEngine;
+#endif
+
 using static Toy.TokenType;
 
 namespace Toy {
@@ -61,6 +65,11 @@ namespace Toy {
 
 			//load another file instead
 			if (libname.Length > 4 && libname.Substring(libname.Length - 4) == ".toy") {
+
+#if TOY_UNITY
+				libname = Application.streamingAssetsPath + "/" + libname;
+#endif
+
 				Environment env = Runner.RunFile(libname);
 
 				//merge the sub-environment into this one, possibly under an alias

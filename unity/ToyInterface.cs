@@ -117,7 +117,7 @@ namespace Toy {
 
 		//public script files
 		public void RunFile(string fileName) {
-			environment = Runner.RunFile(environment, "Assets/StreamingAssets/" + fileName + ".toy");
+			environment = Runner.RunFile(environment, Application.streamingAssetsPath + "/" + fileName + ".toy");
 
 			if (environment == null) {
 				throw new NullReferenceException("Environment is null in ToyInterface.RunFile()");
