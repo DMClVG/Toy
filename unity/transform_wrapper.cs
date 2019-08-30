@@ -51,7 +51,7 @@ namespace Toy {
 			}
 
 			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-				if (arguments[0] is null) {
+				if (arguments[0] == null) {
 					self.self.parent = null;
 					return null;
 				}
