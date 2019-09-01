@@ -44,7 +44,6 @@ namespace Toy {
 
 				//build the call object
 				Token token = new Token(TokenType.EOF, "internal", null, -1);
-				Call call = new Call(((ScriptFunction)callable).GetDeclaration(), token, exprArguments);
 
 				//build a new interpreter
 				Interpreter interpreter = new Interpreter(env);
@@ -53,7 +52,7 @@ namespace Toy {
 				resolver.Resolve(((ScriptFunction)callable).GetDeclaration());
 
 				//call the ICallable, returning the result
-				return interpreter.Interpret(new List<Stmt>() { new Expression(call) });
+				return callable.Call(interpreter, token, arguments);
 
 			//WARNING: duplicate code
 			} catch(ErrorHandler.AssertError) {
