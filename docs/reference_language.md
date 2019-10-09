@@ -79,7 +79,7 @@ All of the mathematical operators can be used on numbers, while `+` and `+=` can
 
 Remember, `&&` is more tightly bound than `||`.
 
-There is also the pipe operator: `|>`, which is syntactic sugar for nesting calls:
+There is also the pipe operator: `|>`, which replaces a series of nested calls:
 
 ```
 //replace this:
@@ -87,6 +87,26 @@ print increment(double(increment(double(5)))); //23
 
 //with this:
 print 5 |> double |> increment |> double |> increment; //23
+```
+
+And the backpipe operator: `<|`, which calls one function many times:
+
+```
+const say = arg => {
+	print arg;
+};
+
+//replace this:
+say("Hello world!");
+say("It's dangerous to go alone!");
+say("Take this!");
+
+//with this:
+say
+	<| "Hello world!"
+	<| "It's dangerous to go alone!"
+	<| "Take this!"
+	;
 ```
 
 ## Var and Const

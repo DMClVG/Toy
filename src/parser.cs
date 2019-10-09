@@ -395,6 +395,8 @@ namespace Toy {
 					expr = new Property(expr, name);
 				} else if (Match(OR_GREATER)) {
 					expr = FinishPipe(expr);
+				} else if (Match(LESS_OR)) {
+					expr = FinishBackpipe(expr);
 				} else {
 					break;
 				}
@@ -458,6 +460,14 @@ namespace Toy {
 			Expr following = ExpressionRule();
 
 			return new Pipe(callee, pipe, following);
+		}
+
+		Expr FinishBackpipe(Expr callee) {
+			Token backpipe = Previous();
+
+			Expr following = ExpressionRule();
+
+			return new Backpipe(callee, backpipe, following);
 		}
 
 		Expr PrimaryRule() {

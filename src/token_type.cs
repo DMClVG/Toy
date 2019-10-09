@@ -16,7 +16,7 @@ namespace Toy {
 		BANG, BANG_EQUAL,
 		EQUAL, EQUAL_EQUAL, EQUAL_GREATER, //EQUAL_GREATER is for the arrow syntax
 		GREATER, GREATER_EQUAL,
-		LESS, LESS_EQUAL,
+		LESS, LESS_EQUAL, LESS_OR,
 
 		//these can ONLY be doubles
 		AND_AND,

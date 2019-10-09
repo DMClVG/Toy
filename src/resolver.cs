@@ -249,6 +249,12 @@ namespace Toy {
 			return null;
 		}
 
+		public object Visit(Backpipe expr) {
+			Resolve(expr.callee);
+			Resolve(expr.following);
+			return null;
+		}
+
 		public object Visit(Function expr) {
 			FunctionType enclosingFunctionType = currentFunctionType;
 			currentFunctionType = FunctionType.FUNCTION;

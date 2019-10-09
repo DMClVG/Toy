@@ -431,6 +431,24 @@ namespace Toy {
 			return callee;
 		}
 
+		public object Visit(Backpipe expr) {
+			object callable = Evaluate(expr.callee);
+
+			if (!(callable is ICallable)) {
+				throw new ErrorHandler.RuntimeError(expr.backpipe, "Expected expression that resolved to a function");
+			}
+
+			//iterate along manually rather than using the tree
+			for (object iter = expr.following; iter != null; iter = iter is Backpipe ? ((Backpipe)iter).following : null) {
+
+				object arg = Evaluate(iter is Backpipe ? ((Backpipe)iter).callee : (Expr)iter);
+
+				((ICallable)callable).Call(this, expr.backpipe, new List<object>() { arg });
+			}
+
+			return null;
+		}
+
 		public object Visit(Function expr) {
 			return new ScriptFunction(expr, environment);
 		}

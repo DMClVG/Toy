@@ -101,7 +101,7 @@ namespace Toy {
 		}
 	}
 
-	//internal helper class (for aliasing files as IBundles)
+	//internal helper class (for aliasing environments as IBundles)
 	public class AliasedFile : IBundle {
 		Environment env = null;
 

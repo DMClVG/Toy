@@ -121,7 +121,7 @@ namespace Toy {
 					break;
 
 				case '<':
-					AddToken(Match('=') ? LESS_EQUAL : LESS);
+					AddToken(Match('=') ? LESS_EQUAL : Match('|') ? LESS_OR : LESS);
 					break;
 
 				case '>':

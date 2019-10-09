@@ -20,6 +20,7 @@ namespace Tool {
 				"Call: Expr callee, Token paren, List<Expr> arguments",
 				"Index: Expr callee, Expr first, Expr second, Expr third, Token bracket",
 				"Pipe: Expr callee, Token pipe, Expr following",
+				"Backpipe: Expr callee, Token backpipe, Expr following",
 				"Function: List<Expr> parameters, List<Stmt> body",
 				"Property: Expr expression, Token name",
 				"Grouping: Expr expression",
