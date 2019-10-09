@@ -26,7 +26,7 @@ Let's start with the most fundemental keyword - `print`.
 print "hello world";
 ```
 
-`print` is followed by a single argument that resolves to either a literal or a variable, which is converted to a string and then outputted to the console, followed by a newline.
+`print` is followed by a single expression that resolves to either a literal or a variable, which is converted to a string and then outputted to the console, followed by a newline.
 
 `print` is a keyword, rather than a library function. This is partially due to Toy's origin as a [lox derivative](http://craftinginterpreters.com/), but I've decided to keep it, as it makes it easy to debug code without requiring a library of some kind (and all of the baggage that comes with). You *can* use it with parentheses, but they're not required at all.
 
