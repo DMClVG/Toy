@@ -225,6 +225,8 @@ const g = () => {
 };
 ```
 
+Warning: The function keyword will be removed in the future, leaving only one way to declare functions.
+
 A function can be called by appending a pair of parentheses after it, and arguments can be passed to it by placing values between those parentheses, separated by commas. An incorrect number of arguments passed is a runtime error.
 
 ```
@@ -269,7 +271,7 @@ const makeCounter = function() {
 	};
 };
 
-const counter = makeCounter():
+const counter = makeCounter();
 
 print counter(); //1
 print counter(); //2
