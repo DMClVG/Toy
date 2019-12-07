@@ -38,12 +38,14 @@ namespace Toy {
 					env.Define("GetType", getTypeCallable, true);
 					env.Define("IsSame", isSame, true);
 				} else {
-					env.Define(alias, new Bundle(), true);
+					env.Define(alias, new StandardBundle(), true);
 				}
 			}
 
 			//member class - the library as a bundle (for the alias)
-			public class Bundle : IBundle {
+			public class StandardBundle : IBundle {
+				public override string ToString() { return "<native library>"; }
+
 				public object Property(Interpreter interpreter, Token token, object argument) {
 					string propertyName = (string)argument;
 
@@ -65,6 +67,8 @@ namespace Toy {
 
 			//member classes representing functions
 			public class Clock : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				public int Arity() {
 					return 0;
 				}
@@ -72,11 +76,11 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds() / (double)1000;
 				}
-
-				public override string ToString() { return "<native function>"; }
 			}
 
 			public class Random : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				System.Random rand = null;
 
 				public Random(int seed = int.MinValue) {
@@ -97,11 +101,11 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return rand.NextDouble();
 				}
-
-				public override string ToString() { return "<native function>"; }
 			}
 
 			public class RandomSeed : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				public int Arity() {
 					return 1;
 				}
@@ -115,11 +119,11 @@ namespace Toy {
 					random = new Random((int)(double)arguments[0]);
 					return null;
 				}
-
-				public override string ToString() { return "<native function>"; }
 			}
 
 			public class ToNumber : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				public int Arity() {
 					return 1;
 				}
@@ -139,11 +143,11 @@ namespace Toy {
 
 					throw new ErrorHandler.RuntimeError(token, "Can only convert booleans and strings to numbers");
 				}
-
-				public override string ToString() { return "<native function>"; }
 			}
 
 			public class ToStringCallable : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				public int Arity() {
 					return 1;
 				}
@@ -159,11 +163,11 @@ namespace Toy {
 
 					return arguments[0].ToString();
 				}
-
-				public override string ToString() { return "<native function>"; }
 			}
 
 			public class ToBoolean : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				public int Arity() {
 					return 1;
 				}
@@ -177,11 +181,11 @@ namespace Toy {
 
 					return interpreter.CheckIsTruthy(arguments[0]);
 				}
-
-				public override string ToString() { return "<native function>"; }
 			}
 
 			public class GetTypeCallable : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				public int Arity() {
 					return 1;
 				}
@@ -218,11 +222,11 @@ namespace Toy {
 					//default
 					return "instance";
 				}
-
-				public override string ToString() { return "<native function>"; }
 			}
 
 			public class IsSame : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				public int Arity() {
 					return 2;
 				}
@@ -230,8 +234,6 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return Object.ReferenceEquals(arguments[0], arguments[1]);
 				}
-
-				public override string ToString() { return "<native function>"; }
 			}
 		}
 	}

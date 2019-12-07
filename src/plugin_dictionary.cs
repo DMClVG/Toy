@@ -7,6 +7,8 @@ namespace Toy {
 	namespace Plugin {
 		//the plugin class
 		public class Dictionary : IPlugin, ICallable, IBundle {
+			public override string ToString() { return "<native plugin>"; }
+
 			public IPlugin Singleton {
 				get {
 					if (singleton == null) {
@@ -45,6 +47,8 @@ namespace Toy {
 
 			//callable properties
 			public class IsDictionaryInstance : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				Dictionary self = null;
 
 				public IsDictionaryInstance(Dictionary self) {
@@ -58,8 +62,6 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List arguments) {
 					return arguments[0] is DictionaryInstance;
 				}
-
-				public override string ToString() { return "<Dictionary property>"; }
 			}
 
 			//the index assign helper class
@@ -134,6 +136,8 @@ namespace Toy {
 				}
 
 				public class Insert : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public Insert(DictionaryInstance self) {
@@ -151,11 +155,11 @@ namespace Toy {
 						self.container[arguments[0]] = arguments[1];
 						return null;
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class Delete : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public Delete(DictionaryInstance self) {
@@ -170,11 +174,11 @@ namespace Toy {
 						self.container.Remove(arguments[0]);
 						return null;
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class Length : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public Length(DictionaryInstance self) {
@@ -188,11 +192,11 @@ namespace Toy {
 					public object Call(Interpreter interpreter, Token token, List arguments) {
 						return (double)self.container.Count;
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class ContainsKey : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public ContainsKey(DictionaryInstance self) {
@@ -206,11 +210,11 @@ namespace Toy {
 					public object Call(Interpreter interpreter, Token token, List arguments) {
 						return self.container.ContainsKey(arguments[0]);
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class ContainsValue : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public ContainsValue(DictionaryInstance self) {
@@ -224,11 +228,11 @@ namespace Toy {
 					public object Call(Interpreter interpreter, Token token, List arguments) {
 						return self.container.ContainsValue(arguments[0]);
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class Every : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public Every(DictionaryInstance self) {
@@ -255,11 +259,11 @@ namespace Toy {
 
 						return true;
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class Any : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public Any(DictionaryInstance self) {
@@ -286,11 +290,11 @@ namespace Toy {
 
 						return false;
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class Filter : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public Filter(DictionaryInstance self) {
@@ -318,11 +322,11 @@ namespace Toy {
 
 						return new DictionaryInstance(resultsContainer);
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class ForEach : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public ForEach(DictionaryInstance self) {
@@ -346,11 +350,11 @@ namespace Toy {
 
 						return null;
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class Map : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public Map(DictionaryInstance self) {
@@ -376,11 +380,11 @@ namespace Toy {
 
 						return new DictionaryInstance(resultsContainer);
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class Reduce : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public Reduce(DictionaryInstance self) {
@@ -405,11 +409,11 @@ namespace Toy {
 
 						return accumulator;
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class Concat : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public Concat(DictionaryInstance self) {
@@ -441,11 +445,11 @@ namespace Toy {
 
 						return new DictionaryInstance(resultsDict);
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class Clear : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public Clear(DictionaryInstance self) {
@@ -460,11 +464,11 @@ namespace Toy {
 						self.container.Clear();
 						return null;
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class EqualsCallable : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public EqualsCallable(DictionaryInstance self) {
@@ -498,11 +502,11 @@ namespace Toy {
 
 						return true;
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public class ToStringCallable : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					DictionaryInstance self = null;
 
 					public ToStringCallable(DictionaryInstance self) {
@@ -516,8 +520,6 @@ namespace Toy {
 					public object Call(Interpreter interpreter, Token token, List arguments) {
 						return self.ToString();
 					}
-
-					public override string ToString() { return "<Dictionary function>"; }
 				}
 
 				public override string ToString() {
@@ -544,8 +546,6 @@ namespace Toy {
 					return "{" + result + "}";
 				}
 			}
-
-			public override string ToString() { return "<plugin>"; }
 		}
 	}
 }

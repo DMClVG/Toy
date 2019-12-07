@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace Toy {
 	public class Rigidbody2DWrapper : IBundle {
+		public override string ToString() { return "<Unity Rigidbody2D wrapper>"; }
+
 		Rigidbody2D self = null;
 
 		public Rigidbody2DWrapper(Rigidbody2D self) {
@@ -53,6 +55,8 @@ namespace Toy {
 		}
 
 		public class AddForce : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			Rigidbody2DWrapper self = null;
 
 			public AddForce(Rigidbody2DWrapper self) {
@@ -78,10 +82,6 @@ namespace Toy {
 
 				return null;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
-
-		public override string ToString() { return "<Unity Rigidbody2D>"; }
 	}
 }

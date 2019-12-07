@@ -5,6 +5,8 @@ using TMPro;
 
 namespace Toy {
 	class GameObjectWrapper : IBundle {
+		public override string ToString() { return "<Unity GameObject wrapper>"; }
+
 		GameObject self = null;
 
 		public GameObjectWrapper(GameObject self) {
@@ -42,6 +44,8 @@ namespace Toy {
 		}
 
 		public class DestroyCallable : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			GameObjectWrapper self = null;
 
 			public DestroyCallable(GameObjectWrapper self) {
@@ -57,14 +61,10 @@ namespace Toy {
 				self.self = null;
 				return null;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public GameObject GetSelf() {
 			return self;
 		}
-
-		public override string ToString() { return "<Unity GameObject>"; }
 	}
 }

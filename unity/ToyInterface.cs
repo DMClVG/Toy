@@ -33,6 +33,8 @@ namespace Toy {
 		ISubmitHandler,
 		ICancelHandler
 	{
+		public override string ToString() { return "<Unity ToyInterface>"; }
+
 		//Toy members
 		[SerializeField]
 		string toyScript = "";
@@ -112,8 +114,6 @@ namespace Toy {
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
 			}
 		}
-
-		public override string ToString() { return "<Unity ToyInterface>"; }
 
 		//public script files
 		public void RunFile(string fileName) {

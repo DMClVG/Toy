@@ -5,6 +5,8 @@ using TMPro;
 
 namespace Toy {
 	public class TextMeshWrapper : IBundle {
+		public override string ToString() { return "<Unity TextMesh wrapper>"; }
+
 		TextMeshProUGUI self = null;
 
 		public TextMeshWrapper(TextMeshProUGUI self) {
@@ -29,6 +31,8 @@ namespace Toy {
 
 		//callables
 		class GetText : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			TextMeshWrapper self = null;
 
 			public GetText(TextMeshWrapper self) {
@@ -42,11 +46,11 @@ namespace Toy {
 			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 				return self.self.text;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		class SetText : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			TextMeshWrapper self = null;
 
 			public SetText(TextMeshWrapper self) {
@@ -60,10 +64,6 @@ namespace Toy {
 			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 				return self.self.text = (string)arguments[0];
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
-
-		public override string ToString() { return "<Unity TextMesh>"; }
 	}
 }

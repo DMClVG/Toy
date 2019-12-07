@@ -5,6 +5,8 @@ using UnityEngine;
 namespace Toy {
 	namespace Plugin {
 		public class Globals : IPlugin, ICollection {
+			public override string ToString() { return "<native plugin>"; }
+
 			//singleton pattern
 			public IPlugin Singleton {
 				get {

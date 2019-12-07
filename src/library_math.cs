@@ -6,6 +6,8 @@ using System.Collections.Generic;
 namespace Toy {
 	namespace Library {
 		class Math : IPlugin, IBundle {
+			public override string ToString() { return "<native library>"; }
+
 			//singleton pattern
 			public IPlugin Singleton {
 				get {
@@ -74,6 +76,8 @@ namespace Toy {
 
 			//callable types
 			public class CallableArity1 : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				Math self = null;
 				Func<double, double> expression = null;
 
@@ -98,6 +102,8 @@ namespace Toy {
 			}
 
 			public class CallableArity2 : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				Math self = null;
 				Func<double, double, double> expression = null;
 

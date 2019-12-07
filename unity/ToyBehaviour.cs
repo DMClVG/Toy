@@ -5,6 +5,8 @@ using UnityEngine;
 
 namespace Toy {
 	public class ToyBehaviour : MonoBehaviour, IBundle {
+		public override string ToString() { return "<Unity ToyBehaviour>"; }
+
 		//Toy members
 		[SerializeField]
 		string toyScript = "";
@@ -95,8 +97,6 @@ namespace Toy {
 			}
 		}
 
-		public override string ToString() { return "<Unity ToyBehaviour>"; }
-
 		//public script files
 		public void RunFile(string fileName) {
 			environment = Runner.RunFile(environment, Application.streamingAssetsPath + "/" + fileName + ".toy");
@@ -116,6 +116,7 @@ namespace Toy {
 
 		//creation/destruction methods (unity glue functions)
 		void Awake() {
+			//TODO: need a way to connect different Toy environments between multiple ToyBehaviours and ToyInterfaces (cleanly)
 			environment = new Environment();
 
 			environment.Define("this", new GameObjectWrapper(this.gameObject), true);

@@ -13,7 +13,7 @@ namespace Toy {
 			if (obj is string) {
 				Console.WriteLine((string)obj);
 			} else {
-				Console.WriteLine(obj);
+				Console.WriteLine(obj.ToString());
 			}
 #endif
 		}

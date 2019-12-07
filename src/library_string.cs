@@ -2,8 +2,10 @@ using CSString = System.String;
 using System.Collections.Generic;
 
 namespace Toy {
-	namespace Library {
+	namespace Library { //TODO: remove String from the library namespace; it should be built into the native language
 		class String : IPlugin {
+			public override string ToString() { return "<native library>"; }
+
 			//singleton pattern
 			public IPlugin Singleton {
 				get {
@@ -212,6 +214,8 @@ namespace Toy {
 
 			//callable members
 			public class Length : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				string self;
 
 				public Length(string self) {
@@ -228,6 +232,8 @@ namespace Toy {
 			}
 
 			public class ToLower : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				string self;
 
 				public ToLower(string self) {
@@ -244,6 +250,8 @@ namespace Toy {
 			}
 
 			public class ToUpper : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				string self;
 
 				public ToUpper(string self) {
@@ -260,6 +268,8 @@ namespace Toy {
 			}
 
 			public class Replace : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				string self;
 
 				public Replace(string self) {
@@ -279,6 +289,8 @@ namespace Toy {
 			}
 
 			public class Trim : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				string self;
 
 				public Trim(string self) {
@@ -297,6 +309,8 @@ namespace Toy {
 			}
 
 			public class IndexOf : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				string self;
 
 				public IndexOf(string self) {
@@ -315,6 +329,8 @@ namespace Toy {
 			}
 
 			public class LastIndexOf : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				string self;
 
 				public LastIndexOf(string self) {

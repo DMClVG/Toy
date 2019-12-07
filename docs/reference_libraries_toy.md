@@ -2,19 +2,19 @@
 
 This is the meta-library, holding information about the Toy language itself. Use this for determining version information.
 
-## version
+## Version
 
 This string is equal to "major.minor.patch".
 
-## major
+## Major
 
 This number is the language's major version number.
 
-## minor
+## Minor
 
 This number is the language's minor version number.
 
-## patch
+## Patch
 
 This number is the language's patch version number.
 

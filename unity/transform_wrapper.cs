@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace Toy {
 	class TransformWrapper : IBundle {
+		public override string ToString() { return "<Unity Transform wrapper>"; }
+
 		Transform self = null;
 		TransformWrapper parentWrapper = null;
 
@@ -40,6 +42,8 @@ namespace Toy {
 		}
 
 		public class SetParent : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			TransformWrapper self = null;
 
 			public SetParent(TransformWrapper self) {
@@ -67,11 +71,11 @@ namespace Toy {
 
 				return null;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class GetParent : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			TransformWrapper self = null;
 
 			public GetParent(TransformWrapper self) {
@@ -85,11 +89,11 @@ namespace Toy {
 			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 				return self.parentWrapper;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class IsChildOf : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			TransformWrapper self = null;
 
 			public IsChildOf(TransformWrapper self) {
@@ -109,11 +113,11 @@ namespace Toy {
 
 				return self.self.IsChildOf(other.self);
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class SetSiblingIndex : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			TransformWrapper self = null;
 
 			public SetSiblingIndex(TransformWrapper self) {
@@ -128,11 +132,11 @@ namespace Toy {
 				self.self.SetSiblingIndex((int)(double)arguments[0]);
 				return null;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class GetSiblingIndex : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			TransformWrapper self = null;
 
 			public GetSiblingIndex(TransformWrapper self) {
@@ -146,11 +150,11 @@ namespace Toy {
 			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 				return (double)self.self.GetSiblingIndex();
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class GetChild : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			TransformWrapper self = null;
 
 			public GetChild(TransformWrapper self) {
@@ -164,11 +168,11 @@ namespace Toy {
 			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 				return new TransformWrapper( self.self.GetChild((int)(double)arguments[0]) );
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class GetChildCount : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			TransformWrapper self = null;
 
 			public GetChildCount(TransformWrapper self) {
@@ -182,11 +186,6 @@ namespace Toy {
 			public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 				return (double)self.self.childCount;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
-
-
-		public override string ToString() { return "<Unity Transform>"; }
 	}
 }

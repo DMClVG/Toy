@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 namespace Toy {
 	namespace Plugin {
 		public class Unity : IPlugin, IBundle {
+			public override string ToString() { return "<Unity plugin>"; }
+
 			//singleton pattern
 			public IPlugin Singleton {
 				get {
@@ -88,6 +90,8 @@ namespace Toy {
 
 			//access members
 			public class FetchGameObject : ICallable {
+				public override string ToString() { return "<Unity function>"; }
+
 				Unity self = null;
 
 				public FetchGameObject(Unity self) {
@@ -110,6 +114,8 @@ namespace Toy {
 			}
 
 			public class LoadGameObject : ICallable {
+				public override string ToString() { return "<Unity function>"; }
+
 				Unity self = null;
 
 				public LoadGameObject(Unity self) {
@@ -132,6 +138,8 @@ namespace Toy {
 			}
 
 			public class LoadGameObjectAt : ICallable {
+				public override string ToString() { return "<Unity function>"; }
+
 				Unity self = null;
 
 				public LoadGameObjectAt(Unity self) {
@@ -164,6 +172,8 @@ namespace Toy {
 			}
 
 			public class IsSameGameObject : ICallable {
+				public override string ToString() { return "<Unity function>"; }
+
 				Unity self = null;
 
 				public IsSameGameObject(Unity self) {
@@ -184,6 +194,8 @@ namespace Toy {
 
 			//virtual input members
 			public class GetAxis : ICallable {
+				public override string ToString() { return "<Unity function>"; }
+
 				Unity self = null;
 
 				public GetAxis(Unity self) {
@@ -197,11 +209,11 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return (double)Input.GetAxis((string)arguments[0]);
 				}
-
-				public override string ToString() { return "<Unity function>"; }
 			}
 
 			public class GetButton : ICallable {
+				public override string ToString() { return "<Unity function>"; }
+
 				Unity self = null;
 
 				public GetButton(Unity self) {
@@ -215,11 +227,11 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return Input.GetButton((string)arguments[0]);
 				}
-
-				public override string ToString() { return "<Unity function>"; }
 			}
 
 			public class GetButtonDown : ICallable {
+				public override string ToString() { return "<Unity function>"; }
+
 				Unity self = null;
 
 				public GetButtonDown(Unity self) {
@@ -233,11 +245,11 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return Input.GetButtonDown((string)arguments[0]);
 				}
-
-				public override string ToString() { return "<Unity function>"; }
 			}
 
 			public class GetButtonUp : ICallable {
+				public override string ToString() { return "<Unity function>"; }
+
 				Unity self = null;
 
 				public GetButtonUp(Unity self) {
@@ -251,11 +263,11 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return Input.GetButtonUp((string)arguments[0]);
 				}
-
-				public override string ToString() { return "<Unity function>"; }
 			}
 
 			public class LoadScene : ICallable {
+				public override string ToString() { return "<Unity function>"; }
+
 				Unity self = null;
 
 				public LoadScene(Unity self) {
@@ -288,11 +300,7 @@ namespace Toy {
 					SceneManager.LoadScene(sceneName, mode);
 					return null;
 				}
-
-				public override string ToString() { return "<Unity function>"; }
 			}
-
-			public override string ToString() { return "<Unity plugin>"; }
 		}
 	}
 }

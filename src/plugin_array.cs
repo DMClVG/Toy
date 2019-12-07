@@ -5,6 +5,8 @@ namespace Toy {
 	namespace Plugin {
 		//the plugin class
 		public class Array : IPlugin, ICallable, IBundle {
+			public override string ToString() { return "<native plugin>"; }
+
 			//singleton pattern
 			public IPlugin Singleton {
 				get {
@@ -44,6 +46,8 @@ namespace Toy {
 
 			//callable properties
 			public class IsArrayInstance : ICallable {
+				public override string ToString() { return "<native function>"; }
+
 				Array self = null;
 
 				public IsArrayInstance(Array self) {
@@ -57,8 +61,6 @@ namespace Toy {
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 					return arguments[0] is ArrayInstance;
 				}
-
-				public override string ToString() { return "<Array property>"; }
 			}
 
 			//the index assign helper class
@@ -158,6 +160,8 @@ namespace Toy {
 				}
 
 				public class Push : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Push(ArrayInstance self) {
@@ -172,11 +176,11 @@ namespace Toy {
 						self.container.Add(arguments[0]);
 						return null;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Pop : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Pop(ArrayInstance self) {
@@ -192,11 +196,11 @@ namespace Toy {
 						self.container.RemoveAt(self.container.Count - 1);
 						return result;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Unshift : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Unshift(ArrayInstance self) {
@@ -211,11 +215,11 @@ namespace Toy {
 						self.container.Insert(0, arguments[0]);
 						return null;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Shift : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Shift(ArrayInstance self) {
@@ -231,11 +235,11 @@ namespace Toy {
 						self.container.RemoveAt(0);
 						return result;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Length : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Length(ArrayInstance self) {
@@ -249,11 +253,11 @@ namespace Toy {
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 						return (double)self.container.Count;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Sort : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 					ScriptFunction comparator = null;
 					Interpreter interpreter = null;
@@ -289,11 +293,11 @@ namespace Toy {
 
 						return Convert.ToInt32(result);
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Insert : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Insert(ArrayInstance self) {
@@ -314,11 +318,11 @@ namespace Toy {
 						self.container.Insert(pos, arguments[1]);
 						return null;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Delete : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Delete(ArrayInstance self) {
@@ -339,11 +343,11 @@ namespace Toy {
 						self.container.RemoveAt(pos);
 						return null;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class ContainsValue : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public ContainsValue(ArrayInstance self) {
@@ -357,11 +361,11 @@ namespace Toy {
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 						return self.container.Contains(arguments[0]);
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Every : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Every(ArrayInstance self) {
@@ -388,11 +392,11 @@ namespace Toy {
 
 						return true;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Any : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Any(ArrayInstance self) {
@@ -419,11 +423,11 @@ namespace Toy {
 
 						return false;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Filter : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Filter(ArrayInstance self) {
@@ -451,11 +455,11 @@ namespace Toy {
 
 						return new ArrayInstance(resultsContainer);
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class ForEach : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public ForEach(ArrayInstance self) {
@@ -479,11 +483,11 @@ namespace Toy {
 
 						return null;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Map : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Map(ArrayInstance self) {
@@ -509,11 +513,11 @@ namespace Toy {
 
 						return new ArrayInstance(resultsContainer);
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Reduce : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Reduce(ArrayInstance self) {
@@ -538,11 +542,11 @@ namespace Toy {
 
 						return accumulator;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Concat : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Concat(ArrayInstance self) {
@@ -572,11 +576,11 @@ namespace Toy {
 
 						return new ArrayInstance(resultsList);
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class Clear : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public Clear(ArrayInstance self) {
@@ -591,11 +595,11 @@ namespace Toy {
 						self.container.Clear();
 						return null;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class EqualsCallable : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public EqualsCallable(ArrayInstance self) {
@@ -625,11 +629,11 @@ namespace Toy {
 
 						return true;
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public class ToStringCallable : ICallable {
+					public override string ToString() { return "<native function>"; }
+
 					ArrayInstance self = null;
 
 					public ToStringCallable(ArrayInstance self) {
@@ -643,8 +647,6 @@ namespace Toy {
 					public object Call(Interpreter interpreter, Token token, List<object> arguments) {
 						return self.ToString();
 					}
-
-					public override string ToString() { return "<Array function>"; }
 				}
 
 				public override string ToString() {
@@ -676,8 +678,6 @@ namespace Toy {
 					return "[" + result + "]";
 				}
 			}
-
-			public override string ToString() { return "<plugin>"; }
 		}
 	}
 }

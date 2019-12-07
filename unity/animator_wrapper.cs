@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace Toy {
 	public class AnimatorWrapper : IBundle {
+		public override string ToString() { return "<Unity Animator wrapper>"; }
+
 		Animator self = null;
 
 		public AnimatorWrapper(Animator self) {
@@ -34,6 +36,8 @@ namespace Toy {
 		}
 
 		public class Play : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			AnimatorWrapper self;
 
 			public Play(AnimatorWrapper self) {
@@ -51,11 +55,11 @@ namespace Toy {
 
 				return null;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class SetTrigger : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			AnimatorWrapper self;
 
 			public SetTrigger(AnimatorWrapper self) {
@@ -73,11 +77,11 @@ namespace Toy {
 
 				return null;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class ResetTrigger : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			AnimatorWrapper self;
 
 			public ResetTrigger(AnimatorWrapper self) {
@@ -95,11 +99,11 @@ namespace Toy {
 
 				return null;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class SetBool : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			AnimatorWrapper self;
 
 			public SetBool(AnimatorWrapper self) {
@@ -118,11 +122,11 @@ namespace Toy {
 
 				return null;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class GetBool : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			AnimatorWrapper self;
 
 			public GetBool(AnimatorWrapper self) {
@@ -138,11 +142,11 @@ namespace Toy {
 
 				return self.self.GetBool(paramName);
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class SetInteger : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			AnimatorWrapper self;
 
 			public SetInteger(AnimatorWrapper self) {
@@ -161,11 +165,11 @@ namespace Toy {
 
 				return null;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class GetInteger : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			AnimatorWrapper self;
 
 			public GetInteger(AnimatorWrapper self) {
@@ -181,11 +185,11 @@ namespace Toy {
 
 				return (double)self.self.GetInteger(paramName);
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class SetNumber : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			AnimatorWrapper self;
 
 			public SetNumber(AnimatorWrapper self) {
@@ -204,11 +208,11 @@ namespace Toy {
 
 				return null;
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
 
 		public class GetNumber : ICallable {
+			public override string ToString() { return "<Unity function>"; }
+
 			AnimatorWrapper self;
 
 			public GetNumber(AnimatorWrapper self) {
@@ -224,11 +228,6 @@ namespace Toy {
 
 				return (double)self.self.GetFloat(paramName);
 			}
-
-			public override string ToString() { return "<Unity function>"; }
 		}
-
-
-		public override string ToString() { return "<Unity Animator>"; }
 	}
 }
