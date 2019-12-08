@@ -40,7 +40,7 @@ continueStmt -> "continue" ";" ;
 
 returnStmt -> "return" expression? ";" ;
 
-assertStmt -> "assert" "(" expression ( "," expression )? ")" ";" ;
+assertStmt -> "assert" expression ( "," expression )? ";" ;
 
 block -> "{" delcaration* "}" ;
 

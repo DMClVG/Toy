@@ -1,8 +1,5 @@
-//TODO: Fix the assert keyword
-
 //TODO: iteration loops
 //TODO: continue x, break x
-
 
 //TODO: function concatenation + (function currying)
 
@@ -18,7 +15,7 @@
 
 //TODO: sanity check using assert, testing the language so far
 //TODO: split(str, char) //how? Into an array?
-//TODO: Format(string, args...) //array as an argument?
+//TODO: format(string, args...) //array as an argument?
 
 //TODO: IO library
 //TODO: JSON library
@@ -26,7 +23,7 @@
 
 //TODO: in-game console
 //TODO: default arugments?
-//TODO: rest/spread operator; Min(...) Max(...)
+//TODO: rest/spread operator; Min(...) Max(...) (or an array)
 //TODO: MAYBE initializer lists
 //TODO: MAYBE promises
 //TODO: MAYBE coroutines

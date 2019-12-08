@@ -11,10 +11,8 @@ The functions provided are implemented in native code, rather than written in To
 
 * [Toy](reference_libraries_toy.md)
 * [Standard](reference_libraries_standard.md)
-* [String](reference_libraries_string.md)
 * [Math](reference_libraries_math.md)
 
-Coming Soon: Math library!
 Coming Soon: JSON library!
 Coming Soon: IO library!
 Coming Soon: Type casting library!

@@ -392,11 +392,11 @@ namespace Toy {
 				object third = expr.third != null ? Evaluate(expr.third) : null;
 
 				if (expr.callee is Literal) {
-					return Toy.Library.String.SliceNotationLiteral(expr.callee, expr.bracket, first, second, third);
+					return Toy.String.SliceNotationLiteral(expr.callee, expr.bracket, first, second, third);
 				}
 
 				if (expr.callee is Variable) {
-					return Toy.Library.String.SliceNotationVariable(expr.callee, expr.bracket, this, first, second, third);
+					return Toy.String.SliceNotationVariable(expr.callee, expr.bracket, this, first, second, third);
 				}
 			}
 
@@ -457,11 +457,11 @@ namespace Toy {
 			}
 
 			if (result is string) {
-				return Toy.Library.String.LiteralProperty((string)result, expr.name, expr.name.lexeme);
+				return Toy.String.LiteralProperty((string)result, expr.name, expr.name.lexeme);
 			}
 
 			if (result is Variable) {
-				return Toy.Library.String.VariableProperty((Variable)result, this, expr.name, expr.name.lexeme);
+				return Toy.String.VariableProperty((Variable)result, this, expr.name, expr.name.lexeme);
 			}
 
 			throw new ErrorHandler.RuntimeError(expr.name, "Expected type with properties (found " + (result == null ? "null" : result.ToString()) + ")");

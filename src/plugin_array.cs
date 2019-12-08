@@ -20,7 +20,7 @@ namespace Toy {
 
 			//IPlugin
 			public void Initialize(Environment env, string alias) {
-				env.Define(String.IsNullOrEmpty(alias) ? "Array" : alias, this, true);
+				env.Define(System.String.IsNullOrEmpty(alias) ? "Array" : alias, this, true);
 			}
 
 			//ICallable

@@ -21,7 +21,7 @@ namespace Toy {
 
 			//IPlugin
 			public void Initialize(Environment env, string alias) {
-				env.Define(String.IsNullOrEmpty(alias) ? "Dictionary" : alias, this, true);
+				env.Define(System.String.IsNullOrEmpty(alias) ? "Dictionary" : alias, this, true);
 			}
 
 			//ICallable
@@ -531,7 +531,7 @@ namespace Toy {
 
 					//build the result
 					string result = "";
-					foreach(Pair kvp in container) {
+					foreach(Pair kvp in container) { //TODO: have quotes around strings
 						result += kvp.Key.ToString() + ":";
 						result += kvp.Value.ToString() + ",";
 					}

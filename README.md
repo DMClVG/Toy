@@ -1,6 +1,6 @@
 # Toy
 
-This is the Toy programming language interpreter, written in C#.
+This is the Toy programming language interpreter, written in C#. It can be tested out here: [toylang.com](toylang.com)
 
 My goal for writing this language is simply to have fun and to learn, but also to create something that *could* be usable in an actual dev environment, particularly as an extension for the Unity game engine.
 
