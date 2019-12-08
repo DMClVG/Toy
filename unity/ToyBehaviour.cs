@@ -90,7 +90,7 @@ namespace Toy {
 					return new AssignableProperty(this, propertyName, 1);
 
 				//game obeject references
-				case "GameObject": return new GameObjectWrapper(gameObject); //TODO: using new here will break IsSame()
+				case "GameObject": return new GameObjectWrapper(gameObject);
 
 				default:
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");

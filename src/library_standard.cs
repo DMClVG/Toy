@@ -49,7 +49,7 @@ namespace Toy {
 				public object Property(Interpreter interpreter, Token token, object argument) {
 					string propertyName = (string)argument;
 
-					switch(propertyName) { //TODO: string constants
+					switch(propertyName) { //TODO: string constants (split(), format())
 						case "Clock": return clock;
 						case "Random": return random;
 						case "RandomSeed": return randomSeed;
@@ -111,7 +111,6 @@ namespace Toy {
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					//TODO: hashing a string seed
 					if (!(arguments[0] is double)) {
 						throw new ErrorHandler.RuntimeError(token, "Unexpected type received (expected number)");
 					}

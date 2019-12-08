@@ -214,14 +214,13 @@ namespace Toy {
 
 		Stmt AssertStmt() {
 			Token keyword = Previous();
-
-			Consume(LEFT_PAREN, "Expected '(' after assert statement");
 			Expr cond = ExpressionRule();
+
 			Expr message = null;
 			if (Match(COMMA)) {
 				message = ExpressionRule();
 			}
-			Consume(RIGHT_PAREN, "Expected ')' after assert expressions");
+
 			Consume(SEMICOLON, "Expected ';' after assert statement");
 
 			return new Assert(keyword, cond, message);

@@ -6,7 +6,7 @@ namespace Toy {
 	class ErrorHandler {
 		//types for throwing
 		public class AssertError : ApplicationException {
-			public AssertError(Token token, string message) {
+			public AssertError(Token token, Expr cond, string message) {
 				if (token.type == EOF) {
 					ErrorHandler.Report(token.line, "at end", message);
 				} else {

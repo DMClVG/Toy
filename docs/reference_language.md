@@ -304,15 +304,13 @@ No.
 
 ## Assert
 
-The `assert` keyword is an oddball. It takes 1 required parameter, an optional second parameter, and requires parentheses. If the first parameter resolves to be falsy, then the program terminates, and then if a string is provided as the second parameter, it prints that string. Note that assert can only take a string as the second parameter - anything else will cause an error before the program runs.
+The `assert` keyword is an always available. It takes 1 required parameter, and an optional second parameter. If the first parameter resolves to be falsy, then the program terminates, and then if a string is provided as the second parameter, it prints that string. Note that assert can only take a string as the second parameter - anything else will cause an error before the program runs.
 
 ```
-assert(true, "This is fine"); //Good!
-assert(false); //Error!
-assert(true, 42); //The program won't run!
+assert true, "This is fine"; //Good!
+assert false; //Error!
+assert true, 42; //The program won't run!
 ```
-
-Warning: The assert keyword's syntax will be modified in the future.
 
 ## Import As
 

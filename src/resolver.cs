@@ -137,7 +137,11 @@ namespace Toy {
 
 			//a bit of type checking
 			if (stmt.message != null && !(stmt.message is Literal && ((Literal)stmt.message).value is string)) {
-				throw new ErrorHandler.ResolverError(stmt.keyword, "Assert may only take a string literal as it's optional second argument");
+				throw new ErrorHandler.ResolverError(stmt.keyword, "'assert' may only take a string literal as it's optional second argument");
+			}
+
+			if (stmt.message == null) {
+				stmt.message = new Literal("<no message>");
 			}
 
 			return null;

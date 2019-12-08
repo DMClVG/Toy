@@ -178,13 +178,7 @@ namespace Toy {
 
 		public object Visit(Assert stmt) {
 			if (!CheckIsTruthy(Evaluate(stmt.cond))) {
-				string msg = "<no message>";
-
-				if (stmt.message != null) {
-					msg = (string)Evaluate(stmt.message);
-				}
-
-				throw new ErrorHandler.AssertError(stmt.keyword, msg);
+				throw new ErrorHandler.AssertError(stmt.keyword, stmt.cond, (string)((Literal)stmt.message).value);
 			}
 
 			return null;

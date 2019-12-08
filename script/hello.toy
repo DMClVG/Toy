@@ -90,7 +90,7 @@ array.Delete(1);
 print array;
 
 print array;
-array.Sort((a, b) => a - b); //NOTE: only works with number arrays
+array.Sort((a, b) => a - b); //NOTE: this callback only works with number arrays
 print array;
 
 print array.ToString() + array.ToString();
