@@ -231,9 +231,9 @@ Coming Soon: `break x;` and `continue x;` i.e. breaking out of multiple nested l
 
 ## Functions and Return
 
-Unlike many other mainstream languages, functions are not statements, but expressions. They are also ONLY first class functions, and do not have names attached; they must be stored in a variable or constant like any other datatype. Note that since functions are just expressions, a function delcaration MUST end with a semicolon.
+Unlike many other mainstream languages, functions are not statements, but expressions. They are also ONLY first class functions, and do not have names attached; they must be stored in a variable or constant like any other datatype. Note that since functions are just expressions, a function declaration MUST end with a semicolon.
 
-Delcaring a function can be done in two ways - with the funtion keyword, or with the arrow operator.
+Declaring a function can be done in two ways - with the funtion keyword, or with the arrow operator.
 
 ```
 const f = function() {
@@ -244,8 +244,6 @@ const g = () => {
 	print "bar";
 };
 ```
-
-Warning: The function keyword will be removed in the future, leaving only one way to declare functions.
 
 A function can be called by appending a pair of parentheses after it, and arguments can be passed to it by placing values between those parentheses, separated by commas. An incorrect number of arguments passed is a runtime error.
 
@@ -259,7 +257,7 @@ f(); //Error!
 f("foo", "bar"); //Error!
 ```
 
-when a function is declared with the arrow operator, if there is exactly 1 argument, then the parentheses can be omitted. Similarly, if there is only 1 expression statement in the function body, then the braces can be omitted, which causes the result of the expression statement to be returned.
+When a function is declared with the arrow operator, if there is exactly 1 argument, then the parentheses can be omitted. Similarly, if there is only 1 expression statement in the function body, then the braces can be omitted, which causes the result of the expression statement to be returned.
 
 ```
 const caller = function(cb) {
