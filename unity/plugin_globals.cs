@@ -42,7 +42,7 @@ namespace Toy {
 
 			//IPlugin
 			public void Initialize(Environment env, string alias) {
-				env.Define(String.IsNullOrEmpty(alias) ? "Globals" : alias, this, true);
+				env.Define(System.String.IsNullOrEmpty(alias) ? "Globals" : alias, this, true);
 			}
 
 			//the index assign helper class

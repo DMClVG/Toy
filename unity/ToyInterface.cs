@@ -138,7 +138,7 @@ namespace Toy {
 
 			environment.Define("this", new GameObjectWrapper(this.gameObject), true);
 
-			if (!String.IsNullOrEmpty(toyScript)) {
+			if (!System.String.IsNullOrEmpty(toyScript)) {
 				RunFile(toyScript);
 			}
 		}
