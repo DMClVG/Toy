@@ -327,7 +327,7 @@ import "Standard" as std;
 
 print std.Clock(); //Standard is bundled into "std"
 
-import "external.toy"; //runs the external file, and merges the environemnt into this one
+import "external.toy"; //runs the external file, and merges the environment into this one
 
 import "external2.toy" as External2; //runs the external file, then stores the environment into a variable
 ```
