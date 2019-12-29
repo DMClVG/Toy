@@ -2,25 +2,7 @@ using CSString = System.String;
 using System.Collections.Generic;
 
 namespace Toy {
-	class String : IPlugin {
-		public override string ToString() { return "<native library>"; }
-
-		//singleton pattern
-		public IPlugin Singleton {
-			get {
-				if (singleton == null) {
-					return singleton = new String();
-				}
-				return singleton;
-			}
-		}
-		static String singleton = null;
-
-		//IPlugin
-		public void Initialize(Environment env, string alias) {
-			env.Define(CSString.IsNullOrEmpty(alias) ? "String" : alias, this, true);
-		}
-
+	class String {
 		//static indexing members
 		public static object SliceNotationLiteral(Expr callee, Token token, object first, object second, object third) {
 			//bounds checking
