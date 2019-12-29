@@ -10,7 +10,7 @@ If you're familiar with JavaScript, you will see a lot of similarities. However,
 
 A full break down of the language's [grammar is available](grammar) for those who are interested.
 
-A list of [available libraries](reference_libraries.md) are included. The string type has it's own [reference page](reference_libraries_string.md).
+A list of [available libraries](reference_libraries.md) are included. The string type has it's own [reference page](reference_string.md).
 
 One of the more interesting features of Toy are the [plugins](reference_plugins.md), which are detailed separately from the language. Array and Dictionary are included as examples for people who want to write their own.
 
