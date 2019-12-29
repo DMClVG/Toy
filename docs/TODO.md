@@ -17,8 +17,8 @@
 
 //TODO: sanity check using assert, testing the language so far
 
-//TODO: IO library
 //TODO: fileio library
+//TODO: HTTP library, etc?
 //TODO: JSON library
 //TODO: switch-case
 

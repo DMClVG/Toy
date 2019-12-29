@@ -1,5 +1,6 @@
 #source
 SRC=$(wildcard *.cs)
+UNSAFE=$(wildcard .unsafe/*.cs)
 
 #config
 ifeq ($(OS),Windows_NT)
@@ -18,8 +19,13 @@ OUTDIR=../out
 OUT=$(addprefix $(OUTDIR)/,$(OUTFILE))
 
 #targets
-all:
+all: safe
+
+safe:
 	$(CSC) -out:$(OUT) $(SRC)
+
+unsafe:
+	$(CSC) -out:$(OUT) $(SRC) $(UNSAFE)
 
 clean:
 ifeq ($(OS),Windows_NT)

@@ -1,0 +1,20 @@
+import "Standard";
+import "IO";
+
+print "Enter a line";
+const line = IO.ReadLine();
+assert GetType(line) == "string";
+
+print "enter a character";
+const char = IO.ReadChar();
+assert GetType(line) == "string";
+
+print "enter a number";
+const num = IO.ReadNumber();
+assert GetType(num) == "number" || GetType(num) == "null";
+
+IO.Write("Testing write...\n");
+
+IO.Write("test complete\n");
+
+IO.Write(true);

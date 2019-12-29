@@ -6,8 +6,13 @@
 
 OUTDIR=out
 
-all: $(OUTDIR) tools
-	$(MAKE) -C src
+all: safe
+
+safe: $(OUTDIR) tools
+	$(MAKE) safe -C src
+
+unsafe: $(OUTDIR) tools
+	$(MAKE) unsafe -C src
 
 tools: $(OUTDIR)
 	$(MAKE) -C tool
