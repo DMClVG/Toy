@@ -27,7 +27,7 @@ namespace Toy {
 					break;
 
 				default:
-					Console.Write($"Usage: {appName} [<file name> | run \"<toy code>\"]");
+					Console.Write($"Usage: {appName} [<file name> | run \"<Toy code>\"]");
 					break;
 			}
 		}

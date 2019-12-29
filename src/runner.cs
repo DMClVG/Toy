@@ -36,12 +36,6 @@ namespace Toy {
 		//call an ICallable object directly
 		public static object Run(Environment env, ICallable callable, List<object> arguments) {
 			try {
-				//transform the argument list
-				List<Expr> exprArguments = new List<Expr>();
-				foreach(object arg in arguments) {
-					exprArguments.Add(new Literal(arg));
-				}
-
 				//build the call object
 				Token token = new Token(TokenType.EOF, "internal", null, -1);
 
@@ -78,8 +72,8 @@ namespace Toy {
 		//actually run the source code
 		public static Environment Run(Interpreter interpreter, string source) {
 			try {
-				Scanner scanner = new Scanner(source);
-				Parser parser = new Parser(scanner.ScanTokens());
+				Lexer lexer = new Lexer(source);
+				Parser parser = new Parser(lexer.ScanTokens());
 				List<Stmt> stmtList = parser.ParseStatements();
 
 				if (ErrorHandler.HadError) {
