@@ -13,7 +13,3 @@ The functions provided are implemented in native code, rather than written in To
 * [Standard](reference_libraries_standard.md)
 * [IO](reference_libraries_io.md) (unsafe)
 * [Math](reference_libraries_math.md)
-
-Coming Soon: JSON library!
-Coming Soon: IO library!
-Coming Soon: Type casting library!
