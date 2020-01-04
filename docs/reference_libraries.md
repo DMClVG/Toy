@@ -11,5 +11,4 @@ The functions provided are implemented in native code, rather than written in To
 
 * [Toy](reference_libraries_toy.md)
 * [Standard](reference_libraries_standard.md)
-* [IO](reference_libraries_io.md) (unsafe)
 * [Math](reference_libraries_math.md)

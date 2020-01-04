@@ -1,6 +1,6 @@
 # IO
 
-This is the basic Input and Output library for Toy. This library is only available in the unsafe build.
+This is the basic Input and Output plugin for Toy. This plugin is only available in the unsafe build.
 
 ## ReadLine()
 

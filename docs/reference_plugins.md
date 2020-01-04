@@ -4,6 +4,7 @@ This is a detailed look at the plugins that are bundled with the Toy lanugage. F
 
 * [Array](reference_plugins_array.md)
 * [Dictionary](reference_plugins_dictionary.md)
+* [IO](reference_plugins_io.md) (Only available with the unsafe option)
 * [Unity](reference_unity.md) (Only available in the Unity Game Engine)
 * [Globals](reference_plugins_globals.md) (Only available in the Unity Game Engine)
 
