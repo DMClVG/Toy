@@ -21,7 +21,7 @@ namespace Toy {
 			//version data
 			double major = 0;
 			double minor = 2;
-			double patch = 5;
+			double patch = 6;
 
 			//IPlugin
 			public void Initialize(Environment env, string alias) {
