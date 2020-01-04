@@ -90,7 +90,7 @@ namespace Toy {
 					return new AssignableProperty(this, propertyName, 1);
 
 				//game obeject references
-				case "GameObject": return new GameObjectWrapper(gameObject);
+				case "GameObject": return new PluginExtras.GameObjectWrapper(gameObject);
 
 				default:
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
@@ -119,7 +119,7 @@ namespace Toy {
 			//TODO: need a way to connect different Toy environments between multiple ToyBehaviours and ToyInterfaces (cleanly)
 			environment = new Environment();
 
-			environment.Define("this", new GameObjectWrapper(this.gameObject), true);
+			environment.Define("this", new PluginExtras.GameObjectWrapper(this.gameObject), true);
 
 			if (!System.String.IsNullOrEmpty(toyScript)) {
 				RunFile(toyScript);
@@ -159,51 +159,51 @@ namespace Toy {
 
 		//physics methods
 		void OnCollisionEnter(Collision collision) {
-			Runner.Run(environment, GetPropertyMethod("OnCollisionEnter", 1), new List<object>() { new GameObjectWrapper(collision.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnCollisionEnter", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collision.gameObject) });
 		}
 
 		void OnCollisiionStay(Collision collision) {
-			Runner.Run(environment, GetPropertyMethod("OnCollisionStay", 1), new List<object>() { new GameObjectWrapper(collision.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnCollisionStay", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collision.gameObject) });
 		}
 
 		void OnCollisionExit(Collision collision) {
-			Runner.Run(environment, GetPropertyMethod("OnCollisionExit", 1), new List<object>() { new GameObjectWrapper(collision.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnCollisionExit", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collision.gameObject) });
 		}
 
 		void OnTriggerEnter(Collider collider) {
-			Runner.Run(environment, GetPropertyMethod("OnTriggerEnter", 1), new List<object>() { new GameObjectWrapper(collider.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnTriggerEnter", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collider.gameObject) });
 		}
 
 		void OnTriggerStay(Collider collider) {
-			Runner.Run(environment, GetPropertyMethod("OnTriggerStay", 1), new List<object>() { new GameObjectWrapper(collider.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnTriggerStay", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collider.gameObject) });
 		}
 
 		void OnTriggerExit(Collider collider) {
-			Runner.Run(environment, GetPropertyMethod("OnTriggerExit", 1), new List<object>() { new GameObjectWrapper(collider.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnTriggerExit", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collider.gameObject) });
 		}
 
 		void OnCollisionEnter2D(Collision2D collision) {
-			Runner.Run(environment, GetPropertyMethod("OnCollisionEnter2D", 1), new List<object>() { new GameObjectWrapper(collision.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnCollisionEnter2D", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collision.gameObject) });
 		}
 
 		void OnCollisionStay2D(Collision2D collision) {
-			Runner.Run(environment, GetPropertyMethod("OnCollisionStay2D", 1), new List<object>() { new GameObjectWrapper(collision.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnCollisionStay2D", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collision.gameObject) });
 		}
 
 		void OnCollisionExit2D(Collision2D collision) {
-			Runner.Run(environment, GetPropertyMethod("OnCollisionExit2D", 1), new List<object>() { new GameObjectWrapper(collision.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnCollisionExit2D", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collision.gameObject) });
 		}
 
 		void OnTriggerEnter2D(Collider2D collider) {
-			Runner.Run(environment, GetPropertyMethod("OnTriggerEnter2D", 1), new List<object>() { new GameObjectWrapper(collider.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnTriggerEnter2D", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collider.gameObject) });
 		}
 
 		void OnTriggerStay2D(Collider2D collider) {
-			Runner.Run(environment, GetPropertyMethod("OnTriggerStay2D", 1), new List<object>() { new GameObjectWrapper(collider.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnTriggerStay2D", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collider.gameObject) });
 		}
 
 		void OnTriggerExit2D(Collider2D collider) {
-			Runner.Run(environment, GetPropertyMethod("OnTriggerExit2D", 1), new List<object>() { new GameObjectWrapper(collider.gameObject) });
+			Runner.Run(environment, GetPropertyMethod("OnTriggerExit2D", 1), new List<object>() { new PluginExtras.GameObjectWrapper(collider.gameObject) });
 		}
 
 		//input methods

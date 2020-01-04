@@ -108,7 +108,7 @@ namespace Toy {
 				return new AssignableProperty(this, propertyName, 2);
 
 				//game obeject references
-				case "GameObject": return new GameObjectWrapper(gameObject); //TODO: using new here will break IsSame()
+				case "GameObject": return new PluginExtras.GameObjectWrapper(gameObject); //TODO: using new here will break IsSame()
 
 				default:
 					throw new ErrorHandler.RuntimeError(token, "Unknown property '" + propertyName + "'");
@@ -136,7 +136,7 @@ namespace Toy {
 		void Awake() {
 			environment = new Environment();
 
-			environment.Define("this", new GameObjectWrapper(this.gameObject), true);
+			environment.Define("this", new PluginExtras.GameObjectWrapper(this.gameObject), true);
 
 			if (!System.String.IsNullOrEmpty(toyScript)) {
 				RunFile(toyScript);

@@ -109,7 +109,7 @@ namespace Toy {
 						throw new ErrorHandler.RuntimeError(token, "No GameObject named '" + (string)arguments[0] + "' could be found");
 					}
 
-					return new GameObjectWrapper(go);
+					return new PluginExtras.GameObjectWrapper(go);
 				}
 			}
 
@@ -133,7 +133,7 @@ namespace Toy {
 						throw new ErrorHandler.RuntimeError(token, "Failed to load that resource");
 					}
 
-					return new GameObjectWrapper(GameObject.Instantiate(go));
+					return new PluginExtras.GameObjectWrapper(GameObject.Instantiate(go));
 				}
 			}
 
@@ -167,7 +167,7 @@ namespace Toy {
 						throw new ErrorHandler.RuntimeError(token, "Failed to load that resource");
 					}
 
-					return new GameObjectWrapper(GameObject.Instantiate(go, position, Quaternion.Euler(rotation.x, rotation.y, rotation.z)));
+					return new PluginExtras.GameObjectWrapper(GameObject.Instantiate(go, position, Quaternion.Euler(rotation.x, rotation.y, rotation.z)));
 				}
 			}
 
@@ -185,8 +185,8 @@ namespace Toy {
 				}
 
 				public object Call(Interpreter interpreter, Token token, List<object> arguments) {
-					GameObjectWrapper goLeft = (GameObjectWrapper)arguments[0];
-					GameObjectWrapper goRight = (GameObjectWrapper)arguments[1];
+					PluginExtras.GameObjectWrapper goLeft = (PluginExtras.GameObjectWrapper)arguments[0];
+					PluginExtras.GameObjectWrapper goRight = (PluginExtras.GameObjectWrapper)arguments[1];
 
 					return System.Object.ReferenceEquals(goLeft.GetSelf(), goRight.GetSelf());
 				}
