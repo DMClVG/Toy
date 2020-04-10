@@ -1,4 +1,4 @@
-export OUT = ../ctoy
+export OUT = ../out
 
 all:
 	$(MAKE) -C source
