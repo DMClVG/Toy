@@ -1,65 +1,74 @@
 #include "vm.h"
 #include "common.h"
+#include "memory.h"
 #include "debug.h"
 
 #include <stdio.h>
 
-//TODO: make this non-static
-static VM vm;
-
-static void resetStack() {
-	vm.stackTop = vm.stack;
+void initVM(VM* vm) {
+	vm->chunk = NULL;
+	vm->ip = NULL;
+	vm->capacity = 0;
+	vm->count = 0;
+	vm->stack = NULL;
 }
 
-void initVM() {
-	resetStack();
+void freeVM(VM* vm) {
+	FREE_ARRAY(Value, vm->stack, vm->capacity);
+	initVM(vm);
 }
 
-void freeVM() {
-	//
+void pushVM(VM* vm, Value value) {
+	if (vm->capacity < vm->count + 1) {
+		int oldCapacity = vm->capacity;
+
+		vm->capacity = GROW_CAPACITY(oldCapacity);
+		vm->stack = GROW_ARRAY(Value, vm->stack, oldCapacity, vm->capacity);
+	}
+
+	vm->stack[vm->count] = value;
+	vm->count++;
 }
 
-void push(Value value) {
-	*vm.stackTop = value;
-	vm.stackTop++;
+Value popVM(VM* vm) {
+	//TODO: shrink stack to save memory
+
+	vm->count--;
+	return vm->stack[vm->count];
 }
 
-Value pop() {
-	vm.stackTop--;
-	return *vm.stackTop;
-}
-
-static InterpretResult run() {
-#define READ_BYTE() (*vm.ip++)
+InterpretResult runVM(VM* vm) {
+	//utility macros
+#define READ_BYTE() (*vm->ip++)
 
 #define READ_CONSTANT(opcode) \
 	(opcode) == OP_CONSTANT ? \
-	(vm.chunk->constants.values[READ_BYTE()]) : \
-	(vm.chunk->constants.values[(*vm.ip++, *vm.ip++, *vm.ip++, *vm.ip++, *(uint32_t*)(vm.ip - 4))])
+	(vm->chunk->constants.values[READ_BYTE()]) : \
+	(vm->chunk->constants.values[(*vm->ip++, *vm->ip++, *vm->ip++, *vm->ip++, *(uint32_t*)(vm->ip - 4))])
 
-#define BINARY_OP(op) \
+#define BINARY_OP(op, ptr) \
 	do { \
-		Value b = pop(); \
-		Value a = pop(); \
-		push(a op b); \
+		Value b = popVM(ptr); \
+		Value a = popVM(ptr); \
+		pushVM(ptr, a op b); \
 	} while (false)
 
 	for (;;) {
 #ifdef DEBUG_TRACE_EXECUTION
 		printf("          ");
-		for (Value* slot = vm.stack; slot < vm.stackTop; slot++) {
+		for (int slot = 0; slot < vm->count; slot++) {
 			printf("[ ");
-			printValue(*slot);
+			printValue(vm->stack[slot]);
 			printf(" ]");
 		}
 		printf("\n");
-		disassembleInstruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
+		disassembleInstruction(vm->chunk, (int)(vm->ip - vm->chunk->code));
 #endif
 
 		uint8_t instruction;
 		switch(instruction = READ_BYTE()) {
 			case OP_RETURN:
-				printValue(pop());
+				printValue(popVM(vm));
 				printf("\n");
 				return INTERPRET_OK;
 
@@ -67,31 +76,23 @@ static InterpretResult run() {
 			case OP_CONSTANT_LONG:
 			{
 				Value constant = READ_CONSTANT(instruction);
-				push(constant);
+				pushVM(vm, constant);
 				break;
 			}
 
-			case OP_NEGATE:
-				push(-pop());
-				break;
+			case OP_NEGATE: pushVM(vm, -popVM(vm)); break;
 
-			case OP_ADD:      BINARY_OP(+); break;
-			case OP_SUBTRACT: BINARY_OP(-); break;
-			case OP_MULTIPLY: BINARY_OP(*); break;
-			case OP_DIVIDE:   BINARY_OP(/); break;
+			case OP_ADD:      BINARY_OP(+, vm); break;
+			case OP_SUBTRACT: BINARY_OP(-, vm); break;
+			case OP_MULTIPLY: BINARY_OP(*, vm); break;
+			case OP_DIVIDE:   BINARY_OP(/, vm); break;
 
 			default:
-				return INTERPRET_RUNTIME_ERROR; //TODO: stack underflow?
+				return INTERPRET_RUNTIME_ERROR;
 		}
 	}
 
 #undef READ_BYTE
 #undef READ_CONSTANT
 #undef BINARY_OP
-}
-
-InterpretResult interpret(Chunk* chunk) {
-	vm.chunk = chunk;
-	vm.ip = vm.chunk->code;
-	return run();
 }

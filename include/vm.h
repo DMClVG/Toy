@@ -4,27 +4,28 @@
 #include "chunk.h"
 #include "value.h"
 
-//TODO: dynamic stack size
-#define STACK_MAX 1024
-
-typedef struct {
-	Chunk* chunk;
-	uint8_t* ip;
-	Value stack[STACK_MAX];
-	Value* stackTop;
-} VM;
-
 typedef enum {
 	INTERPRET_OK,
 	INTERPRET_COMPILE_ERROR,
 	INTERPRET_RUNTIME_ERROR,
 } InterpretResult;
 
-void initVM();
-void freeVM();
-void push(Value value);
-Value pop();
+typedef struct {
+	//instructions
+	Chunk* chunk;
+	uint8_t* ip;
 
-InterpretResult interpret(Chunk* chunk);
+	//stack stuff
+	int capacity;
+	int count;
+	Value* stack;
+} VM;
+
+void initVM(VM* vm);
+void freeVM(VM* vm);
+void pushVM(VM* vm, Value value);
+Value popVM(VM* vm);
+
+InterpretResult runVM(VM* vm);
 
 #endif
