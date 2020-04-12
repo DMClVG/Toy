@@ -68,7 +68,7 @@ print child.Concat();
 
 Invoking an object without a child invoker is an error.
 
-You can inherent from an existing object using the "extend" keyword. This will clone the original object into the new object:
+You can inherit from an existing object using the "extend" keyword. This will clone the original object into the new object:
 
 ```
 const CParent = (parameter) -> {
