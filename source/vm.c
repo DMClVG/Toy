@@ -99,6 +99,7 @@ InterpretResult runVM(VM* vm) {
 }
 
 InterpretResult interpretVM(VM* vm, const char* source) {
+	//TODO: temporary
 	compile(source);
 	return INTERPRET_OK;
 }
