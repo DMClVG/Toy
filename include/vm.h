@@ -27,5 +27,6 @@ void pushVM(VM* vm, Value value);
 Value popVM(VM* vm);
 
 InterpretResult runVM(VM* vm);
+InterpretResult interpretVM(VM* vm, const char* source);
 
 #endif

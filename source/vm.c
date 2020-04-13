@@ -1,6 +1,7 @@
 #include "vm.h"
 #include "common.h"
 #include "memory.h"
+#include "compiler.h"
 #include "debug.h"
 
 #include <stdio.h>
@@ -95,4 +96,9 @@ InterpretResult runVM(VM* vm) {
 #undef READ_BYTE
 #undef READ_CONSTANT
 #undef BINARY_OP
+}
+
+InterpretResult interpretVM(VM* vm, const char* source) {
+	compile(source);
+	return INTERPRET_OK;
 }
