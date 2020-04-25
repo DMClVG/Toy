@@ -71,6 +71,9 @@ static void eatWhitespace(Scanner* scanner) {
 					break;
 				}
 
+				//not a comment
+				return;
+
 			default:
 				return;
 		}

@@ -1,29 +1,87 @@
 #include "compiler.h"
-#include "scanner.h"
+#include "parser.h"
 #include "common.h"
+#include "debug.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
-void compile(const char* source) {
+//handle errors
+void errorAt(Parser* parser, Token* token, const char* message) {
+	if (parser->panicMode) return;
+
+	//print the line
+	fprintf(stderr, "[line %d] Error", token->line);
+
+	//type
+	if (token->type == TOKEN_EOF) {
+		fprintf(stderr, " at end");
+	} else if (token->type == TOKEN_ERROR) {
+		//nothing
+	} else {
+		fprintf(stderr, " at '%.*s'", token->length, token->start);
+	}
+
+	//finally
+	fprintf(stderr, ": %s\n", message);
+	parser->hadError = true;
+}
+
+//curry the above function
+void errorAtPrevious(Parser* parser, const char* message) {
+	errorAt(parser, &parser->previous, message);
+}
+
+void errorAtCurrent(Parser* parser, const char* message) {
+	errorAt(parser, &parser->current, message);
+}
+
+//process the stream of tokens
+void advance(Parser* parser) {
+	parser->previous = parser->current;
+
+	for (;;) {
+		parser->current = scanToken(parser->scanner);
+		if (parser->current.type != TOKEN_ERROR) break;
+
+		//TODO: what happens here?
+
+		errorAtCurrent(parser, parser->current.start);
+	}
+}
+
+void consume(Parser* parser, TokenType type, const char* message) {
+	if (parser->current.type == type) {
+		advance(parser);
+		return;
+	}
+
+	errorAtCurrent(parser, message);
+}
+
+//exposed
+bool compile(const char* source, Chunk* chunk) {
 	//TODO: return bytecode for running or saving to a file
 	Scanner scanner;
+	Parser parser;
 
+	//init scanner & parser
 	initScanner(&scanner, source);
-	int line = -1;
-	for (;;) {
-		Token token = scanToken(&scanner);
+	initParser(&parser, &scanner, chunk);
 
-		//nice debugging
-		if (token.line != line) {
-			line = token.line;
-			printf("%4d ", line);
-		} else {
-			printf("   | ");
-		}
+	//process
+	advance(&parser);
+	expression(&parser);
+	consume(&parser, TOKEN_EOF, "Expected end of expression");
 
-		//print the token
-		printf("%2d '%.*s'\n", token.type, token.length, token.start);
+	//return
+	emitByte(&parser, OP_RETURN);
 
-		if (token.type == TOKEN_EOF) break;
+#ifdef DEBUG_PRINT_CODE
+	if (!parser.hadError) {
+		disassembleChunk(chunk, "code");
 	}
+#endif
+
+	return !parser.hadError;
 }

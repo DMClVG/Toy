@@ -99,7 +99,20 @@ InterpretResult runVM(VM* vm) {
 }
 
 InterpretResult interpretVM(VM* vm, const char* source) {
-	//TODO: temporary
-	compile(source);
-	return INTERPRET_OK;
+	//TODO: compile and run separately
+	Chunk chunk;
+	initChunk(&chunk);
+
+	if (!compile(source, &chunk)) {
+		freeChunk(&chunk);
+		return INTERPRET_COMPILE_ERROR;
+	}
+
+	vm->chunk = &chunk;
+	vm->ip = vm->chunk->code;
+
+	InterpretResult result = runVM(vm);
+
+	freeChunk(&chunk);
+	return result;
 }

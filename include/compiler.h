@@ -1,6 +1,8 @@
 #ifndef CTOY_COMPILER_H
 #define CTOY_COMPILER_H
 
-void compile(const char* source);
+#include "chunk.h"
+
+bool compile(const char* source, Chunk* chunk);
 
 #endif
