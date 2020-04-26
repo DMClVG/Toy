@@ -51,7 +51,7 @@ static void parsePrecendence(Parser* parser, Precedence precedence) {
 //expressions
 static void number(Parser* parser) {
 	double value = strtod(parser->previous.start, NULL);
-	emitConstant(parser, value);
+	emitConstant(parser, NUMBER_VAL(value));
 }
 
 static void grouping(Parser* parser) {
@@ -68,6 +68,11 @@ static void unary(Parser* parser) {
 		case TOKEN_MINUS:
 			emitByte(parser, OP_NEGATE);
 			break;
+
+		case TOKEN_BANG:
+			emitByte(parser, OP_NOT);
+			break;
+
 		default:
 			return;
 	}
@@ -80,6 +85,32 @@ static void binary(Parser* parser) {
 	parsePrecendence(parser, (Precedence)(rule->precedence + 1));
 
 	switch(operatorType) {
+		//comparisons
+		case TOKEN_EQUAL_EQUAL:
+			emitByte(parser, OP_EQUAL);
+			break;
+
+		case TOKEN_BANG_EQUAL:
+			emitBytes(parser, OP_EQUAL, OP_NOT);
+			break;
+
+		case TOKEN_GREATER:
+			emitByte(parser, OP_GREATER);
+			break;
+
+		case TOKEN_GREATER_EQUAL:
+			emitBytes(parser, OP_LESS, OP_NOT);
+			break;
+
+		case TOKEN_LESS:
+			emitByte(parser, OP_LESS);
+			break;
+
+		case TOKEN_LESS_EQUAL:
+			emitBytes(parser, OP_GREATER, OP_NOT);
+			break;
+
+		//arithmetic
 		case TOKEN_PLUS:
 			emitByte(parser, OP_ADD);
 			break;
@@ -96,6 +127,16 @@ static void binary(Parser* parser) {
 			emitByte(parser, OP_DIVIDE);
 			break;
 
+		default:
+			return;
+	}
+}
+
+static void literal(Parser* parser) {
+	switch(parser->previous.type) {
+		case TOKEN_FALSE: emitByte(parser, OP_FALSE); break;
+		case TOKEN_NIL: emitByte(parser, OP_NIL); break;
+		case TOKEN_TRUE: emitByte(parser, OP_TRUE); break;
 		default:
 			return;
 	}
@@ -136,18 +177,18 @@ ParseRule parseRules[] = {
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_MODULO,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_MODULO_EQUAL,
 
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_BANG,
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_BANG_EQUAL,
+	{unary,			NULL,			PREC_NONE}, // TOKEN_BANG,
+	{NULL,			binary,			PREC_EQUALITY}, // TOKEN_BANG_EQUAL,
 
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_EQUAL,
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_EQUAL_EQUAL,
+	{NULL,			binary,			PREC_EQUALITY}, // TOKEN_EQUAL_EQUAL,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_EQUAL_GREATER, //EQUAL_GREATER is for the arrow syntax
 
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_GREATER,
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_GREATER_EQUAL,
+	{NULL,			binary,			PREC_COMPARISON}, // TOKEN_GREATER,
+	{NULL,			binary,			PREC_COMPARISON}, // TOKEN_GREATER_EQUAL,
 
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_LESS,
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_LESS_EQUAL,
+	{NULL,			binary,			PREC_COMPARISON}, // TOKEN_LESS,
+	{NULL,			binary,			PREC_COMPARISON}, // TOKEN_LESS_EQUAL,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_LESS_OR, //back pipe
 
 	//these can ONLY be doubles
@@ -177,17 +218,17 @@ ParseRule parseRules[] = {
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_CONTINUE,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_DO,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_ELSE,
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_FALSE,
+	{literal,		NULL,			PREC_NONE}, // TOKEN_FALSE,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_FOR,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_FOREACH, //reserved
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_IF,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_IMPORT,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_IN, //reserved
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_NIL, //null
+	{literal,		NULL,			PREC_NONE}, // TOKEN_NIL, //null
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_OF, //reserved
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_PRINT,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_RETURN,
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_TRUE,
+	{literal,		NULL,			PREC_NONE}, // TOKEN_TRUE,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_VAR,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_WHILE,
 

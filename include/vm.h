@@ -25,6 +25,7 @@ void initVM(VM* vm);
 void freeVM(VM* vm);
 void pushVM(VM* vm, Value value);
 Value popVM(VM* vm);
+Value peekVM(VM* vm, int distance);
 
 InterpretResult runVM(VM* vm);
 InterpretResult interpretVM(VM* vm, const char* source);
