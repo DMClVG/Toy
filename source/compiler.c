@@ -44,8 +44,6 @@ void advance(Parser* parser) {
 		parser->current = scanToken(parser->scanner);
 		if (parser->current.type != TOKEN_ERROR) break;
 
-		//TODO: what happens here?
-
 		errorAtCurrent(parser, parser->current.start);
 	}
 }

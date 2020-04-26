@@ -189,7 +189,7 @@ print child instantiates object; //true
 print child implements IInterface2; //true
 ```
 
-Note: An object definition affects only the instances of that object, not the object itself.
+Note: An object definition affects only the instances of that object, not the object itself. Thus, extending from an object won't clone the object's members, only it's definition.
 
 ```
 const CClass = () -> {

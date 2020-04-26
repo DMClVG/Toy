@@ -166,7 +166,7 @@ ParseRule parseRules[] = {
 	{unary,			binary,			PREC_TERM}, // TOKEN_MINUS,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_MINUS_EQUAL,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_MINUS_MINUS,
-	//TODO: munus greater for objects
+	//TODO: minus greater for objects
 
 	{NULL,			binary,			PREC_FACTOR}, // TOKEN_STAR,
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_STAR_EQUAL,
