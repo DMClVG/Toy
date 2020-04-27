@@ -3,6 +3,7 @@
 
 #include "scanner.h"
 #include "chunk.h"
+#include "object.h"
 #include "common.h"
 
 //parser rules

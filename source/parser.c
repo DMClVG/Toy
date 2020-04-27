@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "object.h"
 
 #include <stdlib.h>
 
@@ -142,6 +143,11 @@ static void literal(Parser* parser) {
 	}
 }
 
+static void string(Parser* parser) {
+	//TODO: escape characters
+	emitConstant(parser, OBJECT_VAL(copyString(&parser->chunk->objects, parser->previous.start + 1, parser->previous.length - 2)));
+}
+
 void expression(Parser* parser) {
 	parsePrecendence(parser, PREC_ASSIGNMENT);
 }
@@ -208,7 +214,7 @@ ParseRule parseRules[] = {
 	//literals
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_IDENTIFIER,
 	{number,		NULL,			PREC_NONE}, // TOKEN_NUMBER,
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_STRING,
+	{string,		NULL,			PREC_NONE}, // TOKEN_STRING,
 
 	//keywords (alphabetized)
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_AS,

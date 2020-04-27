@@ -8,6 +8,7 @@ void initChunk(Chunk* chunk) {
 	chunk->count = 0;
 	chunk->code = NULL;
 	chunk->lines = NULL;
+	chunk->objects = NULL;
 	initValueArray(&(chunk->constants));
 }
 
@@ -43,6 +44,7 @@ void freeChunk(Chunk* chunk) {
 	FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
 	FREE_ARRAY(int, chunk->lines, chunk->capacity);
 	freeValueArray(&(chunk->constants));
+	freeObjectPool(&(chunk->objects));
 	initChunk(chunk);
 }
 

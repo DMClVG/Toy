@@ -2,10 +2,12 @@
 #include "common.h"
 #include "memory.h"
 #include "compiler.h"
+#include "object.h"
 #include "debug.h"
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 //for errors
 static void runtimeError(VM* vm, const char* fmt, ...) {
@@ -69,6 +71,22 @@ static bool isFalsy(Value value) {
 	return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value)) || (IS_NUMBER(value) && AS_NUMBER(value) == 0);
 }
 
+static void concatenate(VM* vm) {
+	ObjectString* b = AS_STRING(popVM(vm));
+	ObjectString* a = AS_STRING(popVM(vm));
+
+	//copy manually
+	int length = a->length + b-> length;
+	char* chars = ALLOCATE(char, length + 1);
+	memcpy(chars, a->chars, a->length);
+	memcpy(chars + a->length, b->chars, b->length);
+	chars[length] = '\0';
+
+	//return the result
+	ObjectString* result = takeString(&vm->chunk->objects, chars, length);
+	return pushVM(vm, OBJECT_VAL(result));
+}
+
 InterpretResult runVM(VM* vm) {
 	//utility macros
 #define READ_BYTE() (*vm->ip++)
@@ -129,7 +147,23 @@ InterpretResult runVM(VM* vm) {
 				pushVM(vm, NUMBER_VAL(-AS_NUMBER(popVM(vm))));
 				break;
 
-			case OP_ADD:      BINARY_OP(NUMBER_VAL, +, vm); break;
+			case OP_ADD: {
+				if (IS_STRING(peekVM(vm, 0)) && IS_STRING(peekVM(vm, 1))) {
+					concatenate(vm);
+					break;
+				}
+
+				if (IS_NUMBER(peekVM(vm, 0)) && IS_NUMBER(peekVM(vm, 1))) {
+					double b = AS_NUMBER(popVM(vm));
+					double a = AS_NUMBER(popVM(vm));
+					pushVM(vm, NUMBER_VAL(a + b));
+					break;
+				}
+
+				runtimeError(vm, "Operands must be two numbers or two strings");
+				return INTERPRET_RUNTIME_ERROR;
+			}
+
 			case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -, vm); break;
 			case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *, vm); break;
 			case OP_DIVIDE:   BINARY_OP(NUMBER_VAL, /, vm); break;
@@ -174,6 +208,11 @@ InterpretResult interpretVM(VM* vm, const char* source) {
 	vm->ip = vm->chunk->code;
 
 	InterpretResult result = runVM(vm);
+
+#ifdef DEBUG_TRACE_EXECUTION
+	printf("\n");
+	disassembleObjectPool(vm->chunk->objects, "code memory");
+#endif
 
 	freeChunk(&chunk);
 	return result;

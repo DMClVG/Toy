@@ -9,6 +9,9 @@ void disassembleChunk(Chunk* chunk, char* name) {
 	for (int offset = 0; offset < chunk->count;) {
 		offset = disassembleInstruction(chunk, offset);
 	}
+
+	printf("\n");
+	disassembleObjectPool(chunk->objects, "anon chunk memory");
 }
 
 static int simpleInstruction(const char* name, int offset) {
@@ -95,5 +98,15 @@ int disassembleInstruction(Chunk* chunk, int offset) {
 		default:
 			printf("Unknown opcode %d\n", opcode);
 			return offset + 1;
+	}
+}
+
+void disassembleObjectPool(Object* ptr, char* name) {
+	printf("== %s ==\n", name);
+	while (ptr != NULL) {
+		printf("        * ");
+		printObject(ptr);
+		printf("\n");
+		ptr = ptr->next;
 	}
 }
