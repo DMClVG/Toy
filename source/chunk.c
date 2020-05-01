@@ -8,8 +8,9 @@ void initChunk(Chunk* chunk) {
 	chunk->count = 0;
 	chunk->code = NULL;
 	chunk->lines = NULL;
+	initValueArray(&chunk->constants);
+	initTable(&chunk->strings);
 	chunk->objects = NULL;
-	initValueArray(&(chunk->constants));
 }
 
 void writeChunk(Chunk* chunk, uint8_t byte, int line) {
@@ -43,8 +44,9 @@ void writeChunkLong(Chunk* chunk, uint32_t val, int line) {
 void freeChunk(Chunk* chunk) {
 	FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
 	FREE_ARRAY(int, chunk->lines, chunk->capacity);
-	freeValueArray(&(chunk->constants));
-	freeObjectPool(&(chunk->objects));
+	freeValueArray(&chunk->constants);
+	freeTable(&chunk->strings);
+	freeObjectPool(&chunk->objects);
 	initChunk(chunk);
 }
 

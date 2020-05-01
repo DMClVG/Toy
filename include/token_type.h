@@ -20,7 +20,7 @@ typedef enum {
 	TOKEN_MINUS,
 	TOKEN_MINUS_EQUAL,
 	TOKEN_MINUS_MINUS,
-	//TODO: munus greater for objects
+	//TODO: minus greater for objects
 
 	TOKEN_STAR,
 	TOKEN_STAR_EQUAL,

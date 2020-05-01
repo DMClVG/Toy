@@ -83,7 +83,7 @@ static void concatenate(VM* vm) {
 	chars[length] = '\0';
 
 	//return the result
-	ObjectString* result = takeString(&vm->chunk->objects, chars, length);
+	ObjectString* result = takeString(&vm->chunk->objects, &vm->chunk->strings, chars, length);
 	return pushVM(vm, OBJECT_VAL(result));
 }
 

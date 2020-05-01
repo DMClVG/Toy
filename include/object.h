@@ -2,6 +2,7 @@
 #define CTOY_OBJECT_H
 
 #include "value.h"
+#include "table.h"
 #include "common.h"
 
 typedef enum {
@@ -17,6 +18,7 @@ struct sObjectString {
 	Object object;
 	int length;
 	char* chars;
+	uint32_t hash;
 };
 
 #define OBJECT_TYPE(obj) ((obj)->type)
@@ -26,8 +28,8 @@ struct sObjectString {
 #define AS_STRING(value) ((ObjectString*)AS_OBJECT(value))
 #define AS_CSTRING(value) (((ObjectString*)AS_OBJECT(value))->chars)
 
-ObjectString* takeString(Object** pool, char* chars, int length);
-ObjectString* copyString(Object** pool, const char* chars, int length);
+ObjectString* takeString(Object** pool, Table* stringTable, char* chars, int length);
+ObjectString* copyString(Object** pool, Table* stringTable, const char* chars, int length);
 void freeObjectPool(Object** pool);
 
 void printObject(Object* object);

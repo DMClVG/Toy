@@ -145,7 +145,7 @@ static void literal(Parser* parser) {
 
 static void string(Parser* parser) {
 	//TODO: escape characters
-	emitConstant(parser, OBJECT_VAL(copyString(&parser->chunk->objects, parser->previous.start + 1, parser->previous.length - 2)));
+	emitConstant(parser, OBJECT_VAL(copyString(&parser->chunk->objects, &parser->chunk->strings, parser->previous.start + 1, parser->previous.length - 2)));
 }
 
 void expression(Parser* parser) {

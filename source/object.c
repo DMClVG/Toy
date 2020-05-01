@@ -6,6 +6,18 @@
 #include <stdio.h>
 #include <string.h>
 
+//utility functions
+static uint32_t hashString(const char* key, int length) {
+	uint32_t hash = 2166136261u;
+
+	for (int i = 0; i < length; i++) {
+		hash *= key[i];
+		hash *= 16777619;
+	}
+
+	return hash;
+}
+
 //the "constructor" for the base struct
 #define ALLOCATE_OBJECT(pool, type, objectType) (type*)allocateObject(pool, sizeof(type), objectType)
 
@@ -32,24 +44,41 @@ static void freeObject(Object* object) {
 }
 
 //the "constructor" for the string object
-static ObjectString* allocateString(Object** pool, char* chars, int length) {
+static ObjectString* allocateString(Object** pool, Table* stringTable, char* chars, int length, uint32_t hash) {
 	ObjectString* string = ALLOCATE_OBJECT(pool, ObjectString, OBJ_STRING);
 	string->chars = chars;
 	string->length = length;
+	string->hash = hash;
+	tableSet(stringTable, string, NIL_VAL); //intern the strings
 	return string;
 }
 
-ObjectString* takeString(Object** pool, char* chars, int length) {
+ObjectString* takeString(Object** pool, Table* stringTable, char* chars, int length) {
 	//take ownership of the string
-	return allocateString(pool, chars, length);
+	uint32_t hash = hashString(chars, length);
+
+	//get the interned string instead
+	ObjectString* interned = tableFindString(stringTable, chars, length, hash);
+	if (interned != NULL) {
+		FREE_ARRAY(char, chars, length + 1);
+		return interned;
+	}
+
+	return allocateString(pool, stringTable, chars, length, hash);
 }
 
-ObjectString* copyString(Object** pool, const char* chars, int length) {
+ObjectString* copyString(Object** pool, Table* stringTable, const char* chars, int length) {
+	uint32_t hash = hashString(chars, length);
+
+	//get the interned string instead
+	ObjectString* interned = tableFindString(stringTable, chars, length, hash);
+	if (interned != NULL) return interned;
+
 	char* heapChars = ALLOCATE(char, length + 1);
 	memcpy(heapChars, chars, length);
 	heapChars[length] = '\0';
 
-	return allocateString(pool, heapChars, length);
+	return allocateString(pool, stringTable, heapChars, length, hash);
 }
 
 //utilities

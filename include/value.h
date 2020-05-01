@@ -13,6 +13,7 @@ typedef enum {
 //forward declare object stuff
 typedef struct sObject Object;
 typedef struct sObjectString ObjectString;
+typedef struct sTable Table;
 
 typedef struct {
 	ValueType type;
