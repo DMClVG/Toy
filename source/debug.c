@@ -11,7 +11,7 @@ void disassembleChunk(Chunk* chunk, char* name) {
 	}
 
 	printf("\n");
-	disassembleObjectPool(chunk->objects, "anon chunk memory");
+	disassembleObjectPool(chunk->objects, "chunk memory");
 }
 
 static int simpleInstruction(const char* name, int offset) {
@@ -107,10 +107,16 @@ int disassembleInstruction(Chunk* chunk, int offset) {
 			return simpleInstruction("OP_POP", offset);
 
 		case OP_DEFINE_GLOBAL_VAR:
-			return simpleArgInstruction("OP_DEFINE_GLOBAL_VAR", chunk, offset);
+			return constantInstruction("OP_DEFINE_GLOBAL_VAR", chunk, offset);
 
 		case OP_DEFINE_GLOBAL_VAR_LONG:
 			return constantLongInstruction("OP_DEFINE_GLOBAL_VAR_LONG", chunk, offset);
+
+		case OP_SET_GLOBAL:
+			return constantInstruction("OP_SET_GLOBAL", chunk, offset);
+
+		case OP_SET_GLOBAL_LONG:
+			return constantLongInstruction("OP_SET_GLOBAL_LONG", chunk, offset);
 
 		case OP_GET_GLOBAL:
 			return constantInstruction("OP_GET_GLOBAL", chunk, offset);

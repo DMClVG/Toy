@@ -17,7 +17,7 @@ typedef struct {
 } Parser;
 
 //parser rules
-typedef void (*ParseFn)();
+typedef void (*ParseFn)(Parser* parser, bool canAssign);
 
 typedef enum { //TODO: add Toy's extra precedences
 	PREC_NONE,

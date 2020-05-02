@@ -104,17 +104,17 @@ InterpretResult runVM(VM* vm) {
 	(vm->chunk->constants.values[READ_BYTE()]) : \
 	(vm->chunk->constants.values[(*vm->ip++, *vm->ip++, *vm->ip++, *vm->ip++, *(uint32_t*)(vm->ip - 4))])
 
-#define READ_STRING(arg) AS_STRING(READ_CONSTANT(arg == OP_DEFINE_GLOBAL_VAR || arg == OP_GET_GLOBAL ? OP_CONSTANT : OP_CONSTANT_LONG))
+#define READ_STRING(arg) AS_STRING(READ_CONSTANT(arg == OP_DEFINE_GLOBAL_VAR || arg == OP_SET_GLOBAL || arg == OP_GET_GLOBAL ? OP_CONSTANT : OP_CONSTANT_LONG))
 
-#define BINARY_OP(valueType, op, ptr) \
+#define BINARY_OP(valueType, op) \
 	do { \
-		if (!IS_NUMBER(peekVM(ptr, 0)) || !IS_NUMBER(peekVM(ptr, 1))) { \
-			runtimeError(ptr, "Operands must be numbers"); \
+		if (!IS_NUMBER(peekVM(vm, 0)) || !IS_NUMBER(peekVM(vm, 1))) { \
+			runtimeError(vm, "Operands must be numbers"); \
 			return INTERPRET_RUNTIME_ERROR; \
 		} \
-		double b = AS_NUMBER(popVM(ptr)); \
-		double a = AS_NUMBER(popVM(ptr)); \
-		pushVM(ptr, valueType(a op b)); \
+		double b = AS_NUMBER(popVM(vm)); \
+		double a = AS_NUMBER(popVM(vm)); \
+		pushVM(vm, valueType(a op b)); \
 	} while (false)
 
 	for (;;) {
@@ -158,8 +158,8 @@ InterpretResult runVM(VM* vm) {
 				break;
 			}
 
-			case OP_GREATER: BINARY_OP(BOOL_VAL, >, vm); break;
-			case OP_LESS:    BINARY_OP(BOOL_VAL, <, vm); break;
+			case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
+			case OP_LESS:    BINARY_OP(BOOL_VAL, <); break;
 
 			case OP_NOT:
 				pushVM(vm, BOOL_VAL(isFalsy(popVM(vm))));
@@ -191,9 +191,9 @@ InterpretResult runVM(VM* vm) {
 				return INTERPRET_RUNTIME_ERROR;
 			}
 
-			case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -, vm); break;
-			case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *, vm); break;
-			case OP_DIVIDE:   BINARY_OP(NUMBER_VAL, /, vm); break;
+			case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -); break;
+			case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
+			case OP_DIVIDE:   BINARY_OP(NUMBER_VAL, /); break;
 
 			//keywords
 			case OP_PRINT: {
@@ -209,10 +209,34 @@ InterpretResult runVM(VM* vm) {
 			case OP_DEFINE_GLOBAL_VAR_LONG:
 			{
 				ObjectString* name = READ_STRING(instruction);
+
+				if (tableFindString(&vm->globals, name->chars, name->length, name->hash) != NULL) {
+					runtimeError(vm, "Can't redefine a variable: %s", name->chars);
+					return INTERPRET_RUNTIME_ERROR;
+				}
+
 				tableSet(&vm->globals, name, peekVM(vm, 0));
+
 				//pop separately due to garbage collection
 				popVM(vm);
 				popVM(vm);
+				break;
+			}
+
+			case OP_SET_GLOBAL:
+			case OP_SET_GLOBAL_LONG:
+			{
+				ObjectString* name = READ_STRING(instruction);
+				if (tableSet(&vm->globals, name, peekVM(vm, 0))) {
+					tableDelete(&vm->globals, name);
+					runtimeError(vm, "Undefined variable: %s", name->chars);
+					return INTERPRET_RUNTIME_ERROR;
+				}
+
+				//pop the name, preserve the value on the stack
+				Value value = popVM(vm);
+				popVM(vm);
+				pushVM(vm, value);
 				break;
 			}
 
@@ -222,9 +246,10 @@ InterpretResult runVM(VM* vm) {
 				ObjectString* name = READ_STRING(instruction); //The name is derived from the chunk's constants
 				Value value;
 				if (!tableGet(&vm->globals, name, &value)) {
-					runtimeError(vm, "Undefined variable %s", name->chars);
+					runtimeError(vm, "Undefined variable: %s", name->chars);
 					return INTERPRET_RUNTIME_ERROR;
 				}
+				popVM(vm);
 				pushVM(vm, value);
 				break;
 			}

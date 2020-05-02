@@ -113,6 +113,6 @@ void printObject(Object* object) {
 		}
 
 		default:
-			printf("!~");
+			printf("!~%s", OBJECT_TYPE(object));
 	}
 }

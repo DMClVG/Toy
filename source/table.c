@@ -36,7 +36,7 @@ static Entry* findEntry(Entry* entries, int capacity, ObjectString* key) {
 					tombstone = entry;
 				}
 			}
-		} else if (entry->key == key) {
+		} else if (entry->key->length == key->length && entry->key->hash == key->hash && memcmp(entry->key->chars, key->chars, key->length) == 0) {
 			return entry;
 		}
 

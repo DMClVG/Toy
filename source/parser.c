@@ -52,14 +52,25 @@ static void defineVariable(Parser* parser, uint32_t global) {
 	}
 }
 
-static void namedVariable(Parser* parser, Token name) {
+static void namedVariable(Parser* parser, Token name, bool canAssign) {
 	uint32_t global = idenifierConstant(parser, &name);
 
-	if (global < 256) {
-		emitBytes(parser, OP_GET_GLOBAL, global);
+	if (canAssign && match(parser, TOKEN_EQUAL)) {
+		expression(parser);
+
+		if (global < 256) {
+			emitBytes(parser, OP_SET_GLOBAL, global);
+		} else {
+			emitByte(parser, OP_SET_GLOBAL_LONG);
+			emitLong(parser, global);
+		}
 	} else {
-		emitByte(parser, OP_GET_GLOBAL_LONG);
-		emitLong(parser, global);
+		if (global < 256) {
+			emitBytes(parser, OP_GET_GLOBAL, global);
+		} else {
+			emitByte(parser, OP_GET_GLOBAL_LONG);
+			emitLong(parser, global);
+		}
 	}
 }
 
@@ -73,27 +84,32 @@ static void parsePrecendence(Parser* parser, Precedence precedence) {
 		return;
 	}
 
-	prefixRule(parser);
+	bool canAssign = precedence <= PREC_ASSIGNMENT;
+	prefixRule(parser, canAssign);
 
 	while (precedence <= getRule(parser->current.type)->precedence) {
 		advance(parser);
 		ParseFn infixRule = getRule(parser->previous.type)->infix;
-		infixRule(parser);
+		infixRule(parser, canAssign);
+	}
+
+	if (canAssign && match(parser, TOKEN_EQUAL)) {
+		errorAtPrevious(parser, "Invalid assignment target");
 	}
 }
 
 //expressions
-static void number(Parser* parser) {
+static void number(Parser* parser, bool canAssign) {
 	double value = strtod(parser->previous.start, NULL);
 	emitConstant(parser, NUMBER_VAL(value));
 }
 
-static void grouping(Parser* parser) {
+static void grouping(Parser* parser, bool canAssign) {
 	expression(parser);
 	consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after expression");
 }
 
-static void unary(Parser* parser) {
+static void unary(Parser* parser, bool canAssign) {
 	TokenType operatorType = parser->previous.type;
 
 	parsePrecendence(parser, PREC_UNARY);
@@ -112,7 +128,7 @@ static void unary(Parser* parser) {
 	}
 }
 
-static void binary(Parser* parser) {
+static void binary(Parser* parser, bool canAssign) {
 	TokenType operatorType = parser->previous.type;
 
 	ParseRule* rule = getRule(operatorType);
@@ -166,7 +182,7 @@ static void binary(Parser* parser) {
 	}
 }
 
-static void literal(Parser* parser) {
+static void literal(Parser* parser, bool canAssign) {
 	switch(parser->previous.type) {
 		case TOKEN_FALSE: emitByte(parser, OP_FALSE); break;
 		case TOKEN_NIL: emitByte(parser, OP_NIL); break;
@@ -176,13 +192,13 @@ static void literal(Parser* parser) {
 	}
 }
 
-static void string(Parser* parser) {
+static void string(Parser* parser, bool canAssign) {
 	//TODO: escape characters
 	emitConstant(parser, OBJECT_VAL(copyString(&parser->chunk->objects, &parser->chunk->strings, parser->previous.start + 1, parser->previous.length - 2)));
 }
 
-static void variable(Parser* parser) {
-	namedVariable(parser, parser->previous);
+static void variable(Parser* parser, bool canAssign) {
+	namedVariable(parser, parser->previous, canAssign);
 }
 
 //error recovery
