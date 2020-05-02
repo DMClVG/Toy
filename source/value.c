@@ -45,5 +45,7 @@ void printValue(Value value) {
 		case VAL_BOOL: printf(AS_BOOL(value) ? "true" : "false"); break;
 		case VAL_NUMBER: printf("%g", AS_NUMBER(value)); break;
 		case VAL_OBJECT: printObject(AS_OBJECT(value)); break;
+		default:
+			printf("~");
 	}
 }

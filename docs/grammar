@@ -1,0 +1,12 @@
+//TODO: alter the grammar to match Toy properly
+
+declaration
+ | varDecl
+ | statement
+ ;
+
+statement
+ | exprStmt
+ | printStmt
+ ;
+ 

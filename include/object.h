@@ -31,6 +31,7 @@ struct sObjectString {
 ObjectString* takeString(Object** pool, Table* stringTable, char* chars, int length);
 ObjectString* copyString(Object** pool, Table* stringTable, const char* chars, int length);
 void freeObjectPool(Object** pool);
+Object* mergeObjectPools(Object* a, Object* b);
 
 void printObject(Object* object);
 

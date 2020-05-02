@@ -31,10 +31,14 @@ void initVM(VM* vm) {
 	vm->capacity = 0;
 	vm->count = 0;
 	vm->stack = NULL;
+	initTable(&vm->globals);
+	vm->objects = NULL;
 }
 
 void freeVM(VM* vm) {
 	FREE_ARRAY(Value, vm->stack, vm->capacity);
+	freeTable(&vm->globals);
+	freeObjectPool(&vm->objects);
 	initVM(vm);
 }
 
@@ -83,11 +87,15 @@ static void concatenate(VM* vm) {
 	chars[length] = '\0';
 
 	//return the result
-	ObjectString* result = takeString(&vm->chunk->objects, &vm->chunk->strings, chars, length);
+	ObjectString* result = takeString(&vm->objects, &vm->chunk->strings, chars, length);
 	return pushVM(vm, OBJECT_VAL(result));
 }
 
 InterpretResult runVM(VM* vm) {
+	//steal the chunk's memory
+	vm->objects = mergeObjectPools(vm->objects, vm->chunk->objects);
+	vm->chunk->objects = NULL;
+
 	//utility macros
 #define READ_BYTE() (*vm->ip++)
 
@@ -95,6 +103,8 @@ InterpretResult runVM(VM* vm) {
 	(opcode) == OP_CONSTANT ? \
 	(vm->chunk->constants.values[READ_BYTE()]) : \
 	(vm->chunk->constants.values[(*vm->ip++, *vm->ip++, *vm->ip++, *vm->ip++, *(uint32_t*)(vm->ip - 4))])
+
+#define READ_STRING(arg) AS_STRING(READ_CONSTANT(arg == OP_DEFINE_GLOBAL_VAR || arg == OP_GET_GLOBAL ? OP_CONSTANT : OP_CONSTANT_LONG))
 
 #define BINARY_OP(valueType, op, ptr) \
 	do { \
@@ -121,11 +131,11 @@ InterpretResult runVM(VM* vm) {
 
 		uint8_t instruction;
 		switch(instruction = READ_BYTE()) {
+			//return
 			case OP_RETURN:
-				printValue(popVM(vm));
-				printf("\n");
 				return INTERPRET_OK;
 
+			//constants
 			case OP_CONSTANT:
 			case OP_CONSTANT_LONG:
 			{
@@ -133,6 +143,23 @@ InterpretResult runVM(VM* vm) {
 				pushVM(vm, constant);
 				break;
 			}
+
+			//atomic values
+			case OP_NIL: pushVM(vm, NIL_VAL); break;
+			case OP_TRUE: pushVM(vm, BOOL_VAL(true)); break;
+			case OP_FALSE: pushVM(vm, BOOL_VAL(false)); break;
+
+			//operators
+			case OP_EQUAL: {
+				Value b = popVM(vm);
+				Value a = popVM(vm);
+
+				pushVM(vm, BOOL_VAL(valuesEqual(a, b)));
+				break;
+			}
+
+			case OP_GREATER: BINARY_OP(BOOL_VAL, >, vm); break;
+			case OP_LESS:    BINARY_OP(BOOL_VAL, <, vm); break;
 
 			case OP_NOT:
 				pushVM(vm, BOOL_VAL(isFalsy(popVM(vm))));
@@ -168,22 +195,41 @@ InterpretResult runVM(VM* vm) {
 			case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *, vm); break;
 			case OP_DIVIDE:   BINARY_OP(NUMBER_VAL, /, vm); break;
 
-			case OP_TRUE: pushVM(vm, BOOL_VAL(true)); break;
-			case OP_FALSE: pushVM(vm, BOOL_VAL(false)); break;
-
-			case OP_NIL: pushVM(vm, NIL_VAL); break;
-
-			case OP_EQUAL: {
-				Value b = popVM(vm);
-				Value a = popVM(vm);
-
-				pushVM(vm, BOOL_VAL(valuesEqual(a, b)));
+			//keywords
+			case OP_PRINT: {
+				printValue(popVM(vm));
+				printf("\n");
 				break;
 			}
 
-			case OP_GREATER: BINARY_OP(BOOL_VAL, >, vm); break;
-			case OP_LESS:    BINARY_OP(BOOL_VAL, <, vm); break;
+			//internals
+			case OP_POP: popVM(vm); break;
 
+			case OP_DEFINE_GLOBAL_VAR:
+			case OP_DEFINE_GLOBAL_VAR_LONG:
+			{
+				ObjectString* name = READ_STRING(instruction);
+				tableSet(&vm->globals, name, peekVM(vm, 0));
+				//pop separately due to garbage collection
+				popVM(vm);
+				popVM(vm);
+				break;
+			}
+
+			case OP_GET_GLOBAL:
+			case OP_GET_GLOBAL_LONG:
+			{
+				ObjectString* name = READ_STRING(instruction); //The name is derived from the chunk's constants
+				Value value;
+				if (!tableGet(&vm->globals, name, &value)) {
+					runtimeError(vm, "Undefined variable %s", name->chars);
+					return INTERPRET_RUNTIME_ERROR;
+				}
+				pushVM(vm, value);
+				break;
+			}
+
+			//errors
 			default:
 				return INTERPRET_RUNTIME_ERROR;
 		}
@@ -191,6 +237,7 @@ InterpretResult runVM(VM* vm) {
 
 #undef READ_BYTE
 #undef READ_CONSTANT
+#undef READ_STRING
 #undef BINARY_OP
 }
 
@@ -204,6 +251,7 @@ InterpretResult interpretVM(VM* vm, const char* source) {
 		return INTERPRET_COMPILE_ERROR;
 	}
 
+	//load the chunk
 	vm->chunk = &chunk;
 	vm->ip = vm->chunk->code;
 
@@ -211,7 +259,7 @@ InterpretResult interpretVM(VM* vm, const char* source) {
 
 #ifdef DEBUG_TRACE_EXECUTION
 	printf("\n");
-	disassembleObjectPool(vm->chunk->objects, "code memory");
+	disassembleObjectPool(vm->objects, "vm memory");
 #endif
 
 	freeChunk(&chunk);

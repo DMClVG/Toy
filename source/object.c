@@ -90,6 +90,20 @@ void freeObjectPool(Object** pool) {
 	}
 }
 
+Object* mergeObjectPools(Object* a, Object* b) {
+	Object* top = a;
+
+	if (a != NULL) {
+		while(a->next != NULL) {
+			a = a->next;
+		}
+
+		a->next = b;
+	}
+
+	return top;
+}
+
 void printObject(Object* object) {
 	switch(OBJECT_TYPE(object)) {
 		case OBJ_STRING: {
@@ -97,5 +111,8 @@ void printObject(Object* object) {
 			printf("%s", string->chars);
 			break;
 		}
+
+		default:
+			printf("!~");
 	}
 }

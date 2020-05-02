@@ -52,12 +52,17 @@ void errorAtCurrent(Parser* parser, const char* message);
 
 void advance(Parser* parser);
 void consume(Parser* parser, TokenType type, const char* message);
+bool match(Parser* parser, TokenType type);
+bool check(Parser* parser, TokenType type);
 
 //parser.c functions
 void emitByte(Parser* parser, uint8_t byte);
 void emitBytes(Parser* parser, uint8_t byte1, uint8_t byte2);
-void emitConstant(Parser* parser, Value value);
+uint32_t emitConstant(Parser* parser, Value value);
 
+//grammar rules
+void declaration(Parser* parser);
+void statement(Parser* parser);
 void expression(Parser* parser);
 
 #endif

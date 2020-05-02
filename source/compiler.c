@@ -57,6 +57,18 @@ void consume(Parser* parser, TokenType type, const char* message) {
 	errorAtCurrent(parser, message);
 }
 
+bool match(Parser* parser, TokenType type) {
+	if (!check(parser, type)) {
+		return false;
+	}
+	advance(parser);
+	return true;
+}
+
+bool check(Parser* parser, TokenType type) {
+	return parser->current.type == type;
+}
+
 //exposed
 bool compile(const char* source, Chunk* chunk) {
 	//TODO: return bytecode for running or saving to a file
@@ -69,8 +81,9 @@ bool compile(const char* source, Chunk* chunk) {
 
 	//process
 	advance(&parser);
-	expression(&parser);
-	consume(&parser, TOKEN_EOF, "Expected end of expression");
+	while (!match(&parser, TOKEN_EOF)) {
+		declaration(&parser);
+	}
 
 	//return
 	emitByte(&parser, OP_RETURN);

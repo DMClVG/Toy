@@ -19,6 +19,8 @@ typedef struct {
 	int capacity;
 	int count;
 	Value* stack;
+	Table globals; //the global variables
+	Object* objects; //the object pool for the globals
 } VM;
 
 void initVM(VM* vm);
@@ -31,3 +33,8 @@ InterpretResult runVM(VM* vm);
 InterpretResult interpretVM(VM* vm, const char* source);
 
 #endif
+
+
+/* TODO: The the chunk's constants are used as values in the globals table - this means the chunk and the VM are too tightly bound.
+ * TODO: separate the chunk from the VM, otherwise the globals will go out of scope.
+*/

@@ -13,6 +13,15 @@ void initChunk(Chunk* chunk) {
 	chunk->objects = NULL;
 }
 
+void freeChunk(Chunk* chunk) {
+	FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
+	FREE_ARRAY(int, chunk->lines, chunk->capacity);
+	freeValueArray(&chunk->constants);
+	freeTable(&chunk->strings);
+	freeObjectPool(&chunk->objects);
+	initChunk(chunk);
+}
+
 void writeChunk(Chunk* chunk, uint8_t byte, int line) {
 	if (chunk->capacity < chunk->count + 1) {
 		int oldCapacity = chunk->capacity;
@@ -41,29 +50,24 @@ void writeChunkLong(Chunk* chunk, uint32_t val, int line) {
 	chunk->count += 4;
 }
 
-void freeChunk(Chunk* chunk) {
-	FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
-	FREE_ARRAY(int, chunk->lines, chunk->capacity);
-	freeValueArray(&chunk->constants);
-	freeTable(&chunk->strings);
-	freeObjectPool(&chunk->objects);
-	initChunk(chunk);
-}
-
 //utilities
-int pushConstant(Chunk* chunk, Value value) {
-	writeValueArray(&(chunk->constants), value);
+uint32_t pushConstant(Chunk* chunk, Value value) {
+	writeValueArray(&chunk->constants, value);
 	return chunk->constants.count - 1;
 }
 
-void writeConstant(Chunk* chunk, Value value, int line) {
+uint32_t writeConstant(Chunk* chunk, Value value, int line) {
+	uint32_t index = pushConstant(chunk, value);
+
 	//determine the correct opcode
 	if (chunk->constants.count < 256) {
 		//short type
 		writeChunk(chunk, OP_CONSTANT, line);
-		writeChunk(chunk, pushConstant(chunk, value), line);
+		writeChunk(chunk, index, line);
 	} else {
 		writeChunk(chunk, OP_CONSTANT_LONG, line);
-		writeChunkLong(chunk, pushConstant(chunk, value), line);
+		writeChunkLong(chunk, index, line);
 	}
+
+	return index; //the index of the newly pushed constant
 }

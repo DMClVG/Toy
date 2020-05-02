@@ -6,7 +6,7 @@
 void disassembleChunk(Chunk* chunk, char* name) {
 	printf("== %s ==\n", name);
 
-	for (int offset = 0; offset < chunk->count;) {
+	for (int offset = 0; offset < chunk->count; /* do nothing */) {
 		offset = disassembleInstruction(chunk, offset);
 	}
 
@@ -19,10 +19,15 @@ static int simpleInstruction(const char* name, int offset) {
 	return offset + 1;
 }
 
+static int simpleArgInstruction(const char* name, Chunk* chunk, int offset) {
+	printf("%-24s %04d\n", name, chunk->code[offset + 1]);
+	return offset + 2;
+}
+
 static int constantInstruction(const char* name, Chunk* chunk, int offset) {
 	uint8_t constantIndex = chunk->code[offset + 1];
 
-	printf("%-24s %d '", name, constantIndex);
+	printf("%-24s %ld '", name, constantIndex);
 	printValue(chunk->constants.values[constantIndex]);
 	printf("'\n");
 
@@ -36,7 +41,7 @@ static int constantLongInstruction(const char* name, Chunk* chunk, int offset) {
 	printValue(chunk->constants.values[constantIndex]);
 	printf("'\n");
 
-	return offset + 5;
+	return offset + 4;
 }
 
 int disassembleInstruction(Chunk* chunk, int offset) {
@@ -94,6 +99,26 @@ int disassembleInstruction(Chunk* chunk, int offset) {
 
 		case OP_DIVIDE:
 			return simpleInstruction("OP_DIVIDE", offset);
+
+		case OP_PRINT:
+			return simpleInstruction("OP_PRINT", offset);
+
+		case OP_POP:
+			return simpleInstruction("OP_POP", offset);
+
+		case OP_DEFINE_GLOBAL_VAR:
+			return simpleArgInstruction("OP_DEFINE_GLOBAL_VAR", chunk, offset);
+
+		case OP_DEFINE_GLOBAL_VAR_LONG:
+			return constantLongInstruction("OP_DEFINE_GLOBAL_VAR_LONG", chunk, offset);
+
+		case OP_GET_GLOBAL:
+			return constantInstruction("OP_GET_GLOBAL", chunk, offset);
+
+		case OP_GET_GLOBAL_LONG:
+			return constantLongInstruction("OP_GET_GLOBAL_LONG", chunk, offset);
+
+			//TODO: disassemble all global variables and constants
 
 		default:
 			printf("Unknown opcode %d\n", opcode);

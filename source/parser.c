@@ -26,8 +26,41 @@ void emitBytes(Parser* parser, uint8_t byte1, uint8_t byte2) {
 	emitByte(parser, byte2);
 }
 
-void emitConstant(Parser* parser, Value value) {
-	writeConstant(parser->chunk, value, parser->previous.line);
+void emitLong(Parser* parser, uint32_t lng) {
+	writeChunkLong(parser->chunk, lng, parser->previous.line);
+}
+
+uint32_t emitConstant(Parser* parser, Value value) {
+	return writeConstant(parser->chunk, value, parser->previous.line);
+}
+
+static uint32_t idenifierConstant(Parser* parser, Token* name) { //possibly search up existing constant
+	return emitConstant(parser, OBJECT_VAL(copyString(&parser->chunk->objects, &parser->chunk->strings, name->start, name->length)));
+}
+
+static uint32_t parseVariable(Parser* parser, const char* errorMsg) {
+	consume(parser, TOKEN_IDENTIFIER, errorMsg);
+	return idenifierConstant(parser, &parser->previous);
+}
+
+static void defineVariable(Parser* parser, uint32_t global) {
+	if (global < 256) {
+		emitBytes(parser, OP_DEFINE_GLOBAL_VAR, global);
+	} else {
+		emitByte(parser, OP_DEFINE_GLOBAL_VAR_LONG);
+		emitLong(parser, global);
+	}
+}
+
+static void namedVariable(Parser* parser, Token name) {
+	uint32_t global = idenifierConstant(parser, &name);
+
+	if (global < 256) {
+		emitBytes(parser, OP_GET_GLOBAL, global);
+	} else {
+		emitByte(parser, OP_GET_GLOBAL_LONG);
+		emitLong(parser, global);
+	}
 }
 
 //precedence
@@ -148,10 +181,95 @@ static void string(Parser* parser) {
 	emitConstant(parser, OBJECT_VAL(copyString(&parser->chunk->objects, &parser->chunk->strings, parser->previous.start + 1, parser->previous.length - 2)));
 }
 
+static void variable(Parser* parser) {
+	namedVariable(parser, parser->previous);
+}
+
+//error recovery
+static void synchronize(Parser* parser) {
+	parser->panicMode = false;
+
+	while(parser->current.type != TOKEN_EOF) {
+		if (parser->previous.type == TOKEN_SEMICOLON) return;
+
+		switch(parser->current.type) {
+			//NOTE: statements begin with these
+			case TOKEN_ASSERT:
+			case TOKEN_BREAK:
+			case TOKEN_CONST:
+			case TOKEN_CONTINUE:
+			case TOKEN_DO:
+			case TOKEN_FOR:
+			case TOKEN_FOREACH:
+			case TOKEN_IF:
+			case TOKEN_IMPORT:
+			case TOKEN_RETURN:
+			case TOKEN_VAR:
+			case TOKEN_WHILE:
+			case TOKEN_PASS:
+				return;
+
+			default:
+				//do nothing
+				;
+		}
+
+		advance(parser);
+	}
+}
+
+//gammar rules
+static void varDecl(Parser* parser) {
+	uint32_t globalVar = parseVariable(parser, "Expected variable name");
+
+	if (match(parser, TOKEN_EQUAL)) {
+		expression(parser);
+	} else {
+		emitByte(parser, OP_NIL); //all values default to 'null'
+	}
+
+	consume(parser, TOKEN_SEMICOLON, "Expected semicolon after variable declaration");
+
+	defineVariable(parser, globalVar);
+}
+
+void declaration(Parser* parser) {
+	if (match(parser, TOKEN_VAR)) {
+		varDecl(parser);
+	} else { //TODO: const
+		statement(parser);
+	}
+
+	if (parser->panicMode) {
+		synchronize(parser);
+	}
+}
+
+static void printStmt(Parser* parser) {
+	expression(parser);
+	consume(parser, TOKEN_SEMICOLON, "Expected ';' at end of print statement");
+	emitByte(parser, OP_PRINT);
+}
+
+static void expressionStmt(Parser* parser) {
+	expression(parser);
+	consume(parser, TOKEN_SEMICOLON, "Expected ';' at end of expression statement");
+	emitByte(parser, OP_POP);
+}
+
+void statement(Parser* parser) {
+	if (match(parser, TOKEN_PRINT)) {
+		printStmt(parser);
+	} else {
+		expressionStmt(parser);
+	}
+}
+
 void expression(Parser* parser) {
 	parsePrecendence(parser, PREC_ASSIGNMENT);
 }
 
+//TODO: move the pratt table
 //a pratt table
 ParseRule parseRules[] = {
 	//single character tokens
@@ -212,7 +330,7 @@ ParseRule parseRules[] = {
 	{NULL,			NULL,			PREC_NONE}, // TOKEN_COLON,
 
 	//literals
-	{NULL,			NULL,			PREC_NONE}, // TOKEN_IDENTIFIER,
+	{variable,		NULL,			PREC_NONE}, // TOKEN_IDENTIFIER,
 	{number,		NULL,			PREC_NONE}, // TOKEN_NUMBER,
 	{string,		NULL,			PREC_NONE}, // TOKEN_STRING,
 
