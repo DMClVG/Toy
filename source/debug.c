@@ -112,17 +112,17 @@ int disassembleInstruction(Chunk* chunk, int offset) {
 		case OP_DEFINE_GLOBAL_VAR_LONG:
 			return constantLongInstruction("OP_DEFINE_GLOBAL_VAR_LONG", chunk, offset);
 
-		case OP_SET_GLOBAL:
-			return constantInstruction("OP_SET_GLOBAL", chunk, offset);
+		case OP_SET_GLOBAL_VAR:
+			return constantInstruction("OP_SET_GLOBAL_VAR", chunk, offset);
 
-		case OP_SET_GLOBAL_LONG:
-			return constantLongInstruction("OP_SET_GLOBAL_LONG", chunk, offset);
+		case OP_SET_GLOBAL_VAR_LONG:
+			return constantLongInstruction("OP_SET_GLOBAL_VAR_LONG", chunk, offset);
 
-		case OP_GET_GLOBAL:
-			return constantInstruction("OP_GET_GLOBAL", chunk, offset);
+		case OP_GET_GLOBAL_VAR:
+			return constantInstruction("OP_GET_GLOBAL_VAR", chunk, offset);
 
-		case OP_GET_GLOBAL_LONG:
-			return constantLongInstruction("OP_GET_GLOBAL_LONG", chunk, offset);
+		case OP_GET_GLOBAL_VAR_LONG:
+			return constantLongInstruction("OP_GET_GLOBAL_VAR_LONG", chunk, offset);
 
 			//TODO: disassemble all global variables and constants
 

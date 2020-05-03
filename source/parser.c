@@ -59,16 +59,16 @@ static void namedVariable(Parser* parser, Token name, bool canAssign) {
 		expression(parser);
 
 		if (global < 256) {
-			emitBytes(parser, OP_SET_GLOBAL, global);
+			emitBytes(parser, OP_SET_GLOBAL_VAR, global);
 		} else {
-			emitByte(parser, OP_SET_GLOBAL_LONG);
+			emitByte(parser, OP_SET_GLOBAL_VAR_LONG);
 			emitLong(parser, global);
 		}
 	} else {
 		if (global < 256) {
-			emitBytes(parser, OP_GET_GLOBAL, global);
+			emitBytes(parser, OP_GET_GLOBAL_VAR, global);
 		} else {
-			emitByte(parser, OP_GET_GLOBAL_LONG);
+			emitByte(parser, OP_GET_GLOBAL_VAR_LONG);
 			emitLong(parser, global);
 		}
 	}

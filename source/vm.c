@@ -104,7 +104,7 @@ InterpretResult runVM(VM* vm) {
 	(vm->chunk->constants.values[READ_BYTE()]) : \
 	(vm->chunk->constants.values[(*vm->ip++, *vm->ip++, *vm->ip++, *vm->ip++, *(uint32_t*)(vm->ip - 4))])
 
-#define READ_STRING(arg) AS_STRING(READ_CONSTANT(arg == OP_DEFINE_GLOBAL_VAR || arg == OP_SET_GLOBAL || arg == OP_GET_GLOBAL ? OP_CONSTANT : OP_CONSTANT_LONG))
+#define READ_STRING(arg) AS_STRING(READ_CONSTANT(arg == OP_DEFINE_GLOBAL_VAR || arg == OP_SET_GLOBAL_VAR || arg == OP_GET_GLOBAL_VAR ? OP_CONSTANT : OP_CONSTANT_LONG))
 
 #define BINARY_OP(valueType, op) \
 	do { \
@@ -218,13 +218,13 @@ InterpretResult runVM(VM* vm) {
 				tableSet(&vm->globals, name, peekVM(vm, 0));
 
 				//pop separately due to garbage collection
-				popVM(vm);
-				popVM(vm);
+				popVM(vm); //value
+				popVM(vm); //name
 				break;
 			}
 
-			case OP_SET_GLOBAL:
-			case OP_SET_GLOBAL_LONG:
+			case OP_SET_GLOBAL_VAR:
+			case OP_SET_GLOBAL_VAR_LONG:
 			{
 				ObjectString* name = READ_STRING(instruction);
 				if (tableSet(&vm->globals, name, peekVM(vm, 0))) {
@@ -240,8 +240,8 @@ InterpretResult runVM(VM* vm) {
 				break;
 			}
 
-			case OP_GET_GLOBAL:
-			case OP_GET_GLOBAL_LONG:
+			case OP_GET_GLOBAL_VAR:
+			case OP_GET_GLOBAL_VAR_LONG:
 			{
 				ObjectString* name = READ_STRING(instruction); //The name is derived from the chunk's constants
 				Value value;
