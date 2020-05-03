@@ -20,7 +20,9 @@ void repl() {
 			break;
 		}
 
-		interpretVM(&vm, input);
+		if (interpretVM(&vm, input) != INTERPRET_OK) {
+			cleanVM(&vm);
+		}
 	}
 
 	freeVM(&vm);

@@ -308,3 +308,10 @@ InterpretResult interpretVM(VM* vm, const char* source) {
 	freeChunk(&chunk);
 	return result;
 }
+
+void cleanVM(VM* vm) {
+	FREE_ARRAY(Value, vm->stack, vm->capacity);
+	vm->capacity = 0;
+	vm->count = 0;
+	vm->stack = NULL;
+}

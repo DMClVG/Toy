@@ -32,5 +32,6 @@ Value peekVM(VM* vm, int distance);
 
 InterpretResult runVM(VM* vm);
 InterpretResult interpretVM(VM* vm, const char* source);
+void cleanVM(VM* vm);
 
 #endif
