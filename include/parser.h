@@ -6,12 +6,29 @@
 #include "object.h"
 #include "common.h"
 
-//parser rules
+//local variables
 typedef struct {
+	Token name;
+	int depth;
+} Local;
+
+//parser structure
+typedef struct {
+	//reference the scanner
 	Scanner* scanner;
+
+	//process the chunk
 	Chunk* chunk;
 	Token current;
 	Token previous;
+
+	//handle local vars/consts
+	Local* locals;
+	int localCapacity;
+	int localCount;
+	int scopeDepth;
+
+	//error handling
 	bool hadError;
 	bool panicMode;
 } Parser;
@@ -44,6 +61,7 @@ ParseRule* getRule(TokenType type);
 
 //initialize the parser
 void initParser(Parser* parser, Scanner* scanner, Chunk* chunk);
+void freeParser(Parser* parser);
 
 //compiler.c utility functions
 void errorAt(Parser* parser, Token* token, const char* message);

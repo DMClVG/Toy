@@ -94,5 +94,8 @@ bool compile(const char* source, Chunk* chunk) {
 	}
 #endif
 
-	return !parser.hadError;
+	bool hadError = parser.hadError;
+	freeParser(&parser);
+
+	return !hadError;
 }

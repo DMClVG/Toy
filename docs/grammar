@@ -8,5 +8,9 @@ declaration
 statement
  | exprStmt
  | printStmt
+ | block
  ;
- 
+
+block
+ | "{" declaration* "}"
+ ;

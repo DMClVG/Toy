@@ -19,9 +19,14 @@ static int simpleInstruction(const char* name, int offset) {
 	return offset + 1;
 }
 
-static int simpleArgInstruction(const char* name, Chunk* chunk, int offset) {
+static int byteInstruction(const char* name, Chunk* chunk, int offset) {
 	printf("%-24s %04d\n", name, chunk->code[offset + 1]);
 	return offset + 2;
+}
+
+static int longInstruction(const char* name, Chunk* chunk, int offset) {
+	printf("%-24s %04d\n", name, *(uint32_t*)(chunk->code + offset + 1));
+	return offset + 5;
 }
 
 static int constantInstruction(const char* name, Chunk* chunk, int offset) {
@@ -41,7 +46,7 @@ static int constantLongInstruction(const char* name, Chunk* chunk, int offset) {
 	printValue(chunk->constants.values[constantIndex]);
 	printf("'\n");
 
-	return offset + 4;
+	return offset + 5;
 }
 
 int disassembleInstruction(Chunk* chunk, int offset) {
@@ -109,20 +114,32 @@ int disassembleInstruction(Chunk* chunk, int offset) {
 		case OP_DEFINE_GLOBAL_VAR:
 			return constantInstruction("OP_DEFINE_GLOBAL_VAR", chunk, offset);
 
-		case OP_DEFINE_GLOBAL_VAR_LONG:
-			return constantLongInstruction("OP_DEFINE_GLOBAL_VAR_LONG", chunk, offset);
-
 		case OP_SET_GLOBAL_VAR:
 			return constantInstruction("OP_SET_GLOBAL_VAR", chunk, offset);
-
-		case OP_SET_GLOBAL_VAR_LONG:
-			return constantLongInstruction("OP_SET_GLOBAL_VAR_LONG", chunk, offset);
 
 		case OP_GET_GLOBAL_VAR:
 			return constantInstruction("OP_GET_GLOBAL_VAR", chunk, offset);
 
+		case OP_SET_LOCAL_VAR:
+			return byteInstruction("OP_SET_LOCAL_VAR", chunk, offset);
+
+		case OP_GET_LOCAL_VAR:
+			return byteInstruction("OP_GET_LOCAL_VAR", chunk, offset);
+
+		case OP_DEFINE_GLOBAL_VAR_LONG:
+			return constantLongInstruction("OP_DEFINE_GLOBAL_VAR_LONG", chunk, offset);
+
+		case OP_SET_GLOBAL_VAR_LONG:
+			return constantLongInstruction("OP_SET_GLOBAL_VAR_LONG", chunk, offset);
+
 		case OP_GET_GLOBAL_VAR_LONG:
 			return constantLongInstruction("OP_GET_GLOBAL_VAR_LONG", chunk, offset);
+
+		case OP_SET_LOCAL_VAR_LONG:
+			return longInstruction("OP_SET_LOCAL_VAR_LONG", chunk, offset);
+
+		case OP_GET_LOCAL_VAR_LONG:
+			return longInstruction("OP_GET_LOCAL_VAR_LONG", chunk, offset);
 
 			//TODO: disassemble all global variables and constants
 

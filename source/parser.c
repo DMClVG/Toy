@@ -1,7 +1,11 @@
 #include "parser.h"
 #include "object.h"
+#include "memory.h"
 
 #include <stdlib.h>
+#include <string.h>
+
+#include <stdio.h> //TODO: remove this
 
 //forward declarations
 ParseRule* getRule(TokenType type);
@@ -10,10 +14,19 @@ ParseRule* getRule(TokenType type);
 void initParser(Parser* parser, Scanner* scanner, Chunk* chunk) {
 	parser->scanner = scanner;
 	parser->chunk = chunk;
-	//parser->previous = ???
-	//parser->current = ???
+
+	parser->locals = NULL;
+	parser->localCapacity = 0;
+	parser->localCount = 0;
+	parser->scopeDepth = 0;
+
 	parser->hadError = false;
 	parser->panicMode = false;
+}
+
+void freeParser(Parser* parser) {
+	FREE_ARRAY(Local, parser->locals, parser->localCapacity);
+	initParser(parser, NULL, NULL);
 }
 
 //convenience
@@ -38,12 +51,62 @@ static uint32_t idenifierConstant(Parser* parser, Token* name) { //possibly sear
 	return emitConstant(parser, OBJECT_VAL(copyString(&parser->chunk->objects, &parser->chunk->strings, name->start, name->length)));
 }
 
+static void addLocal(Parser* parser, Token name) {
+	//expand locals array
+	if (parser->localCapacity < parser->localCount + 1) {
+		int oldCapacity = parser->localCapacity;
+
+		parser->localCapacity = GROW_CAPACITY(oldCapacity);
+		parser->locals = GROW_ARRAY(Local, parser->locals, oldCapacity, parser->localCapacity);
+	}
+
+	Local* local = &parser->locals[parser->localCount++];
+	local->name = name;
+	local->depth = -1;
+}
+
+static bool identifiersEqual(Token* a, Token* b) {
+	if (a->length != b->length) return false;
+	return memcmp(a->start, b->start, a->length) == 0;
+}
+
+static void declareVariable(Parser* parser) {
+	if (parser->scopeDepth == 0) return;
+	Token* name = &parser->previous;
+
+	for (int i = parser->localCount - 1; i >= 0; i--) {
+		Local* local = &parser->locals[i];
+		if (local->depth != -1 && local->depth < parser->scopeDepth) {
+			break;
+		}
+
+		if (identifiersEqual(name, &local->name)) {
+			errorAtPrevious(parser, "A variable with that name has already been declared in this scope");
+		}
+	}
+
+	addLocal(parser, *name);
+}
+
 static uint32_t parseVariable(Parser* parser, const char* errorMsg) {
 	consume(parser, TOKEN_IDENTIFIER, errorMsg);
+
+	declareVariable(parser);
+	if (parser->scopeDepth > 0) return 0;
+
 	return idenifierConstant(parser, &parser->previous);
 }
 
+static void markInitialized(Parser* parser) {
+	parser->locals[parser->localCount - 1].depth = parser->scopeDepth;
+}
+
 static void defineVariable(Parser* parser, uint32_t global) {
+	if (parser->scopeDepth > 0) {
+		markInitialized(parser);
+		return;
+	}
+
 	if (global < 256) {
 		emitBytes(parser, OP_DEFINE_GLOBAL_VAR, global);
 	} else {
@@ -52,7 +115,47 @@ static void defineVariable(Parser* parser, uint32_t global) {
 	}
 }
 
+static uint32_t resolveLocal(Parser* parser, Token* name) {
+	for (int i = parser->localCount - 1; i >= 0; i--) {
+		Local* local = &parser->locals[i];
+		if (identifiersEqual(name, &local->name)) {
+			if (local->depth == -1) {
+				errorAtPrevious(parser, "Can't read variable in it's own initializer");
+			}
+			return i;
+		}
+	}
+
+	return  -1;
+}
+
 static void namedVariable(Parser* parser, Token name, bool canAssign) {
+	//yes, I know there's code duplication here. Leave it alone.
+	uint32_t local = resolveLocal(parser, &name);
+
+	//handle locals
+	if (local != -1) {
+		if (canAssign && match(parser, TOKEN_EQUAL)) {
+			expression(parser);
+
+			if (local < 256) {
+				emitBytes(parser, OP_SET_LOCAL_VAR, local);
+			} else {
+				emitByte(parser, OP_SET_LOCAL_VAR_LONG);
+				emitLong(parser, local);
+			}
+		} else {
+			if (local < 256) {
+				emitBytes(parser, OP_GET_LOCAL_VAR, local);
+			} else {
+				emitByte(parser, OP_GET_LOCAL_VAR_LONG);
+				emitLong(parser, local);
+			}
+		}
+		return;
+	}
+
+	//handle globals
 	uint32_t global = idenifierConstant(parser, &name);
 
 	if (canAssign && match(parser, TOKEN_EQUAL)) {
@@ -71,6 +174,19 @@ static void namedVariable(Parser* parser, Token name, bool canAssign) {
 			emitByte(parser, OP_GET_GLOBAL_VAR_LONG);
 			emitLong(parser, global);
 		}
+	}
+}
+
+static void beginScope(Parser* parser) {
+	parser->scopeDepth++;
+}
+
+static void endScope(Parser* parser) {
+	parser->scopeDepth--;
+
+	while(parser->localCount > 0 && parser->locals[parser->localCount - 1].depth > parser->scopeDepth) {
+		emitByte(parser, OP_POP); //TODO: OP_POPN
+		parser->localCount--;
 	}
 }
 
@@ -128,7 +244,7 @@ static void unary(Parser* parser, bool canAssign) {
 	}
 }
 
-static void binary(Parser* parser, bool canAssign) {
+static void binary(Parser* parser, bool canAssign) { //TODO: can I compute literals in the parser?
 	TokenType operatorType = parser->previous.type;
 
 	ParseRule* rule = getRule(operatorType);
@@ -273,12 +389,29 @@ static void expressionStmt(Parser* parser) {
 	emitByte(parser, OP_POP);
 }
 
+static void block(Parser* parser) {
+	while (!check(parser, TOKEN_RIGHT_BRACE) && !check(parser, TOKEN_EOF)) {
+		declaration(parser);
+	}
+
+	consume(parser, TOKEN_RIGHT_BRACE, "Expected '}' at the end of a block");
+}
+
 void statement(Parser* parser) {
 	if (match(parser, TOKEN_PRINT)) {
 		printStmt(parser);
-	} else {
-		expressionStmt(parser);
+		return;
 	}
+
+	if (match(parser, TOKEN_LEFT_BRACE)) {
+		beginScope(parser);
+		block(parser);
+		endScope(parser);
+		return;
+	}
+
+	//default
+	expressionStmt(parser);
 }
 
 void expression(Parser* parser) {

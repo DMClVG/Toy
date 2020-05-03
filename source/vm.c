@@ -104,7 +104,9 @@ InterpretResult runVM(VM* vm) {
 	(vm->chunk->constants.values[READ_BYTE()]) : \
 	(vm->chunk->constants.values[(*vm->ip++, *vm->ip++, *vm->ip++, *vm->ip++, *(uint32_t*)(vm->ip - 4))])
 
-#define READ_STRING(arg) AS_STRING(READ_CONSTANT(arg == OP_DEFINE_GLOBAL_VAR || arg == OP_SET_GLOBAL_VAR || arg == OP_GET_GLOBAL_VAR ? OP_CONSTANT : OP_CONSTANT_LONG))
+#define READ_STRING(arg) AS_STRING(READ_CONSTANT(arg < OP_LONG_SENTINEL ? OP_CONSTANT : OP_CONSTANT_LONG))
+
+#define READ_LOCAL(arg) arg < OP_LONG_SENTINEL ? READ_BYTE() : (*vm->ip++, *vm->ip++, *vm->ip++, *vm->ip++, *(uint32_t*)(vm->ip - 4))
 
 #define BINARY_OP(valueType, op) \
 	do { \
@@ -251,6 +253,22 @@ InterpretResult runVM(VM* vm) {
 				}
 				popVM(vm);
 				pushVM(vm, value);
+				break;
+			}
+
+			case OP_SET_LOCAL_VAR:
+			case OP_SET_LOCAL_VAR_LONG:
+			{
+				uint32_t slot = READ_LOCAL(instruction);
+				vm->stack[slot] = peekVM(vm, 0);
+				break;
+			}
+
+			case OP_GET_LOCAL_VAR:
+			case OP_GET_LOCAL_VAR_LONG:
+			{
+				uint32_t slot = READ_LOCAL(instruction);
+				pushVM(vm, vm->stack[slot]);
 				break;
 			}
 
