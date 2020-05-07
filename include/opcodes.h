@@ -1,0 +1,51 @@
+#ifndef CTOY_OPCODES_H
+#define CTOY_OPCODES_H
+
+typedef enum {
+	//return
+	OP_RETURN = 0,
+
+	//constants
+	OP_CONSTANT,
+
+	//atomic values
+	OP_NIL,
+	OP_TRUE,
+	OP_FALSE,
+
+	//operators
+	OP_EQUAL,
+	OP_GREATER,
+	OP_LESS,
+	OP_NOT,
+	OP_NEGATE,
+	OP_ADD,
+	OP_SUBTRACT,
+	OP_MULTIPLY,
+	OP_DIVIDE,
+
+	//keywords
+	OP_PRINT,
+
+	//internals
+	OP_POP,
+
+	OP_DEFINE_GLOBAL_VAR,
+	OP_SET_GLOBAL_VAR,
+	OP_GET_GLOBAL_VAR,
+	OP_SET_LOCAL_VAR,
+	OP_GET_LOCAL_VAR,
+
+	OP_LONG_SENTINEL, //everything above this opcode is long
+
+	OP_CONSTANT_LONG,
+	OP_DEFINE_GLOBAL_VAR_LONG,
+	OP_SET_GLOBAL_VAR_LONG,
+	OP_GET_GLOBAL_VAR_LONG,
+	OP_SET_LOCAL_VAR_LONG,
+	OP_GET_LOCAL_VAR_LONG,
+
+	//TODO: consts
+} OpCode;
+
+#endif

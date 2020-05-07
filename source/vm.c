@@ -120,6 +120,7 @@ InterpretResult runVM(VM* vm) {
 	} while (false)
 
 	for (;;) {
+		//debugging
 #ifdef DEBUG_TRACE_EXECUTION
 		printf("          ");
 		for (int slot = 0; slot < vm->count; slot++) {
@@ -281,6 +282,7 @@ InterpretResult runVM(VM* vm) {
 #undef READ_BYTE
 #undef READ_CONSTANT
 #undef READ_STRING
+#undef READ_LOCAL
 #undef BINARY_OP
 }
 

@@ -5,15 +5,18 @@
 #include "table.h"
 #include "common.h"
 
+//object types
 typedef enum {
 	OBJ_STRING,
 } ObjectType;
 
+//base object
 struct sObject {
 	ObjectType type;
 	Object* next; //for the object pool
 };
 
+//string object
 struct sObjectString {
 	Object object;
 	int length;
@@ -33,7 +36,7 @@ ObjectString* copyString(Object** pool, Table* stringTable, const char* chars, i
 void freeObjectPool(Object** pool);
 Object* mergeObjectPools(Object* a, Object* b);
 
-void printObject(Object* object);
+void printObject(Object* object); //debugging
 
 static inline bool isObjectType(Value value, ObjectType type) {
 	return IS_OBJECT(value) && AS_OBJECT(value)->type == type;

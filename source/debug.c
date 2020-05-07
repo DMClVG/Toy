@@ -1,5 +1,7 @@
 #include "debug.h"
+#include "opcodes.h"
 #include "value.h"
+#include "common.h"
 
 #include <stdio.h>
 

@@ -3,6 +3,7 @@
 
 #include "chunk.h"
 
+//compile source code into a Chunk
 bool compile(const char* source, Chunk* chunk);
 
 #endif

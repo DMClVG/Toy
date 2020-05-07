@@ -20,7 +20,6 @@ typedef enum {
 	TOKEN_MINUS,
 	TOKEN_MINUS_EQUAL,
 	TOKEN_MINUS_MINUS,
-	//TODO: minus greater for objects
 
 	TOKEN_STAR,
 	TOKEN_STAR_EQUAL,
@@ -43,7 +42,7 @@ typedef enum {
 
 	TOKEN_LESS,
 	TOKEN_LESS_EQUAL,
-	TOKEN_LESS_OR, //back pipe
+	TOKEN_LESS_OR, //back pipe TODO: remove this, replace it
 
 	//these can ONLY be doubles
 	TOKEN_AND_AND,
