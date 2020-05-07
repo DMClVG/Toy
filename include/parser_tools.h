@@ -1,3 +1,6 @@
+#ifndef CTOY_PARSER_TOOLS_H
+#define CTOY_PARSER_TOOLS_H
+
 #include "parser.h"
 
 //error handling
@@ -31,3 +34,5 @@ uint32_t parseVariable(Parser* parser, const char* errorMsg);
 void addLocal(Parser* parser, Token name);
 uint32_t resolveLocal(Parser* parser, Token* name);
 void namedVariable(Parser* parser, Token name, bool canAssign);
+
+#endif
