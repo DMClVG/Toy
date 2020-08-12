@@ -670,3 +670,8 @@ This function removes all callbacks from the internal list of callbacks. It is c
 * Pure Keyword
 * Capture syntax for functions
 
+```
+const f = (args) -> [x] {
+	print args;
+};
+```
