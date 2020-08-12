@@ -1,8 +1,30 @@
 #include "keyword_types.h"
 
 KeywordType keywordTypes[] = {
+	{"as", TOKEN_AS},
+	{"assert", TOKEN_ASSERT},
+	{"break", TOKEN_BREAK},
+	{"case", TOKEN_CASE},
+	{"const", TOKEN_CONST},
+	{"continue", TOKEN_CONTINUE},
+	{"default", TOKEN_DEFAULT},
+	{"do", TOKEN_DO},
+	{"else", TOKEN_ELSE},
+	{"export", TOKEN_EXPORT},
+	{"false", TOKEN_FALSE},
+	{"for", TOKEN_FOR},
+	{"foreach", TOKEN_FOREACH},
+	{"if", TOKEN_IF},
+	{"import", TOKEN_IMPORT},
+	{"in", TOKEN_IN},
+	{"null", TOKEN_NIL},
+	{"of", TOKEN_OF},
 	{"print", TOKEN_PRINT},
-	//TODO: more
+	{"return", TOKEN_RETURN},
+	{"switch", TOKEN_SWITCH},
+	{"true", TOKEN_TRUE},
+	{"var", TOKEN_VAR},
+	{"while", TOKEN_WHILE},
 
 	{NULL, TOKEN_EOF}
 };

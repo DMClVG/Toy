@@ -1,0 +1,39 @@
+import "Math";
+
+//events - internal state can change, not names
+export var OnCharacterDamaged = [::];
+export var OnCharacterHealed = [::];
+export var OnCharacterDeath = [::];
+
+//vars
+var _maxHealth = 0;
+var _health = 0;
+
+//functions
+export const SetMaxHealth = value => {
+	_maxHealth = Math.Max(value, 0);
+	_health = Math.Min(_health, _maxHealth);
+};
+
+export const SetHealth = value => {
+	//lose _health
+	if (_health > value) {
+		_health = Math.Clamp(value, 0, _maxHealth);
+		OnCharacterDamaged(_health);
+	}
+
+	//gain _health
+	else if (_health < value) {
+		_health = Math.Clamp(value, 0, _maxHealth);
+		OnCharacterHealed(_health);
+	}
+
+	if (_health <= 0) {
+		OnCharacterDeath(null); //should events have args?
+	}
+}
+
+export const GetMaxHealth = () => _maxHealth;
+export const GetHealth = () => _health;
+
+export as HealthUtility; //name used in the importing script
