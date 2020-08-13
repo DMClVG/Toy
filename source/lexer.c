@@ -167,7 +167,7 @@ Token makeKeywordOrIdentifier(Lexer* lexer) {
 
 	//scan for a keyword
 	for (int i = 0; keywordTypes[i].keyword; i++) {
-		if (!strncmp(keywordTypes[i].keyword, &lexer->source[lexer->start], lexer->current - lexer->start)) {
+		if (strlen(keywordTypes[i].keyword) == lexer->current - lexer->start && !strncmp(keywordTypes[i].keyword, &lexer->source[lexer->start], lexer->current - lexer->start)) {
 			Token token;
 
 			token.type = keywordTypes[i].type;
