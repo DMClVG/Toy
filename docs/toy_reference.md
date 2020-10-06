@@ -83,7 +83,7 @@ Note that:
 
 * All of the mathematical operators can be used on numbers
 * `+` and `+=` can be used on strings for concatenation
-* `==` and `!=` can be used on strings and numbers to compare them; comparing numbers to booleans will use their truthiness. Functions only equal themselves
+* `==` and `!=` can be used on strings and numbers to compare them; comparing numbers to booleans will use their truthiness. Functions and events only equal themselves
 * `+=` and `-=` can be used on events to subscribe and unsubscribe a callback, respectfully
 
 Remember, `&&` is more tightly bound than `||`.
@@ -298,7 +298,7 @@ for (var i = 0; i < 10; i++) {
 }
 ```
 
-TODO: `break x;` and `continue x;` i.e. breaking out of multiple nested loops? Or a `goto` statement?
+TODO: `break x;` and `continue x;` i.e. breaking out of multiple nested loops using a label? Scoped labels and goto?
 
 ## Functions and Return
 
@@ -371,19 +371,16 @@ No.
 
 ## Assert
 
-TODO: I'm no so sure about the variable number of arguments here.
-
-The `assert` keyword takes 1 required parameter, and an optional second parameter. If the first parameter resolves to be falsy, then the program terminates, and then if a string is provided as the second parameter, it prints that string. Note that assert can only take a string as the second parameter - anything else will cause an error before the program runs.
+The `assert` keyword takes 2 parameters, separated by a comma. If the first parameter resolves to be falsy, then the program terminates, and the value of the second parameter is displayed to the user.
 
 ```
 assert true, "This is fine"; //Good!
-assert false; //Error!
-assert true, 42; //Compile error!
+assert false, "This is not"; //Error!
 ```
 
 ## Import As
 
-`import` is used to load libraries and external \*.toy files. Several libraries are provided by default. The import keyword can only take a string as it's argument, followed by an optional `as alias`.
+`import` is used to load libraries and external \*.toy files. Several built-in libraries are provided by default. The import keyword can only take a string as it's argument, followed by an optional `as alias`.
 
 ```
 import "Standard";
@@ -456,6 +453,8 @@ This function returns an array representation of this string, with each characte
 
 # Array
 
+Arrays are collections of variables stored as one piece of data. They can hold any number of values, but "holes" in the array are not permitted. You can access a specific element by using zero-indexing.
+
 ```
 var arr = ["hello", "world", "foo", "bar"];
 
@@ -492,7 +491,6 @@ This function sorts the elements according to the callback "cb". "cb" may be cal
 
 ```
 //how to sort an array of numbers
-//note that if there are any non-numbers, then the program will fail
 array.Sort((a, b) => a - b);
 ```
 
@@ -551,6 +549,8 @@ This function returns a string representation of the array. Each element is conv
 Nesting an array within it's own data structure will cause the inner reference to be printed as "\<circular reference\>".
 
 # Dictionary
+
+Dictionaries are key-value collections of variables. Every key has a single associated value; any missing value is considered `null`.
 
 ```
 var dict = ["key one" : "value one", "key two" : "value two"];
@@ -647,6 +647,8 @@ Nesting a dictionary within it's own data structure will cause the inner referen
 var evt = [::];
 
 var unsub = evt.Subscribe(x => print x);
+
+evt += x => { print x; };
 
 evt("hello world");
 ```
