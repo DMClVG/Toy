@@ -1,3 +1,5 @@
+The C# version of Toy is officially deprecated.
+
 # Toy
 
 This is the Toy programming language interpreter, written in C#. It can be tested out here: [toylang.com](https://www.toylang.com)
