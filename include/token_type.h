@@ -74,7 +74,7 @@ typedef enum {
 	TOKEN_DEFAULT,
 	TOKEN_DO,
 	TOKEN_ELSE,
-	TOKEN_EXPORT,
+	TOKEN_EXPORT, //reserved
 	TOKEN_FALSE,
 	TOKEN_FOR,
 	TOKEN_FOREACH, //reserved

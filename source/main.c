@@ -1,9 +1,14 @@
+//DOCS: This file is regularly re-written as testing continues
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "lexer.h"
-#include "keyword_types.h"
+#include "parser.h"
 
+//for testing
+#include "debug.h"
+
+//read a file and return it as a char array
 char* readFile(const char* path) {
 	FILE* file = fopen(path, "rb");
 
@@ -54,26 +59,7 @@ int main(int argc, const char *argv[]) {
 	do {
 		token = scanLexer(&lexer);
 
-		if (token.type == TOKEN_ERROR) {
-			printf("Error\t%d\t%.*s\n", token.line, token.length, token.lexeme);
-			continue;
-		}
-
-		printf("%d\t%d\t", token.type, token.line);
-
-		if (token.type == TOKEN_IDENTIFIER || token.type == TOKEN_NUMBER || token.type == TOKEN_STRING || token.type == TOKEN_INTERPOLATED_STRING) {
-			printf("%.*s\t", token.length, token.lexeme);
-		} else {
-			char* keyword = findKeywordByType(token.type);
-
-			if (keyword != NULL) {
-				printf("%s", keyword);
-			} else {
-				printf("-");
-			}
-		}
-
-		printf("\n", token.line);
+		printToken(&token);
 
 	} while (token.type != TOKEN_EOF);
 

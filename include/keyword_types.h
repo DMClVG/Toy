@@ -11,6 +11,7 @@ typedef struct {
 
 extern KeywordType keywordTypes[];
 
+//for debugging
 char* findKeywordByType(TokenType type);
 
 #endif

@@ -1,0 +1,38 @@
+import "Math";
+
+//events
+var OnCharacterDamaged = [::];
+var OnCharacterHealed = [::];
+var OnCharacterDeath = [::];
+
+//vars
+var _maxHealth = 0;
+var _health = 0;
+
+//functions
+const SetMaxHealth = value => {
+	_maxHealth = Math.Max(value, 0);
+	_health = Math.Min(_health, _maxHealth);
+};
+
+const SetHealth = value => {
+	//lose _health
+	if (_health > value) {
+		_health = Math.Clamp(value, 0, _maxHealth);
+		OnCharacterDamaged(_health);
+	}
+
+	//gain _health
+	else if (_health < value) {
+		_health = Math.Clamp(value, 0, _maxHealth);
+		OnCharacterHealed(_health);
+	}
+
+	if (_health <= 0) {
+		OnCharacterDeath(null);
+	}
+}
+
+const GetMaxHealth = () => _maxHealth;
+const GetHealth = () => _health;
+
