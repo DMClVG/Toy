@@ -1,4 +1,4 @@
-The C# version of Toy is officially deprecated.
+The C# version of Toy is officially deprecated, in favour of the branch [0.4.0](https://github.com/Ratstail91/Toy/tree/0.4.0).
 
 # Toy
 
