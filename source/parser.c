@@ -5,6 +5,39 @@
 
 #include <stdio.h>
 
+/* DOCS: The original build of this had the parser spread between a dozen files - I'm trying to prevent that.
+*/
+
+//forward declare the precedent rules
+typedef enum {
+	PREC_NONE,
+	PREC_ASSIGNMENT,
+	PREC_TERNARY,
+	PREC_OR,
+	PREC_AND,
+	PREC_EQUALITY,
+	PREC_COMPARISON,
+	PREC_TERM,
+	PREC_FACTOR,
+	PREC_UNARY,
+	PREC_CALL,
+	PREC_PRIMARY,
+} Precedence;
+
+//for the pratt table
+typedef void (*ParseFn)(Parser* parser, Chunk* chunk, bool canAssign);
+
+typedef struct {
+	ParseFn prefix;
+	ParseFn infix;
+	ParseFn mixfix; //for ternary
+	Precedence precedence;
+} ParseRule;
+
+//get the precedence rule for each token type
+static ParseRule* getRule(TokenType type);
+static void parsePrecendence(Parser* parser, Chunk* chunk, Precedence precedence);
+
 //convenience
 static void emitByte(Parser* parser, Chunk* chunk, uint8_t byte) {
 	writeChunk(chunk, byte, parser->lexer->line);
@@ -98,7 +131,7 @@ static void synchronize(Parser* parser) {
 	}
 }
 
-//grammar expression rules
+//refer to the grammar expression rules below
 static void expression(Parser* parser, Chunk* chunk) {
 	//TODO: delegate to the pratt table for expression precedence
 }
@@ -136,6 +169,71 @@ static void declaration(Parser* parser, Chunk* chunk) {
 	}
 }
 
+//
+//precedence
+static void parsePrecendence(Parser* parser, Chunk* chunk, Precedence precedence) {
+	advance(parser);
+
+	ParseFn prefixRule = getRule(parser->previous.type)->prefix;
+	if (prefixRule == NULL) {
+		error(parser, parser->previous, "Expected expression");
+		return;
+	}
+
+	bool canAssign = precedence <= PREC_ASSIGNMENT;
+	prefixRule(parser, chunk, canAssign);
+
+	while (precedence <= getRule(parser->current.type)->precedence) {
+		advance(parser);
+		ParseFn infixRule = getRule(parser->previous.type)->infix;
+		infixRule(parser, chunk, canAssign);
+	}
+
+	//TODO: mixfix
+
+	if (canAssign && match(parser, TOKEN_EQUAL)) {
+		error(parser, parser->previous, "Invalid assignment target");
+	}
+}
+
+//expression rules
+static void variable(Parser* parser, bool canAssign) {
+	//TODO: variables
+}
+
+static void number(Parser* parser, bool canAssign) {
+	//TODO: numbers
+}
+
+static void string(Parser* parser, bool canAssign) {
+	//TODO: strings
+}
+
+static void grouping(Parser* parser, bool canAssign) {
+	//TODO: groupings
+}
+
+static void unary(Parser* parser, bool canAssign) {
+	//TODO: unary
+}
+
+static void binary(Parser* parser, bool canAssign) { //TODO: can I compute literals in the parser?
+	//TODO: binary
+}
+
+static void atom(Parser* parser, bool canAssign) {
+	//TODO: atom
+}
+
+//a pratt table
+ParseRule parseRules[] = {
+	//
+};
+
+ParseRule* getRule(TokenType type) {
+	return &parseRules[type];
+}
+
 //exposed functions
 void initParser(Parser* parser, Lexer* lexer) {
 	parser->lexer = lexer;
@@ -162,6 +260,7 @@ Chunk* scanParser(Parser* parser) {
 	return chunk;
 }
 
+//TODO: move chunks into their own file
 void initChunk(Chunk* chunk) {
 	chunk->capacity = 0;
 	chunk->count = 0;
