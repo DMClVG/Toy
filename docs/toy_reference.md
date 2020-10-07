@@ -398,7 +398,7 @@ import "external2.toy" as External2; //runs the external file, then stores the e
 
 # String
 
-Strings are a series of characters, and are created by surrounding said characters with a pair of quotation marks `"`. Strings can also be interpolated by replacing the quotation marks with backticks `` ` ``, and inserting variables between `${` and `}`.
+Strings are a series of characters, and are created by surrounding said characters with a pair of quotation marks `"`. Strings can also be interpolated by replacing the quotation marks with backticks `` ` ``, and inserting variables between `${` and `}`. Characters within a string can be escaped with the `\` character.
 
 ```
 var greeting = "Hello world";
@@ -644,7 +644,7 @@ Nesting a dictionary within it's own data structure will cause the inner referen
 # Event
 
 ```
-var evt = [::];
+var evt = [...];
 
 var unsub = evt.Subscribe(x => print x);
 

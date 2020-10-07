@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-void cleanLexer(Lexer* lexer) {
+static void cleanLexer(Lexer* lexer) {
 	lexer->source = NULL;
 	lexer->start = 0;
 	lexer->current = 0;
@@ -16,20 +16,20 @@ void initLexer(Lexer* lexer, char* source) {
 	lexer->source = source;
 }
 
-bool isAtEnd(Lexer* lexer) {
+static bool isAtEnd(Lexer* lexer) {
 	return lexer->source[lexer->current] == '\0';
 }
 
-char peek(Lexer* lexer) {
+static char peek(Lexer* lexer) {
 	return lexer->source[lexer->current];
 }
 
-char peekNext(Lexer* lexer) {
+static char peekNext(Lexer* lexer) {
 	if (isAtEnd(lexer)) return '\0';
 	return lexer->source[lexer->current + 1];
 }
 
-char advance(Lexer* lexer) {
+static char advance(Lexer* lexer) {
 	if (isAtEnd(lexer)) {
 		return '\0';
 	}
@@ -43,7 +43,7 @@ char advance(Lexer* lexer) {
 	return lexer->source[lexer->current - 1];
 }
 
-void eatWhitespace(Lexer* lexer) {
+static void eatWhitespace(Lexer* lexer) {
 	const char c = peek(lexer);
 
 	switch(c) {
@@ -78,11 +78,11 @@ void eatWhitespace(Lexer* lexer) {
 	eatWhitespace(lexer);
 }
 
-bool isDigit(Lexer* lexer) {
+static bool isDigit(Lexer* lexer) {
 	return peek(lexer) >= '0' && peek(lexer) <= '9';
 }
 
-bool isAlpha(Lexer* lexer) {
+static bool isAlpha(Lexer* lexer) {
 	return
 		peek(lexer) >= 'A' && peek(lexer) <= 'Z' ||
 		peek(lexer) >= 'a' && peek(lexer) <= 'z' ||
@@ -90,7 +90,7 @@ bool isAlpha(Lexer* lexer) {
 	;
 }
 
-bool match(Lexer* lexer, char c) {
+static bool match(Lexer* lexer, char c) {
 	if (peek(lexer) == c) {
 		advance(lexer);
 		return true;
@@ -99,7 +99,7 @@ bool match(Lexer* lexer, char c) {
 	return false;
 }
 
-Token makeErrorToken(Lexer* lexer, char* msg) {
+static Token makeErrorToken(Lexer* lexer, char* msg) {
 	Token token;
 
 	token.type = TOKEN_ERROR;
@@ -110,7 +110,7 @@ Token makeErrorToken(Lexer* lexer, char* msg) {
 	return token;
 }
 
-Token makeToken(Lexer* lexer, TokenType type) {
+static Token makeToken(Lexer* lexer, TokenType type) {
 	Token token;
 
 	token.type = type;
@@ -119,7 +119,7 @@ Token makeToken(Lexer* lexer, TokenType type) {
 	return token;
 }
 
-Token makeNumber(Lexer* lexer) {
+static Token makeNumber(Lexer* lexer) {
 	while(isDigit(lexer)) advance(lexer);
 
 	if (peek(lexer) == '.') {
@@ -137,8 +137,13 @@ Token makeNumber(Lexer* lexer) {
 	return token;
 }
 
-Token makeString(Lexer* lexer, char terminator) {
+static Token makeString(Lexer* lexer, char terminator) {
 	while (!isAtEnd(lexer) && peek(lexer) != terminator) {
+		//escaping strings
+		if (peek(lexer) == '\\') {
+			advance(lexer);
+		}
+
 		advance(lexer);
 	}
 
@@ -158,7 +163,7 @@ Token makeString(Lexer* lexer, char terminator) {
 	return token;
 }
 
-Token makeKeywordOrIdentifier(Lexer* lexer) {
+static Token makeKeywordOrIdentifier(Lexer* lexer) {
 	advance(lexer); //first letter can only be alpha
 
 	while(isDigit(lexer) || isAlpha(lexer)) {
