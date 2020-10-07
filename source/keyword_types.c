@@ -3,6 +3,8 @@
 KeywordType keywordTypes[] = {
 	{"as", TOKEN_AS},
 	{"assert", TOKEN_ASSERT},
+	{"async", TOKEN_ASYNC},
+	{"await", TOKEN_AWAIT},
 	{"break", TOKEN_BREAK},
 	{"case", TOKEN_CASE},
 	{"const", TOKEN_CONST},
@@ -20,6 +22,7 @@ KeywordType keywordTypes[] = {
 	{"null", TOKEN_NIL},
 	{"of", TOKEN_OF},
 	{"print", TOKEN_PRINT},
+	{"pure", TOKEN_PURE},
 	{"return", TOKEN_RETURN},
 	{"switch", TOKEN_SWITCH},
 	{"true", TOKEN_TRUE},

@@ -67,6 +67,8 @@ typedef enum {
 	//keywords (alphabetized)
 	TOKEN_AS,
 	TOKEN_ASSERT,
+	TOKEN_ASYNC, //reserved
+	TOKEN_AWAIT, //reserved
 	TOKEN_BREAK,
 	TOKEN_CASE,
 	TOKEN_CONST,
@@ -84,6 +86,7 @@ typedef enum {
 	TOKEN_NIL, //null
 	TOKEN_OF, //reserved
 	TOKEN_PRINT,
+	TOKEN_PURE, //reserved
 	TOKEN_RETURN,
 	TOKEN_SWITCH,
 	TOKEN_TRUE,

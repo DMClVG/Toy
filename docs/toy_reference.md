@@ -677,3 +677,5 @@ const f = (args) -> [x] {
 	print args;
 };
 ```
+
+* async/await/promises
