@@ -679,3 +679,5 @@ const f = (args) -> [x] {
 ```
 
 * async/await/promises
+* Access individual functions within an event
+* const event = [..];
