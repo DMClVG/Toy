@@ -25,12 +25,11 @@ typedef enum {
 } Precedence;
 
 //for the pratt table
-typedef void (*ParseFn)(Parser* parser, Chunk* chunk, bool canAssign);
+typedef void (*ParseFn)(Parser* parser, Chunk* chunk, bool canBeAssigned);
 
 typedef struct {
 	ParseFn prefix;
 	ParseFn infix;
-	ParseFn mixfix; //for ternary
 	Precedence precedence;
 } ParseRule;
 
@@ -133,7 +132,8 @@ static void synchronize(Parser* parser) {
 
 //refer to the grammar expression rules below
 static void expression(Parser* parser, Chunk* chunk) {
-	//TODO: delegate to the pratt table for expression precedence
+	//delegate to the pratt table for expression precedence
+	parsePrecendence(parser, chunk, PREC_ASSIGNMENT);
 }
 
 //grammar statement rules
@@ -169,65 +169,135 @@ static void declaration(Parser* parser, Chunk* chunk) {
 	}
 }
 
-//
 //precedence
 static void parsePrecendence(Parser* parser, Chunk* chunk, Precedence precedence) {
+	//every expression has a prefix rule
 	advance(parser);
-
 	ParseFn prefixRule = getRule(parser->previous.type)->prefix;
 	if (prefixRule == NULL) {
 		error(parser, parser->previous, "Expected expression");
 		return;
 	}
 
-	bool canAssign = precedence <= PREC_ASSIGNMENT;
-	prefixRule(parser, chunk, canAssign);
+	bool canBeAssigned = precedence <= PREC_ASSIGNMENT;
+	prefixRule(parser, chunk, canBeAssigned);
 
+	//infix rules are left-recursive
 	while (precedence <= getRule(parser->current.type)->precedence) {
 		advance(parser);
 		ParseFn infixRule = getRule(parser->previous.type)->infix;
-		infixRule(parser, chunk, canAssign);
+		infixRule(parser, chunk, canBeAssigned);
 	}
 
-	//TODO: mixfix
-
-	if (canAssign && match(parser, TOKEN_EQUAL)) {
+	//if your precedence is above "assignment"
+	if (canBeAssigned && match(parser, TOKEN_EQUAL)) {
 		error(parser, parser->previous, "Invalid assignment target");
 	}
 }
 
 //expression rules
-static void variable(Parser* parser, bool canAssign) {
-	//TODO: variables
-}
-
-static void number(Parser* parser, bool canAssign) {
+static void number(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//TODO: numbers
 }
 
-static void string(Parser* parser, bool canAssign) {
+static void string(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//TODO: strings
+	printf("MARK 1\n");
 }
 
-static void grouping(Parser* parser, bool canAssign) {
+static void variable(Parser* parser, Chunk* chunk, bool canBeAssigned) {
+	//TODO: variables
+}
+
+static void grouping(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//TODO: groupings
 }
 
-static void unary(Parser* parser, bool canAssign) {
+static void unary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//TODO: unary
 }
 
-static void binary(Parser* parser, bool canAssign) { //TODO: can I compute literals in the parser?
+static void binary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//TODO: binary
 }
 
-static void atom(Parser* parser, bool canAssign) {
+static void atom(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//TODO: atom
 }
 
 //a pratt table
 ParseRule parseRules[] = {
-	//
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_LEFT_PAREN
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_RIGHT_PAREN
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_LEFT_BRACE
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_RIGHT_BRACE
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_LEFT_BRACKET
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_RIGHT_BRACKET
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_SEMICOLON
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_COMMA
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_PLUS
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_PLUS_EQUAL
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_PLUS_PLUS
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_MINUS
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_MINUS_EQUAL
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_MINUS_MINUS
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_STAR
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_STAR_EQUAL
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_SLASH
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_SLASH_EQUAL
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_MODULO
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_MODULO_EQUAL
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_BANG
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_BANG_EQUAL
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_EQUAL
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_EQUAL_EQUAL
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_EQUAL_GREATER
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_GREATER
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_GREATER_EQUAL
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_LESS
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_LESS_EQUAL
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_LESS_OR
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_AND_AND
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_OR_OR
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_OR_GREATER
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_DOT
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_DOT_DOT_DOT
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_QUESTION
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_COLON
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_IDENTIFIER
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_NUMBER
+	{string,	NULL,		PREC_PRIMARY},		// TOKEN_STRING
+	{string,	NULL,		PREC_PRIMARY},		// TOKEN_INTERPOLATED_STRING
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_AS
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_ASSERT
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_ASYNC
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_AWAIT
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_BREAK
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_CASE
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_CONST
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_CONTINUE
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_DEFAULT
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_DO
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_ELSE
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_EXPORT
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_FALSE
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_FOR
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_FOREACH
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_IF
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_IMPORT
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_IN
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_NIL
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_OF
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_PRINT
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_PURE
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_RETURN
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_SWITCH
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_TRUE
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_VAR
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_WHILE
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_PASS
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_ERROR
+	{NULL,		NULL,		PREC_NONE},			// TOKEN_EOF
 };
 
 ParseRule* getRule(TokenType type) {
@@ -247,6 +317,7 @@ void freeParser(Parser* parser) {
 
 Chunk* scanParser(Parser* parser) {
 	Chunk* chunk = ALLOCATE(Chunk, 1);
+	initChunk(chunk);
 
 	advance(parser); //prime the first input
 

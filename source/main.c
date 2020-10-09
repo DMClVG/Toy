@@ -52,18 +52,20 @@ int main(int argc, const char *argv[]) {
 	char* source = readFile(argv[1]);
 
 	Lexer lexer;
+	Parser parser;
 
 	initLexer(&lexer, source);
+	initParser(&parser, &lexer);
 
-	Token token;
-	do {
-		token = scanLexer(&lexer);
+	Chunk* chunk = NULL;
 
-		printToken(&token);
+	chunk = scanParser(&parser);
 
-	} while (token.type != TOKEN_EOF);
-
+	freeChunk(chunk);
+	freeParser(&parser);
 	free((void*)source);
+
+	printf("ending mark\n");
 
 	return 0;
 }
