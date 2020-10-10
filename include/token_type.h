@@ -50,8 +50,9 @@ typedef enum {
 	TOKEN_OR_OR,
 	TOKEN_OR_GREATER, //pipe
 
-	//these can single OR triple
+	//these can single, double or triple
 	TOKEN_DOT,
+	TOKEN_DOT_DOT,
 	TOKEN_DOT_DOT_DOT, //reserved for the rest/spread operator
 
 	//ternary operator

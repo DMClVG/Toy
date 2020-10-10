@@ -83,7 +83,7 @@ Note that:
 
 * All of the mathematical operators can be used on numbers
 * `+` and `+=` can be used on strings for concatenation
-* `==` and `!=` can be used on strings and numbers to compare them; comparing numbers to booleans will use their truthiness. Functions and events only equal themselves
+* `==` and `!=` can be used on strings or numbers to compare them, but not strings AND numbers; Functions and events only equal themselves
 * `+=` and `-=` can be used on events to subscribe and unsubscribe a callback, respectfully
 
 Remember, `&&` is more tightly bound than `||`.
@@ -644,7 +644,7 @@ Nesting a dictionary within it's own data structure will cause the inner referen
 # Event
 
 ```
-var evt = [...];
+var evt = [..];
 
 var unsub = evt.Subscribe(x => print x);
 
@@ -671,13 +671,53 @@ This function removes all callbacks from the internal list of callbacks. It is c
 
 * Pure Keyword
 * Capture syntax for functions
+* Coroutines
+* Access individual functions within an event
 
 ```
-const f = (args) -> [x] {
-	print args;
+//capture syntax
+const f = (args) => [x] {
+	print args + x;
+};
+
+//pure syntax
+const f = (args) => pure {
+	return args; //"print" keyword is not allowed in pure functions
+};
+
+//coroutines
+cosnt cr = delay => coroutine {
+	yield WaitForSeconds(delay);
+	print "Hello world";
+};
+
+Coroutine.Run(cr(1));
+
+//I think it might internally wrap the coroutine in an extra layer function like this:
+const cr = arg => Coroutine(() => { /* code */ });
+
+//So `Coroutine` would be a type that holds a function, and the `coroutine` keyword does invisible wrapping...
+const cr = delay => {
+	return Coroutine(() => {
+		yield WaitForSeconds(delay);
+		print "hello world";
+	});
 };
 ```
 
-* async/await/promises
-* Access individual functions within an event
-* const event = [..];
+## Rejected Ideas
+
+* async/await/promises - no way to signal an error
+
+```
+//async syntax
+const f = (args) => async {
+	print args;
+};
+
+const g = (args) => async {
+	await f(args);
+};
+
+Promise.All([g]); //blocks until all functions in the array return
+```
