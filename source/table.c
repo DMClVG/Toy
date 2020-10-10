@@ -61,7 +61,7 @@ static void adjustCapacity(Table* table, int capacity) {
 	//zero the new array
 	for (int i = 0; i < capacity; i++) {
 		entries[i].key = NULL;
-		entries[i].value = NIL_LITERAL;
+		entries[i].value = TO_NIL_LITERAL;
 	}
 
 	//move the array
@@ -128,7 +128,7 @@ bool tableDelete(Table* table, char* key) {
 
 	//tombstone
 	entry->key = NULL;
-	entry->value = BOOL_LITERAL(true);
+	entry->value = TO_BOOL_LITERAL(true);
 
 	return true;
 }

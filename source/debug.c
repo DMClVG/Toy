@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "keyword_types.h"
+#include "opcodes.h"
 
 void printToken(Token* token) {
 	if (token->type == TOKEN_ERROR) {
@@ -30,6 +31,57 @@ void printToken(Token* token) {
 
 void printChunk(Chunk* chunk) {
 	//TODO: printChunk(Chunk* chunk)
+	printf("Printing chunk: %d/%d\n\n", chunk->count, chunk->capacity);
+
+	for (int i = 0; i < chunk->count; /* EMPTY */) {
+		switch(chunk->code[i]) {
+			case OP_PRINT: {
+				if (chunk->code[i + 1] == OP_LITERAL) {
+					printf("print literal %u\n", chunk->code[i + 2]);
+					i += 3;
+				}
+
+				else if (chunk->code[i + 1] == OP_LITERAL_LONG) {
+					printf("print literal-long %d\n", *((uint32_t*)(chunk->code + i + 2)));
+					i += 6;
+				}
+
+				else {
+					printf("Unexpected OP passed to OP_PRINT\n");
+					return;
+				}
+			}
+
+			break;
+
+			case OP_RETURN:
+				printf("return\n");
+				i++;
+				break;
+
+			default:
+				printf("Unexpected OP passed to printChunk %d\n", chunk->code[i]);
+				return;
+		}
+	}
+
+	printf("=====Constants=====\n");
+	for (int i = 0; i < chunk->literals.count; i++) {
+		switch(chunk->literals.literals[i].type) {
+			case LITERAL_NIL:
+				printf("null\n");
+				break;
+			case LITERAL_BOOL:
+				printf("bool (%s)\n", AS_BOOL(chunk->literals.literals[i]) ? "true" : "false");
+				break;
+			case LITERAL_NUMBER:
+				printf("number (%d)\n", AS_NUMBER(chunk->literals.literals[i]));
+				break;
+			case LITERAL_STRING:
+				printf("string (%s)\n", AS_STRING(chunk->literals.literals[i]));
+				break;
+		}
+	}
 }
 
 void printTable(Table* table) {

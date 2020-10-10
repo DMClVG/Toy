@@ -8,6 +8,7 @@ typedef enum {
 	LITERAL_BOOL,
 	LITERAL_NUMBER,
 	LITERAL_STRING,
+	//TODO: interpolated strings
 } LiteralType;
 
 typedef struct {
@@ -28,10 +29,10 @@ typedef struct {
 #define AS_NUMBER(value) ((value).as.number)
 #define AS_STRING(value) ((value).as.string)
 
-#define NIL_LITERAL           ((Literal){LITERAL_NIL,		{ .number = 0 }})
-#define BOOL_LITERAL(value)   ((Literal){LITERAL_BOOL,		{ .boolean = value }})
-#define NUMBER_LITERAL(value) ((Literal){LITERAL_NUMBER,	{ .number = value }})
-#define STRING_LITERAL(value) ((Literal){LITERAL_LITERAL,	{ .string = (char*)value }})
+#define TO_NIL_LITERAL           ((Literal){LITERAL_NIL,		{ .number = 0 }})
+#define TO_BOOL_LITERAL(value)   ((Literal){LITERAL_BOOL,		{ .boolean = value }})
+#define TO_NUMBER_LITERAL(value) ((Literal){LITERAL_NUMBER,		{ .number = value }})
+#define TO_STRING_LITERAL(value) ((Literal){LITERAL_STRING,		{ .string = (char*)value }})
 
 typedef struct {
 	int capacity;
@@ -44,5 +45,7 @@ void writeLiteralArray(LiteralArray* array, Literal value);
 void freeLiteralArray(LiteralArray* array);
 
 void printLiteral(Literal literal);
+
+char* copyAndParseString(char* original, int originalLength);
 
 #endif

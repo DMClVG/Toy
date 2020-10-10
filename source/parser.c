@@ -5,6 +5,9 @@
 
 #include <stdio.h>
 
+//debugging
+#include "keyword_types.h"
+
 /* DOCS: The original build of this had the parser spread between a dozen files - I'm trying to prevent that.
 */
 
@@ -42,7 +45,7 @@ static void emitByte(Parser* parser, Chunk* chunk, uint8_t byte) {
 	writeChunk(chunk, byte, parser->lexer->line);
 }
 
-static void emitTwoByte(Parser* parser, Chunk* chunk, uint8_t byte1, uint8_t byte2) {
+static void emitTwoBytes(Parser* parser, Chunk* chunk, uint8_t byte1, uint8_t byte2) {
 	emitByte(parser, chunk, byte1);
 	emitByte(parser, chunk, byte2);
 }
@@ -51,7 +54,23 @@ static void emitLong(Parser* parser, Chunk* chunk, uint32_t lng) {
 	writeChunkLong(chunk, lng, parser->lexer->line);
 }
 
-//utilities
+static void emitLiteral(Parser* parser, Chunk* chunk, Literal literal) {
+	//get the index of the new literal
+	const uint32_t index = chunk->literals.count;
+
+	writeLiteralArray(&chunk->literals, literal);
+
+	//handle > 256 literals
+	if (index >= 256) {
+		emitByte(parser, chunk, (uint8_t)OP_LITERAL_LONG);
+		emitLong(parser, chunk, (uint32_t)index);
+	} else {
+		emitByte(parser, chunk, (uint8_t)OP_LITERAL);
+		emitByte(parser, chunk, (uint8_t)index);
+	}
+}
+
+//parsing utilities
 static void error(Parser* parser, Token token, const char* message) {
 	//keep going while panicing
 	if (parser->panic) return;
@@ -138,9 +157,9 @@ static void expression(Parser* parser, Chunk* chunk) {
 
 //grammar statement rules
 static void printStmt(Parser* parser, Chunk* chunk) {
+	emitByte(parser, chunk, OP_PRINT);
 	expression(parser, chunk);
 	consume(parser, TOKEN_SEMICOLON, "Expected ';' at end of print statement");
-	emitByte(parser, chunk, OP_PRINT);
 }
 
 static void expressionStmt(Parser* parser, Chunk* chunk) {
@@ -201,8 +220,19 @@ static void number(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 }
 
 static void string(Parser* parser, Chunk* chunk, bool canBeAssigned) {
-	//TODO: strings
-	printf("MARK 1\n");
+	//handle interpolated strings as well
+	switch(parser->previous.type) {
+		case TOKEN_STRING:
+			emitLiteral(parser, chunk, TO_STRING_LITERAL(copyAndParseString(parser->previous.lexeme, parser->previous.length)));
+			break;
+
+		case TOKEN_INTERPOLATED_STRING:
+			//TODO: interpolated strings
+			break;
+
+		default:
+			error(parser, parser->previous, "Unexpected token passed to string");
+	}
 }
 
 static void variable(Parser* parser, Chunk* chunk, bool canBeAssigned) {

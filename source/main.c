@@ -61,6 +61,8 @@ int main(int argc, const char *argv[]) {
 
 	chunk = scanParser(&parser);
 
+	printChunk(chunk);
+
 	freeChunk(chunk);
 	freeParser(&parser);
 	free((void*)source);

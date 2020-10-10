@@ -6,7 +6,7 @@ typedef enum {
 	OP_RETURN = 0,
 
 	//constants
-	OP_CONSTANT,
+	OP_LITERAL,
 
 	//keywords
 	OP_PRINT,
@@ -16,7 +16,7 @@ typedef enum {
 
 	OP_LONG_SENTINEL, //everything above this opcode is long
 
-	OP_CONSTANT_LONG,
+	OP_LITERAL_LONG,
 } OpCode;
 
 #endif
