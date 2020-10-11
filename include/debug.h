@@ -11,4 +11,6 @@ void printTable(Table* table);
 
 void dbPrintLiteral(Literal* literal);
 
+//TODO: integration testing
+
 #endif

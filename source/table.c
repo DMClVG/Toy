@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+//"don't use modulo" - some gamedev guy
+
 //utility functions
 static uint32_t hashString(const char* string, int length) {
 	uint32_t hash = 2166136261u;

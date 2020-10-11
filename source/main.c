@@ -57,9 +57,7 @@ int main(int argc, const char *argv[]) {
 	initLexer(&lexer, source);
 	initParser(&parser, &lexer);
 
-	Chunk* chunk = NULL;
-
-	chunk = scanParser(&parser);
+	Chunk* chunk = scanParser(&parser);
 
 	printChunk(chunk);
 

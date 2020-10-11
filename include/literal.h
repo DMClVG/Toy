@@ -9,6 +9,8 @@ typedef enum {
 	LITERAL_NUMBER,
 	LITERAL_STRING,
 	//TODO: interpolated strings
+	//TODO: arrays (LiteralArrays)
+	//TODO: dictionaries (Tables)
 } LiteralType;
 
 typedef struct {

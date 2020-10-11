@@ -12,3 +12,4 @@
 void* reallocate(void* pointer, size_t oldSize, size_t newSize);
 
 #endif
+//TODO: GROW_CAPACITY_FAST - this is an optimisation for the tables, grow a table twice as fast (benchmark it)
