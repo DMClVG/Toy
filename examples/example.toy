@@ -398,3 +398,4 @@ print "foobar";
 print "foobar";
 print "foobar";
 print "foobar";
+print false;

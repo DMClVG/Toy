@@ -4,6 +4,7 @@
 #include "opcodes.h"
 
 #include <stdio.h>
+#include <string.h>
 
 //debugging
 #include "keyword_types.h"
@@ -56,9 +57,20 @@ static void emitLong(Parser* parser, Chunk* chunk, uint32_t lng) {
 
 static void emitLiteral(Parser* parser, Chunk* chunk, Literal literal) {
 	//get the index of the new literal
-	const uint32_t index = chunk->literals.count;
+	int index = findLiteral(&chunk->literals, literal);
 
-	writeLiteralArray(&chunk->literals, literal);
+	if (index < 0) {
+		//new literal
+		index = chunk->literals.count;
+		writeLiteralArray(&chunk->literals, literal);
+	} else {
+		//free existing string literals
+		//TODO: interpolated strings
+		if (literal.type == LITERAL_STRING) {
+			char* str = AS_STRING(literal);
+			FREE_ARRAY(char, str, strlen(str));
+		}
+	}
 
 	//handle > 256 literals
 	if (index >= 256) {
@@ -226,9 +238,9 @@ static void string(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 			emitLiteral(parser, chunk, TO_STRING_LITERAL(copyAndParseString(parser->previous.lexeme, parser->previous.length)));
 			break;
 
-		case TOKEN_INTERPOLATED_STRING:
-			//TODO: interpolated strings
-			break;
+//		case TOKEN_INTERPOLATED_STRING:
+//			//TODO: interpolated strings
+//			break;
 
 		default:
 			error(parser, parser->previous, "Unexpected token passed to string");
@@ -251,8 +263,21 @@ static void binary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//TODO: binary
 }
 
-static void atom(Parser* parser, Chunk* chunk, bool canBeAssigned) {
-	//TODO: atom
+static void atomic(Parser* parser, Chunk* chunk, bool canBeAssigned) {
+	//handle atomic literals
+	switch(parser->previous.type) {
+		case TOKEN_NIL:
+			emitLiteral(parser, chunk, TO_NIL_LITERAL);
+			break;
+
+		case TOKEN_TRUE:
+			emitLiteral(parser, chunk, TO_BOOL_LITERAL(true));
+			break;
+
+		case TOKEN_FALSE:
+			emitLiteral(parser, chunk, TO_BOOL_LITERAL(false));
+			break;
+	}
 }
 
 //a pratt table
@@ -311,19 +336,19 @@ ParseRule parseRules[] = {
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_DO
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_ELSE
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_EXPORT
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_FALSE
+	{atomic,	NULL,		PREC_NONE},			// TOKEN_FALSE
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_FOR
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_FOREACH
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_IF
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_IMPORT
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_IN
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_NIL
+	{atomic,	NULL,		PREC_NONE},			// TOKEN_NIL
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_OF
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_PRINT
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_PURE
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_RETURN
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_SWITCH
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_TRUE
+	{atomic,	NULL,		PREC_NONE},			// TOKEN_TRUE
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_VAR
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_WHILE
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_PASS

@@ -25,7 +25,7 @@ void writeLiteralArray(LiteralArray* array, Literal value) {
 void freeLiteralArray(LiteralArray* array) {
 	//clean up memory
 	for(int i = i; i < array->count; i++) {
-		//TODO: clean up string literals
+		//TODO: clean up interpolated literals
 		if (IS_STRING(array->literals[i])) {
 			char* str = AS_STRING(array->literals[i]);
 			FREE_ARRAY(char, str, strlen(str));
@@ -57,6 +57,46 @@ void printLiteral(Literal literal) {
 		default:
 			printf("~");
 	}
+}
+
+//find a literal in the array that matches the "literal" argument
+int findLiteral(LiteralArray* array, Literal literal) {
+	for (int i = 0; i < array->count; i++) {
+		//not the same type
+		if (array->literals[i].type != literal.type) {
+			continue;
+		}
+
+		//matching type, compare values
+		switch(array->literals[i].type) {
+			case LITERAL_NIL:
+				return i;
+
+			case LITERAL_BOOL:
+				if (AS_BOOL(array->literals[i]) == AS_BOOL(literal)) {
+					return i;
+				}
+				break;
+
+			case LITERAL_NUMBER:
+				if (AS_NUMBER(array->literals[i]) == AS_NUMBER(literal)) {
+					return i;
+				}
+				break;
+
+			case LITERAL_STRING:
+				if (strcmp(AS_STRING(array->literals[i]), AS_STRING(literal)) == 0) {
+					return i;
+				}
+				break;
+
+			default:
+				fprintf(stderr, "Unexpected literal type in findLiteral: %d\n", literal.type);
+				break;
+		}
+	}
+
+	return -1;
 }
 
 //string utilities

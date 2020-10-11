@@ -45,6 +45,7 @@ void writeLiteralArray(LiteralArray* array, Literal value);
 void freeLiteralArray(LiteralArray* array);
 
 void printLiteral(Literal literal);
+int findLiteral(LiteralArray* array, Literal literal);
 
 char* copyAndParseString(char* original, int originalLength);
 
