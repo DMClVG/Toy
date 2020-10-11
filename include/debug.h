@@ -9,4 +9,6 @@ void printToken(Token* token);
 void printChunk(Chunk* chunk);
 void printTable(Table* table);
 
+void dbPrintLiteral(Literal* literal);
+
 #endif

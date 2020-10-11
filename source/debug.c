@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "keyword_types.h"
+#include "opcode_names.h"
 #include "opcodes.h"
 
 void printToken(Token* token) {
@@ -26,7 +27,7 @@ void printToken(Token* token) {
 		}
 	}
 
-	printf("\n", token->line);
+	printf("\t%d\n", token->line);
 }
 
 void printChunk(Chunk* chunk) {
@@ -35,55 +36,48 @@ void printChunk(Chunk* chunk) {
 
 	for (int i = 0; i < chunk->count; /* EMPTY */) {
 		switch(chunk->code[i]) {
-			case OP_PRINT: {
-				if (chunk->code[i + 1] == OP_LITERAL) {
-					printf("print literal %u\n", chunk->code[i + 2]);
-					i += 3;
-				}
+			case OP_LITERAL:
+				dbPrintLiteral(&chunk->literals.literals[ chunk->code[i + 1] ]);
+				i += 2;
+				break;
 
-				else if (chunk->code[i + 1] == OP_LITERAL_LONG) {
-					printf("print literal-long %d\n", *((uint32_t*)(chunk->code + i + 2)));
-					i += 6;
-				}
-
-				else {
-					printf("Unexpected OP passed to OP_PRINT\n");
-					return;
-				}
-			}
-
-			break;
-
-			case OP_RETURN:
-				printf("return\n");
-				i++;
+			case OP_LITERAL_LONG:
+				dbPrintLiteral(&chunk->literals.literals[ *((uint32_t*)(chunk->code + i + 1)) ]);
+				i += 2;
 				break;
 
 			default:
-				printf("Unexpected OP passed to printChunk %d\n", chunk->code[i]);
-				return;
+				printf("%s\n", findNameByOpCode(chunk->code[i]));
+				i++;
+				break;
 		}
 	}
 
 	printf("=====Constants=====\n");
 	for (int i = 0; i < chunk->literals.count; i++) {
-		switch(chunk->literals.literals[i].type) {
-			case LITERAL_NIL:
-				printf("null\n");
-				break;
-			case LITERAL_BOOL:
-				printf("bool (%s)\n", AS_BOOL(chunk->literals.literals[i]) ? "true" : "false");
-				break;
-			case LITERAL_NUMBER:
-				printf("number (%d)\n", AS_NUMBER(chunk->literals.literals[i]));
-				break;
-			case LITERAL_STRING:
-				printf("string (%s)\n", AS_STRING(chunk->literals.literals[i]));
-				break;
-		}
+		dbPrintLiteral(&chunk->literals.literals[i]);
 	}
 }
 
 void printTable(Table* table) {
 	//TODO: printTable(Table* table)
+}
+
+void dbPrintLiteral(Literal* literal) {
+	switch(literal->type) {
+		case LITERAL_NIL:
+			printf("null");
+			break;
+		case LITERAL_BOOL:
+			printf("bool (%s)", AS_BOOL(*literal) ? "true" : "false");
+			break;
+		case LITERAL_NUMBER:
+			printf("number (%f)", AS_NUMBER(*literal));
+			break;
+		case LITERAL_STRING:
+			printf("string (%s)", AS_STRING(*literal));
+			break;
+	}
+
+	printf("\n");
 }

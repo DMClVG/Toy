@@ -4,6 +4,7 @@
 #include "opcodes.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 //debugging
@@ -169,15 +170,15 @@ static void expression(Parser* parser, Chunk* chunk) {
 
 //grammar statement rules
 static void printStmt(Parser* parser, Chunk* chunk) {
-	emitByte(parser, chunk, OP_PRINT);
 	expression(parser, chunk);
+	emitByte(parser, chunk, OP_PRINT);
 	consume(parser, TOKEN_SEMICOLON, "Expected ';' at end of print statement");
 }
 
 static void expressionStmt(Parser* parser, Chunk* chunk) {
 	expression(parser, chunk); //push
-	consume(parser, TOKEN_SEMICOLON, "Expected ';' at the end of an expression statement");
 	emitByte(parser, chunk, OP_POP); //pop
+	consume(parser, TOKEN_SEMICOLON, "Expected ';' at the end of an expression statement");
 }
 
 //high-level grammar rules
@@ -227,10 +228,6 @@ static void parsePrecendence(Parser* parser, Chunk* chunk, Precedence precedence
 }
 
 //expression rules
-static void number(Parser* parser, Chunk* chunk, bool canBeAssigned) {
-	//TODO: numbers
-}
-
 static void string(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//handle interpolated strings as well
 	switch(parser->previous.type) {
@@ -247,20 +244,99 @@ static void string(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	}
 }
 
+static void number(Parser* parser, Chunk* chunk, bool canBeAssigned) {
+	//handle numbers
+
+	//copy the lexeme to a tmp buffer
+	char buff[32]; //enough space?
+	sprintf(buff, "%.*s\0", parser->previous.length, parser->previous.lexeme);
+
+	//output the number & emit it
+	double number = strtod(buff, NULL);
+	emitLiteral(parser, chunk, TO_NUMBER_LITERAL(number));
+}
+
 static void variable(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//TODO: variables
 }
 
 static void grouping(Parser* parser, Chunk* chunk, bool canBeAssigned) {
-	//TODO: groupings
-}
-
-static void unary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
-	//TODO: unary
+	//handle groupings
+	expression(parser, chunk);
+	consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after grouping");
 }
 
 static void binary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
-	//TODO: binary
+	//handle binary expressions
+
+	//handle the left-side of the operator
+	TokenType operatorType = parser->previous.type;
+	parsePrecendence(parser, chunk, getRule(operatorType)->precedence + 1);
+
+	switch(operatorType) {
+		//compare
+		case TOKEN_EQUAL_EQUAL:
+			emitByte(parser, chunk, OP_EQUALITY);
+			break;
+
+		case TOKEN_BANG_EQUAL:
+			emitTwoBytes(parser, chunk, OP_EQUALITY, OP_NOT);
+			break;
+
+		case TOKEN_GREATER:
+			emitByte(parser, chunk, OP_GREATER);
+			break;
+
+		case TOKEN_GREATER_EQUAL:
+			emitTwoBytes(parser, chunk, OP_LESS, OP_NOT);
+			break;
+
+		case TOKEN_LESS:
+			emitByte(parser, chunk, OP_LESS);
+			break;
+
+		case TOKEN_LESS_EQUAL:
+			emitTwoBytes(parser, chunk, OP_GREATER, OP_NOT);
+			break;
+
+		//arithmetic
+		case TOKEN_PLUS:
+			emitByte(parser, chunk, OP_ADD);
+			break;
+
+		case TOKEN_MINUS:
+			emitByte(parser, chunk, OP_SUBTRACT);
+			break;
+
+		case TOKEN_STAR:
+			emitByte(parser, chunk, OP_MULTIPLY);
+			break;
+
+		case TOKEN_SLASH:
+			emitByte(parser, chunk, OP_DIVIDE);
+			break;
+
+		case TOKEN_MODULO:
+			emitByte(parser, chunk, OP_MODULO);
+			break;
+	}
+}
+
+static void unary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
+	//handle unary expressions
+	TokenType operatorType = parser->previous.type;
+
+	parsePrecendence(parser, chunk, PREC_UNARY);
+
+	switch(operatorType) {
+		case TOKEN_MINUS:
+			emitByte(parser, chunk, OP_NEGATE);
+			break;
+
+		case TOKEN_BANG:
+			emitByte(parser, chunk, OP_NOT);
+			break;
+	}
 }
 
 static void atomic(Parser* parser, Chunk* chunk, bool canBeAssigned) {
@@ -282,7 +358,7 @@ static void atomic(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 
 //a pratt table
 ParseRule parseRules[] = {
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_LEFT_PAREN
+	{grouping,	NULL,		PREC_CALL},			// TOKEN_LEFT_PAREN
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_RIGHT_PAREN
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_LEFT_BRACE
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_RIGHT_BRACE
@@ -290,27 +366,27 @@ ParseRule parseRules[] = {
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_RIGHT_BRACKET
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_SEMICOLON
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_COMMA
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_PLUS
+	{NULL,		binary,		PREC_TERM},			// TOKEN_PLUS
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_PLUS_EQUAL
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_PLUS_PLUS
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_MINUS
+	{unary,		binary,		PREC_TERM},			// TOKEN_MINUS
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_MINUS_EQUAL
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_MINUS_MINUS
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_STAR
+	{NULL,		binary,		PREC_FACTOR},		// TOKEN_STAR
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_STAR_EQUAL
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_SLASH
+	{NULL,		binary,		PREC_FACTOR},		// TOKEN_SLASH
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_SLASH_EQUAL
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_MODULO
+	{NULL,		binary,		PREC_FACTOR},		// TOKEN_MODULO
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_MODULO_EQUAL
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_BANG
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_BANG_EQUAL
+	{unary,		NULL,		PREC_NONE},			// TOKEN_BANG
+	{NULL,		binary,		PREC_EQUALITY},		// TOKEN_BANG_EQUAL
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_EQUAL
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_EQUAL_EQUAL
+	{NULL,		binary,		PREC_EQUALITY},		// TOKEN_EQUAL_EQUAL
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_EQUAL_GREATER
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_GREATER
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_GREATER_EQUAL
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_LESS
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_LESS_EQUAL
+	{NULL,		binary,		PREC_COMPARISON},	// TOKEN_GREATER
+	{NULL,		binary,		PREC_COMPARISON},	// TOKEN_GREATER_EQUAL
+	{NULL,		binary,		PREC_COMPARISON},	// TOKEN_LESS
+	{NULL,		binary,		PREC_COMPARISON},	// TOKEN_LESS_EQUAL
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_LESS_OR
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_AND_AND
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_OR_OR
@@ -321,7 +397,7 @@ ParseRule parseRules[] = {
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_QUESTION
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_COLON
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_IDENTIFIER
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_NUMBER
+	{number,	NULL,		PREC_PRIMARY},		// TOKEN_NUMBER
 	{string,	NULL,		PREC_PRIMARY},		// TOKEN_STRING
 	{string,	NULL,		PREC_PRIMARY},		// TOKEN_INTERPOLATED_STRING
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_AS
@@ -336,19 +412,19 @@ ParseRule parseRules[] = {
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_DO
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_ELSE
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_EXPORT
-	{atomic,	NULL,		PREC_NONE},			// TOKEN_FALSE
+	{atomic,	NULL,		PREC_PRIMARY},		// TOKEN_FALSE
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_FOR
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_FOREACH
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_IF
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_IMPORT
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_IN
-	{atomic,	NULL,		PREC_NONE},			// TOKEN_NIL
+	{atomic,	NULL,		PREC_PRIMARY},		// TOKEN_NIL
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_OF
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_PRINT
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_PURE
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_RETURN
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_SWITCH
-	{atomic,	NULL,		PREC_NONE},			// TOKEN_TRUE
+	{atomic,	NULL,		PREC_PRIMARY},		// TOKEN_TRUE
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_VAR
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_WHILE
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_PASS
