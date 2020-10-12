@@ -453,12 +453,14 @@ This function returns an array representation of this string, with each characte
 
 # Array
 
-Arrays are collections of variables stored as one piece of data. They can hold any number of values, but "holes" in the array are not permitted. You can access a specific element by using zero-indexing.
+Arrays are collections of variables stored as one piece of data. They can hold any number of values, but "holes" in the array are not permitted. You can access a specific element by using zero-indexing. Arrays can be "destructured" into individual variables.
 
 ```
 var arr = ["hello", "world", "foo", "bar"];
 
 print arr[1]; //world
+
+var [a, b] = arr; //destructuring
 
 var arr = []; //empty
 ```
@@ -670,7 +672,7 @@ This function removes all callbacks from the internal list of callbacks. It is c
 
 # Random Ideas
 
-* Destructuring of arrays
+* Dictionary destructuring?
 * Pure Keyword
 * Capture syntax for functions
 * Coroutines
