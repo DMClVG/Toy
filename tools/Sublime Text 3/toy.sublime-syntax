@@ -1,0 +1,95 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+name: Toy
+file_extensions:
+  - toy
+scope: source.toy
+
+contexts:
+  # The prototype context is prepended to all contexts but those setting
+  # meta_include_prototype: false.
+  prototype:
+    - include: comments
+
+  main:
+    # The main context is the initial starting point of our syntax.
+    # Include other contexts from here (or specify them directly).
+    - include: keywords
+    - include: numbers
+    - include: strings
+    - include: interpolated_strings
+    - include: literals
+
+  keywords:
+    # Keywords are if, else for and while.
+    # Note that blackslashes don't need to be escaped within single quoted
+    # strings in YAML. When using single quoted strings, only single quotes
+    # need to be escaped: this is done by using two single quotes next to each
+    # other.
+    - match: '\b(as|assert|async|await|break|case|const|continue|default|do|else|export|for|foreach|if|import|in|of|print|pure|return|switch|var|while)\b'
+      scope: keyword.control.toy
+
+  numbers:
+    - match: '\b(-)?[0-9.]+\b'
+      scope: constant.numeric.toy
+
+  strings:
+    # Strings begin and end with quotes, and use backslashes as an escape
+    # character.
+    - match: '"'
+      scope: punctuation.definition.string.begin.toy
+      push: inside_string
+
+  interpolated_strings:
+    - match: '`'
+      scope: punctuation.definition.string.interpolated.begin.toy
+      push: inside_interpolated_string
+
+  inside_string:
+    - meta_include_prototype: false
+    - meta_scope: string.quoted.double.toy
+    - match: '\.'
+      scope: constant.character.escape.toy
+    - match: '"'
+      scope: punctuation.definition.string.end.toy
+      pop: true
+
+  inside_interpolated_string:
+    - meta_include_prototype: false
+    - meta_scope: string.interpolated.toy
+    - match: '\.'
+      scope: constant.character.escape.toy
+    - match: '\${'
+      scope: punctuation.definition.string.interpolated.element.begin.toy
+      push:
+      - meta_scope: source.toy
+      - include: main
+      - match: '\}'
+        scope: punctuation.definition.string.interpolated.element.end.toy
+        pop: true
+    - match: '`'
+      scope: punctuation.definition.string.interpolated.end.toy
+      pop: true
+
+  literals:
+    - match: '\b(null|true|false)\b'
+      scope: constant.numeric.toy
+      pop: true
+
+  comments:
+    # Comments begin with a '//' and finish at the end of the line.
+    - match: '//'
+      scope: punctuation.definition.comment.toy
+      push:
+        # This is an anonymous context push for brevity.
+        - meta_scope: comment.line.double-slash.toy
+        - match: $\n?
+          pop: true
+    - match: '/\*'
+      scope: punctuation.definition.comment.toy
+      push:
+        - meta_scope: comment.block.toy
+        - match: '\*/'
+          scope: comment.block.toy
+          pop: true
