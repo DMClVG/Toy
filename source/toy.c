@@ -6,6 +6,18 @@
 #include <stdio.h>
 #include <string.h>
 
+static void error(Toy* toy, Chunk* chunk, const char* message) {
+	//TODO: option to strip debug data (lines) from the chunks
+	if (chunk->lines) {
+		fprintf(stderr, "[Line %d] Runtime Error: %s\n", chunk->lines[(int)toy->pc - (int)chunk->code - 1], message);
+	} else {
+		fprintf(stderr, "[Line data stripped] Runtime Error: %s\n", message);
+	}
+
+	toy->error = true;
+	toy->panic = true;
+}
+
 void pushLiteral(Toy* toy, Literal* literal) {
 	//grow the stack if necessary
 	if (toy->capacity < toy->count + 1) {
@@ -32,7 +44,7 @@ Literal* peekLiteral(Toy* toy) {
 Literal* popLiteral(Toy* toy) {
 	//prevent underflow
 	if (toy->count <= 0) {
-		fprintf(stderr, "Stack underflow\n");
+		fprintf(stderr, "[No line data] Stack underflow\n");
 		toy->count = 0;
 		return NULL;
 	}
@@ -53,6 +65,7 @@ void initToy(Toy* toy) {
 	toy->capacity = 0;
 	toy->count = 0;
 	toy->stack = NULL;
+	toy->pc = NULL;
 	initLiteralArray(&toy->garbage);
 }
 
@@ -65,17 +78,17 @@ void freeToy(Toy* toy) {
 void executeChunk(Toy* toy, Chunk* chunk) {
 	//NOTE: chunk MUST remain unchanged
 
-	for (uint8_t* pc = chunk->code; *pc && !toy->error; /* EMPTY */) {
-		switch(*(pc++)) {
+	for (toy->pc = chunk->code; *(toy->pc) && !toy->panic; /* EMPTY */) {
+		switch(*(toy->pc++)) {
 			//pushing && popping
 			case OP_LITERAL:
-				pushLiteral(toy, &chunk->literals.literals[*pc]);
-				pc++;
+				pushLiteral(toy, &chunk->literals.literals[*(toy->pc)]);
+				toy->pc++;
 				break;
 
 			case OP_LITERAL_LONG:
-				pushLiteral(toy, &chunk->literals.literals[ *((uint32_t*)pc) ]); //TODO: test long literals
-				pc += sizeof(uint32_t);
+				pushLiteral(toy, &chunk->literals.literals[ *((uint32_t*)(toy->pc)) ]); //TODO: test long literals
+				toy->pc += sizeof(uint32_t);
 				break;
 
 			case OP_POP:
@@ -109,7 +122,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				}
 
 				else {
-					fprintf(stderr, "Mismatched types in equality\n"); //TODO: proper error handling with chunk->lines
+					error(toy, chunk, "Mismatched types in equality");
 				}
 			}
 			break;
@@ -123,7 +136,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 					PUSH_TEMP_LITERAL(toy, TO_BOOL_LITERAL(AS_NUMBER(*lhs) > AS_NUMBER(*rhs)));
 				}
 				else {
-					fprintf(stderr, "Mismatched types in comparison\n"); //TODO: proper error handling with chunk->lines
+					error(toy, chunk, "Mismatched types in comparison");
 				}
 			}
 			break;
@@ -137,7 +150,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 					PUSH_TEMP_LITERAL(toy, TO_BOOL_LITERAL(AS_NUMBER(*lhs) < AS_NUMBER(*rhs)));
 				}
 				else {
-					fprintf(stderr, "Mismatched types in comparison\n"); //TODO: proper error handling with chunk->lines
+					error(toy, chunk, "Mismatched types in comparison");
 				}
 			}
 			break;
@@ -164,7 +177,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				}
 
 				else {
-					fprintf(stderr, "Mismatched types in addition\n"); //TODO: proper error handling with chunk->lines
+					error(toy, chunk, "Mismatched types in addition");
 				}
 			}
 			break;
@@ -178,7 +191,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 					PUSH_TEMP_LITERAL(toy, TO_NUMBER_LITERAL(AS_NUMBER(*lhs) - AS_NUMBER(*rhs)));
 				}
 				else {
-					fprintf(stderr, "Mismatched types in subtraction\n"); //TODO: proper error handling with chunk->lines
+					error(toy, chunk, "Mismatched types in subtraction");
 				}
 			}
 			break;
@@ -192,7 +205,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 					PUSH_TEMP_LITERAL(toy, TO_NUMBER_LITERAL(AS_NUMBER(*lhs) * AS_NUMBER(*rhs)));
 				}
 				else {
-					fprintf(stderr, "Mismatched types in multiplication\n"); //TODO: proper error handling with chunk->lines
+					error(toy, chunk, "Mismatched types in multiplication");
 				}
 			}
 			break;
@@ -206,7 +219,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 					PUSH_TEMP_LITERAL(toy, TO_NUMBER_LITERAL(AS_NUMBER(*lhs) / AS_NUMBER(*rhs)));
 				}
 				else {
-					fprintf(stderr, "Mismatched types in division\n"); //TODO: proper error handling with chunk->lines
+					error(toy, chunk, "Mismatched types in division");
 				}
 			}
 			break;
@@ -221,13 +234,13 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 
 					//determine if there's any fractional parts
 					if (rd - (long)rd != 0 || ld - (long)ld != 0) {
-						fprintf(stderr, "operands to modulo must be whole numbers\n"); //TODO: proper error handling with chunk->lines
+						error(toy, chunk, "Operands to modulo must be whole numbers");
 					}
 
 					PUSH_TEMP_LITERAL(toy, TO_NUMBER_LITERAL( (long)ld % (long)rd ));
 				}
 				else {
-					fprintf(stderr, "Mismatched types in modulo\n"); //TODO: proper error handling with chunk->lines
+					error(toy, chunk, "Mismatched types in modulo");
 				}
 			}
 			break;
@@ -239,7 +252,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 					PUSH_TEMP_LITERAL(toy, TO_NUMBER_LITERAL(-AS_NUMBER(*rhs)));
 				}
 				else {
-					fprintf(stderr, "Unknown type in negation\n"); //TODO: proper error handling with chunk->lines
+					error(toy, chunk, "Unknown type in negation");
 				}
 			}
 			break;
@@ -257,7 +270,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 			break;
 
 			default:
-				fprintf(stderr, "Unexpected OpCode in Toy virtual machine %s\n", findNameByOpCode(*(pc-1)));
+				fprintf(stderr, "[Internal] Unexpected OpCode in Toy virtual machine %s\n", findNameByOpCode(*(toy->pc-1)));
 				toy->error = true;
 				break;
 		}

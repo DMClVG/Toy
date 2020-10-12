@@ -85,7 +85,7 @@ static void error(Parser* parser, Token token, const char* message) {
 	//keep going while panicing
 	if (parser->panic) return;
 
-	fprintf(stderr, "[line %d] Error", token.line);
+	fprintf(stderr, "[Line %d] Error", token.line);
 
 	//check type
 	if (token.type == TOKEN_EOF) {

@@ -8,10 +8,13 @@
 
 typedef struct {
 	bool error; //I've had a runtime error
+	bool panic; //I'm processing a runtime error
 
 	int capacity; //capacity of the stack
 	int count; //number of literals in the stack
 	Literal** stack; //raw literal array for the stack
+
+	uint8_t* pc; //program counter
 
 	LiteralArray garbage; //can be cleaned between "declarations"
 
