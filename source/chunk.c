@@ -15,7 +15,7 @@ void freeChunk(Chunk* chunk) {
 	FREE_ARRAY(int, chunk->lines, chunk->capacity);
 	freeLiteralArray(&chunk->literals);
 //	freeTable(&chunk->variables);
-	initChunk(chunk);
+	FREE(Chunk, chunk); //allocated in the parser
 }
 
 void writeChunk(Chunk* chunk, uint8_t val, int line) {

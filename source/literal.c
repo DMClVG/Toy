@@ -111,7 +111,7 @@ char* copyAndParseString(char* original, int originalLength) {
 	}
 
 	//print each char into a new buffer
-	char* buffer = ALLOCATE(char, newLength) + 1;
+	char* buffer = ALLOCATE(char, newLength + 1);
 	char* ptr = buffer;
 
 	for (int i = 0; original[i] && i < originalLength; i++) {

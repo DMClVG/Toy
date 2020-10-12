@@ -11,3 +11,4 @@
 * Update the website
 * Garbage collection
 * Reuse existing literals in the garbage
+* Many, many, many tests
