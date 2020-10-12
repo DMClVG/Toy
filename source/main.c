@@ -106,7 +106,7 @@ void repl() {
 }
 
 //entry point
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[]) {
 	if (argc == 1) {
 		repl();
 	} else if (argc == 2) {
