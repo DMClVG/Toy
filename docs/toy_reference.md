@@ -569,7 +569,7 @@ Dictionaries can be indexed using traditional bracket notation, or the member-of
 ```
 dictionary["foo"] = "bar";
 print dictionary["foo"];
-print dictionary.foo; //syntactic sugar
+print dictionary.foo; //syntactic sugar (can't be used for assignment)
 ```
 
 ## Insert(k, v)
