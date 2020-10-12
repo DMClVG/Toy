@@ -114,6 +114,8 @@ static Token makeToken(Lexer* lexer, TokenType type) {
 	Token token;
 
 	token.type = type;
+	token.lexeme = &lexer->source[lexer->current - 1];
+	token.length = 1;
 	token.line = lexer->line;
 
 	return token;
@@ -249,12 +251,14 @@ Token scanLexer(Lexer* lexer) {
 		case '.':
 			if (peek(lexer) == '.' && peekNext(lexer) == '.') {
 				return makeToken(lexer, TOKEN_DOT_DOT_DOT);
+			} else if (peek(lexer) == '.') {
+				return makeToken(lexer, TOKEN_DOT_DOT);
 			} else {
 				return makeToken(lexer, TOKEN_DOT);
 			}
 
 		case '?': return makeToken(lexer, TOKEN_QUESTION);
-		case ':': return makeToken(lexer, TOKEN_COLON);
+		case ':': return makeToken(lexer, match(lexer, ':') ? TOKEN_COLON_COLON : TOKEN_COLON);
 
 		case '"':
 		case '`':

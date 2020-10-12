@@ -1,9 +1,9 @@
-import "Math";
+import "Math" as Math; //here, "Math" is a dictionary
 
 //events
-var OnCharacterDamaged = [::];
-var OnCharacterHealed = [::];
-var OnCharacterDeath = [::];
+var OnCharacterDamaged = [..];
+var OnCharacterHealed = [..];
+var OnCharacterDeath = [..];
 
 //vars
 var _maxHealth = 0;

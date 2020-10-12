@@ -1,7 +1,7 @@
 #ifndef TOY_TOKEN_TYPE_H
 #define TOY_TOKEN_TYPE_H
 
-/* DOCS: Remember to update keyword_names.c
+/* DOCS: Remember to update keyword_names.c, lexer.c and the pratt table
 */
 
 typedef enum {
@@ -55,12 +55,15 @@ typedef enum {
 
 	//these can single, double or triple
 	TOKEN_DOT,
-	TOKEN_DOT_DOT,
+	TOKEN_DOT_DOT, //for creating events
 	TOKEN_DOT_DOT_DOT, //reserved for the rest/spread operator
 
 	//ternary operator
 	TOKEN_QUESTION,
 	TOKEN_COLON,
+
+	//method operator
+	TOKEN_COLON_COLON,
 
 	//literals
 	TOKEN_IDENTIFIER,

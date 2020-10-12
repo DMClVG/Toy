@@ -73,10 +73,10 @@ Likewise, the following logical operators are available:
 !  !=  ==  <  >  <=  >=  &&  ||  ?:
 ```
 
-And the assignment operator:
+As well as the assignment operator, the method operator (Methods are functions attached to objects), and the member-of operator (see [Dictionary](#Dictionary)):
 
 ```
-=
+=  ::  .
 ```
 
 Note that:
@@ -410,8 +410,8 @@ greeting[0:4] = "Goodnight";
 
 print greeting; //Goodnight world
 
-print greeting.IndexOf("oo"); //1
-print greeting.Length(); //11
+print greeting::IndexOf("oo"); //1
+print greeting::Length(); //11
 
 var answer = 42;
 var interpolated = `Hello ${val}`; //Hello 42
@@ -491,7 +491,7 @@ This function sorts the elements according to the callback "cb". "cb" may be cal
 
 ```
 //how to sort an array of numbers
-array.Sort((a, b) => a - b);
+array::Sort((a, b) => a - b);
 ```
 
 ## Insert(i, x)
@@ -562,11 +562,12 @@ var dict = [:]; //empty
 
 ## Indexing
 
-Dictionaries can be indexed using traditional bracket notation. Existing elements can be accessed or overwritten, or new ones inserted if they don't already exist this way.
+Dictionaries can be indexed using traditional bracket notation, or the member-of operator. Existing elements can be accessed or overwritten, or new ones inserted if they don't already exist this way.
 
 ```
 dictionary["foo"] = "bar";
 print dictionary["foo"];
+print dictionary.foo; //syntactic sugar
 ```
 
 ## Insert(k, v)
@@ -646,7 +647,7 @@ Nesting a dictionary within it's own data structure will cause the inner referen
 ```
 var evt = [..];
 
-var unsub = evt.Subscribe(x => print x);
+var unsub = evt::Subscribe(x => print x);
 
 evt += x => { print x; };
 
@@ -692,7 +693,7 @@ cosnt cr = delay => coroutine {
 	print "Hello world";
 };
 
-Coroutine.Run(cr(1));
+Coroutine::Run(cr(1));
 
 //I think it might internally wrap the coroutine in an extra layer function like this:
 const cr = arg => Coroutine(() => { /* code */ });
@@ -720,5 +721,5 @@ const g = (args) => async {
 	await f(args);
 };
 
-Promise.All([g]); //blocks until all functions in the array return
+Promise::All([g]); //blocks until all functions in the array return
 ```
