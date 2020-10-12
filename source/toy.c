@@ -22,7 +22,6 @@ void pushLiteral(Toy* toy, Literal* literal) {
 Literal* peekLiteral(Toy* toy) {
 	//prevent underflow
 	if (toy->count <= 0) {
-		fprintf(stderr, "Stack underflow\n");
 		toy->count = 0;
 		return NULL;
 	}
@@ -83,24 +82,65 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				popLiteral(toy);
 				break;
 
-			case OP_PRINT:
-				printLiteral(*peekLiteral(toy));
-				printf("\n"); //not included in the function above
-				popLiteral(toy);
-				break;
+			case OP_PRINT: {
+				//guard against deferencing a null pointer
+				Literal* top = peekLiteral(toy);
+				if (top != NULL) {
+					printLiteral(*top);
+					printf("\n"); //not included in the function above
+					popLiteral(toy);
+				}
+			}
+			break;
 
 			//operations
-			case OP_EQUALITY:
-				//TODO
-				break;
+			case OP_EQUALITY: {
+				Literal* rhs = popLiteral(toy);
+				Literal* lhs = popLiteral(toy);
 
-			case OP_GREATER:
-				//TODO
-				break;
+				if (IS_NUMBER(*lhs) && IS_NUMBER(*rhs)) {
+					//write the resulting literal to the garbage array, then push it to the stack
+					PUSH_TEMP_LITERAL(toy, TO_BOOL_LITERAL(AS_NUMBER(*lhs) == AS_NUMBER(*rhs)));
+				} else
 
-			case OP_LESS:
-				//TODO
-				break;
+				if (IS_STRING(*lhs) && IS_STRING(*rhs)) {
+					//the garbage array now gains ownership of this c-string
+					PUSH_TEMP_LITERAL(toy, TO_BOOL_LITERAL( strcmp(AS_STRING(*lhs), AS_STRING(*rhs)) == 0 ));
+				}
+
+				else {
+					fprintf(stderr, "Mismatched types in equality\n"); //TODO: proper error handling with chunk->lines
+				}
+			}
+			break;
+
+			case OP_GREATER: {
+				Literal* rhs = popLiteral(toy);
+				Literal* lhs = popLiteral(toy);
+
+				if (IS_NUMBER(*lhs) && IS_NUMBER(*rhs)) {
+					//write the resulting literal to the garbage array, then push it to the stack
+					PUSH_TEMP_LITERAL(toy, TO_BOOL_LITERAL(AS_NUMBER(*lhs) > AS_NUMBER(*rhs)));
+				}
+				else {
+					fprintf(stderr, "Mismatched types in comparison\n"); //TODO: proper error handling with chunk->lines
+				}
+			}
+			break;
+
+			case OP_LESS: {
+				Literal* rhs = popLiteral(toy);
+				Literal* lhs = popLiteral(toy);
+
+				if (IS_NUMBER(*lhs) && IS_NUMBER(*rhs)) {
+					//write the resulting literal to the garbage array, then push it to the stack
+					PUSH_TEMP_LITERAL(toy, TO_BOOL_LITERAL(AS_NUMBER(*lhs) < AS_NUMBER(*rhs)));
+				}
+				else {
+					fprintf(stderr, "Mismatched types in comparison\n"); //TODO: proper error handling with chunk->lines
+				}
+			}
+			break;
 
 			case OP_ADD: {
 				Literal* rhs = popLiteral(toy);

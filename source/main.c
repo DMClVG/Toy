@@ -1,6 +1,7 @@
 //DOCS: This file is regularly re-written as testing continues
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "lexer.h"
 #include "parser.h"
@@ -43,16 +44,9 @@ char* readFile(const char* path) {
 	return buffer;
 }
 
-//entry point
-int main(int argc, const char *argv[]) {
-	if (argc != 2) {
-		printf("Usage: %s [file]\n", argv[0]);
-		return 0;
-	}
-
-	printf(">>begin\n");
-
-	char* source = readFile(argv[1]);
+//run functions
+void runFile(const char* fname) {
+	char* source = readFile(fname);
 
 	Lexer lexer;
 	Parser parser;
@@ -64,8 +58,6 @@ int main(int argc, const char *argv[]) {
 
 	Chunk* chunk = scanParser(&parser);
 
-//	printChunk(chunk);
-
 	executeChunk(&toy, chunk);
 
 	freeChunk(chunk);
@@ -73,8 +65,55 @@ int main(int argc, const char *argv[]) {
 	freeToy(&toy);
 	freeParser(&parser);
 	free((void*)source);
+}
 
-	printf("<<end\n");
+void repl() {
+	char input[2048];
+	memset(input, 0, 2048);
+
+	Parser parser;
+	Toy toy;
+
+	initToy(&toy);
+
+	for(;;) {
+		printf(">");
+		fgets(input, 2048, stdin);
+
+		//setup
+		Lexer lexer;
+
+		initLexer(&lexer, input);
+		initParser(&parser, &lexer);
+
+		//run
+		Chunk* chunk = scanParser(&parser);
+
+		//clean up the memory
+		if (parser.error) {
+			freeParser(&parser);
+			break;
+		}
+
+		executeChunk(&toy, chunk);
+		freeChunk(chunk);
+
+		//cleanup
+		freeParser(&parser);
+	}
+
+	freeToy(&toy);
+}
+
+//entry point
+int main(int argc, const char *argv[]) {
+	if (argc == 1) {
+		repl();
+	} else if (argc == 2) {
+		runFile(argv[1]);
+	} else {
+		printf("Usage: %s [file]\n", argv[0]);
+	}
 
 	return 0;
 }
