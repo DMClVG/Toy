@@ -6,3 +6,5 @@ all:
 
 clean:
 	$(MAKE) -C source clean
+
+rebuild: clean all
