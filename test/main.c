@@ -10,6 +10,16 @@
 #include <windows.h>
 #endif
 
+void green() {
+#ifdef PLATFORM_WINDOWS
+	HANDLE hConsole = GetStdHandle(STD_ERROR_HANDLE);
+	FlushConsoleInputBuffer(hConsole);
+	SetConsoleTextAttribute(hConsole, 2);
+#else
+	printf("\x1B[32m");
+#endif
+}
+
 void red() {
 #ifdef PLATFORM_WINDOWS
 	HANDLE hConsole = GetStdHandle(STD_ERROR_HANDLE);
@@ -32,7 +42,9 @@ void reset() {
 
 #define TEST(fname, expected) \
 	if (!runTestFile(fname, expected)) { \
+		green(); \
 		printf("+ pass %s\n", fname); \
+		reset(); \
 		passes++; \
 	} else { \
 		red(); \
