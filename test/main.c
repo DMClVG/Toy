@@ -46,7 +46,11 @@ int runTestFile(const char* fname, const char* expected) {
 	memset(buffer, 0, 1024);
 
 	//open the file
+#ifdef PLATFORM_WINDOWS
 	sprintf(buffer, "out test/scripts/%s", fname);
+#else
+	sprintf(buffer, "./out test/scripts/%s", fname);
+#endif
 	FILE* handle = popen(buffer, "r");
 
 	//read in the file toy output
