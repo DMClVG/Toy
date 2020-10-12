@@ -7,9 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-//debugging
-#include "keyword_types.h"
-
 /* DOCS: The original build of this had the parser spread between a dozen files - I'm trying to prevent that.
 */
 
@@ -93,10 +90,6 @@ static void error(Parser* parser, Token token, const char* message) {
 	//check type
 	if (token.type == TOKEN_EOF) {
 		fprintf(stderr, " at end");
-	}
-
-	else if (token.type == TOKEN_ERROR) {
-		//print nothing?
 	}
 
 	else {
@@ -458,57 +451,7 @@ Chunk* scanParser(Parser* parser) {
 		declaration(parser, chunk);
 	}
 
-	emitByte(parser, chunk, OP_RETURN); //terminate the chunk (placeholder)
+	emitByte(parser, chunk, OP_EOF); //terminate the chunk
 
 	return chunk;
-}
-
-//TODO: move chunks into their own file
-void initChunk(Chunk* chunk) {
-	chunk->capacity = 0;
-	chunk->count = 0;
-	chunk->code = NULL;
-	chunk->lines = NULL;
-	initLiteralArray(&chunk->literals);
-	initTable(&chunk->variables);
-}
-
-void freeChunk(Chunk* chunk) {
-	FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
-	FREE_ARRAY(int, chunk->lines, chunk->capacity);
-	freeLiteralArray(&chunk->literals);
-	freeTable(&chunk->variables);
-	initChunk(chunk);
-}
-
-void writeChunk(Chunk* chunk, uint8_t val, int line) {
-	//grow the arrays if necessary
-	if (chunk->capacity < chunk->count + 1) {
-		int oldCapacity = chunk->capacity;
-
-		chunk->capacity = GROW_CAPACITY(oldCapacity);
-		chunk->code = GROW_ARRAY(uint8_t, chunk->code, oldCapacity, chunk->capacity);
-		chunk->lines = GROW_ARRAY(int, chunk->lines, oldCapacity, chunk->capacity);
-	}
-
-	//write a byte
-	chunk->code[chunk->count] = val;
-	chunk->lines[chunk->count] = line;
-	chunk->count++;
-}
-
-void writeChunkLong(Chunk* chunk, uint32_t val, int line) {
-	//grow the arrays if necessary
-	if (chunk->capacity < chunk->count + 1) {
-		int oldCapacity = chunk->capacity;
-
-		chunk->capacity = GROW_CAPACITY(oldCapacity);
-		chunk->code = GROW_ARRAY(uint8_t, chunk->code, oldCapacity, chunk->capacity);
-		chunk->lines = GROW_ARRAY(int, chunk->lines, oldCapacity, chunk->capacity);
-	}
-
-	//write a uint32
-	*(uint32_t*)(chunk->code + chunk->count) = val;
-	chunk->lines[chunk->count] = line;
-	chunk->count += sizeof(uint32_t);
 }

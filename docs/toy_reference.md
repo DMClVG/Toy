@@ -669,6 +669,7 @@ This function removes all callbacks from the internal list of callbacks. It is c
 
 # Random Ideas
 
+* Destructuring of arrays
 * Pure Keyword
 * Capture syntax for functions
 * Coroutines

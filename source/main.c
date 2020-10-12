@@ -4,6 +4,7 @@
 
 #include "lexer.h"
 #include "parser.h"
+#include "toy.h"
 
 //for testing
 #include "debug.h"
@@ -49,23 +50,31 @@ int main(int argc, const char *argv[]) {
 		return 0;
 	}
 
+	printf(">>begin\n");
+
 	char* source = readFile(argv[1]);
 
 	Lexer lexer;
 	Parser parser;
+	Toy toy;
 
 	initLexer(&lexer, source);
 	initParser(&parser, &lexer);
+	initToy(&toy);
 
 	Chunk* chunk = scanParser(&parser);
 
-	printChunk(chunk);
+//	printChunk(chunk);
+
+	executeChunk(&toy, chunk);
 
 	freeChunk(chunk);
+
+	freeToy(&toy);
 	freeParser(&parser);
 	free((void*)source);
 
-	printf("ending mark\n");
+	printf("<<end\n");
 
 	return 0;
 }

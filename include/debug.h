@@ -9,6 +9,7 @@ void printToken(Token* token);
 void printChunk(Chunk* chunk);
 void printTable(Table* table);
 
+void printChunkByteArray(Chunk* chunk);
 void dbPrintLiteral(Literal* literal);
 
 //TODO: integration testing

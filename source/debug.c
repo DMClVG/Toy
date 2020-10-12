@@ -31,7 +31,6 @@ void printToken(Token* token) {
 }
 
 void printChunk(Chunk* chunk) {
-	//TODO: printChunk(Chunk* chunk)
 	printf("Printing chunk: %d/%d\n\n", chunk->count, chunk->capacity);
 
 	for (int i = 0; i < chunk->count; /* EMPTY */) {
@@ -43,7 +42,7 @@ void printChunk(Chunk* chunk) {
 
 			case OP_LITERAL_LONG:
 				dbPrintLiteral(&chunk->literals.literals[ *((uint32_t*)(chunk->code + i + 1)) ]);
-				i += 2;
+				i += 5;
 				break;
 
 			default:
@@ -56,6 +55,12 @@ void printChunk(Chunk* chunk) {
 	printf("=====Constants=====\n");
 	for (int i = 0; i < chunk->literals.count; i++) {
 		dbPrintLiteral(&chunk->literals.literals[i]);
+	}
+}
+
+void printChunkByteArray(Chunk* chunk) {
+	for (int i = 0; i < chunk->count; i++) {
+		printf("%d: %d\n", i, chunk->code[i]);
 	}
 }
 

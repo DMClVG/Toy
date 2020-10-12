@@ -51,4 +51,6 @@ int findLiteral(LiteralArray* array, Literal literal);
 
 char* copyAndParseString(char* original, int originalLength);
 
+#define IS_TRUTHY(x) (IS_NIL(x) || (IS_BOOL(x) && AS_BOOL(x)) || (IS_NUMBER(x) && AS_NUMBER(x) != 0))
+
 #endif
