@@ -81,10 +81,13 @@ int main(int argc, const char* argv[]) {
 	int passes = 0, failures = 0;
 
 	//run each test
-	TEST("1.toy", "hello world\n");
+	TEST("print.toy", "hello world\n");
+	TEST("numbers.toy", "1\n3\n-1\n4\n2\n0\ntrue\nfalse\n");
+	TEST("strings.toy", "foo\nbar\nfoobar\nbuzz\n");
+	TEST("groupings.toy", "0.6\n0.2\n");
 
 	//finally
-	printf("[Fineal Result]: %d / %d \n", passes, passes + failures);
+	printf("[Final Result]: %d / %d \n", passes, passes + failures);
 
 	return failures;
 }

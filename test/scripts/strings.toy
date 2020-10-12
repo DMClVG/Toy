@@ -1,0 +1,4 @@
+print "foo";
+print "bar";
+print "foo" + "bar";
+print "buzz";
