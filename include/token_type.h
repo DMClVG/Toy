@@ -1,6 +1,9 @@
 #ifndef TOY_TOKEN_TYPE_H
 #define TOY_TOKEN_TYPE_H
 
+/* DOCS: Remember to update keyword_names.c
+*/
+
 typedef enum {
 	//single character tokens
 	TOKEN_LEFT_PAREN,

@@ -1,6 +1,9 @@
 #ifndef TOY_OPCODES_H
 #define TOY_OPCODES_H
 
+/* DOCS: Remember to update opcode_names.c
+*/
+
 typedef enum {
 	//end of file
 	OP_EOF = 0,

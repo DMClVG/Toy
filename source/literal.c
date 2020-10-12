@@ -55,7 +55,8 @@ void printLiteral(Literal literal) {
 			break;
 
 		default:
-			printf("~");
+			//should never bee seen
+			fprintf(stderr, "[Internal] Unrecognized literal type: %d\n", literal.type);
 	}
 }
 
