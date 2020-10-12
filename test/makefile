@@ -4,8 +4,12 @@ CC=gcc
 OUT=../testrunner
 
 IDIR =../include
-CFLAGS=$(addprefix -I,$(IDIR)) # -Wall -W -pedantic
+CFLAGS+=$(addprefix -I,$(IDIR)) # -Wall -W -pedantic
 LIBS=
+
+ifeq ($(OS),Windows_NT)
+	CFLAGS+=-DPLATFORM_WINDOWS
+endif
 
 ODIR=obj
 SRC = $(wildcard *.c)
