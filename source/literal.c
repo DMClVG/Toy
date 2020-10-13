@@ -24,7 +24,7 @@ void writeLiteralArray(LiteralArray* array, Literal value) {
 
 void freeLiteralArray(LiteralArray* array) {
 	//clean up memory
-	for(int i = i; i < array->count; i++) {
+	for(int i = 0; i < array->count; i++) {
 		//TODO: clean up interpolated literals
 		if (IS_STRING(array->literals[i])) {
 			char* str = AS_STRING(array->literals[i]);

@@ -2,8 +2,8 @@
 #include "memory.h"
 
 #include <stdio.h> //debugging
-#define LN printf("%s: %d\n", __FILE__, __LINE__);
-//define LN
+//#define LN printf("%s: %d\n", __FILE__, __LINE__);
+#define LN
 
 #include <string.h>
 
@@ -79,7 +79,7 @@ Entry* entryArrayGet(Entry* array, int capacity, Literal key, int startPos) {
 printf("%d\n", index);
 	//literal probing and collision checking
 	for (;;) {
-printf("loop: %d (%d / %d)\n", index, index + startPos, capacity);
+printf("loop: (%d / %d)\n", index, capacity);
 		Entry* entry = &array[index];
 
 		if (IS_NIL(entry->key)) { //if key is empty, it's either empty or tombstone

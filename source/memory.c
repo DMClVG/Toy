@@ -9,7 +9,7 @@
 
 int memoryAllocated = 0;
 
-void color() {
+static void color() {
 #ifdef PLATFORM_WINDOWS
 	HANDLE hConsole = GetStdHandle(STD_ERROR_HANDLE);
 	FlushConsoleInputBuffer(hConsole);
@@ -45,7 +45,8 @@ void* reallocate(void* pointer, size_t oldSize, size_t newSize) {
 		exit(1);
 	}
 
-	memoryAllocated += -oldSize + newSize;
+	memoryAllocated -= oldSize;
+	memoryAllocated += newSize;
 	printf("memoryAllocated: %d\n", memoryAllocated);\
 	reset();
 	return mem;
