@@ -64,8 +64,8 @@ void printChunkByteArray(Chunk* chunk) {
 	}
 }
 
-void printTable(Table* table) {
-	//TODO: printTable(Table* table)
+void printDictionary(Dictionary* dictionary) {
+	//TODO: print dict
 }
 
 void dbPrintLiteral(Literal* literal) {

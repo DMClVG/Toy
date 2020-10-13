@@ -1,0 +1,15 @@
+var a = "hello world";
+var b = "goodnight world";
+var c;
+var d = 0;
+var c = true;
+var f = null;
+var g;
+
+c = a;
+d = a;
+
+print a; //hello world\n
+print d; //hello world\n
+print c + " " + b; //hello world goodnight world\n
+print g; //null\n

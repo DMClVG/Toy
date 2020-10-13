@@ -3,11 +3,11 @@
 
 #include "lexer.h"
 #include "parser.h"
-#include "table.h"
+#include "dictionary.h"
 
 void printToken(Token* token);
 void printChunk(Chunk* chunk);
-void printTable(Table* table);
+void printDictionary(Dictionary* dictionary);
 
 void printChunkByteArray(Chunk* chunk);
 void dbPrintLiteral(Literal* literal);

@@ -68,8 +68,9 @@ void runFile(const char* fname) {
 }
 
 void repl() {
-	char input[2048];
-	memset(input, 0, 2048);
+	const int size = 2048;
+	char input[size];
+	memset(input, 0, size);
 
 	Parser parser;
 	Toy toy;
@@ -78,7 +79,7 @@ void repl() {
 
 	for(;;) {
 		printf(">");
-		fgets(input, 2048, stdin);
+		fgets(input, size, stdin);
 
 		//setup
 		Lexer lexer;
@@ -91,6 +92,7 @@ void repl() {
 
 		//clean up the memory
 		if (parser.error) {
+			freeChunk(chunk);
 			freeParser(&parser);
 			break;
 		}

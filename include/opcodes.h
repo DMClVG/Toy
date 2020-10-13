@@ -25,8 +25,12 @@ typedef enum {
 	OP_NEGATE,
 	OP_NOT,
 
-	//constants
+	//data
 	OP_LITERAL,
+	OP_CONSTANT_DECLARE,
+	OP_VARIABLE_DECLARE,
+	OP_VARIABLE_GET,
+	OP_VARIABLE_SET,
 
 	//keywords
 	OP_PRINT,

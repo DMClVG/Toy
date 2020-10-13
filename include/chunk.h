@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "literal.h"
-#include "table.h"
+#include "dictionary.h"
 
 //DOCS: chunks are the intermediaries between parsers and compilers
 typedef struct {
@@ -13,7 +13,7 @@ typedef struct {
 	int* lines; //for error messages
 
 	LiteralArray literals; //an array of literal values
-//	Table variables; //a table of variables
+//	Dictionary constants; //a dict of constants
 } Chunk;
 
 void initChunk(Chunk* chunk);

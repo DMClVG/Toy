@@ -4,7 +4,7 @@
 #include "common.h"
 #include "literal.h"
 #include "chunk.h"
-//#include "table.h"
+#include "dictionary.h"
 
 typedef struct {
 	bool error; //I've had a runtime error
@@ -18,7 +18,7 @@ typedef struct {
 
 	LiteralArray garbage; //can be cleaned between "declarations"
 
-	//Table variables; //a table of live variables
+	Dictionary variables; //a dict of live variables
 	//TODO: scope via an array of tables?
 } Toy;
 

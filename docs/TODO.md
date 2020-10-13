@@ -11,5 +11,6 @@
 * Update the website
 * Garbage collection
 * Reuse existing literals in the garbage
+* Garbage collection
 * Many, many, many tests
 * Slice notation
