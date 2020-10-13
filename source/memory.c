@@ -28,7 +28,9 @@ static void reset() {
 void* reallocate(void* pointer, size_t oldSize, size_t newSize) {
 	color();
 	if (newSize == 0) {
-		printf("freeing %d units of memory\n", oldSize);
+		if (oldSize > 0) {
+			printf("freeing %d units of memory\n", oldSize);
+		}
 		free(pointer);
 
 		memoryAllocated -= oldSize;

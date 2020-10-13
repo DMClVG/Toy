@@ -102,7 +102,7 @@ LN		initDictionary(&dictionary);
 
 LN		for (int i = 0; i < 500; i++) {
 LN			Literal key = TO_NUMBER_LITERAL(i);
-			printf("size, count, capacity: %d / %d / %d\n", i, dictionary.numberCount, dictionary.numberCapacity);
+//			printf("size, count, capacity: %d / %d / %d\n", i, dictionary.numberCount, dictionary.numberCapacity);
 LN			dictionarySet(&dictionary, key, TO_STRING_LITERAL("Hello world"));
 LN		}
 

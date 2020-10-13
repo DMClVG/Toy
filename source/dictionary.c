@@ -76,10 +76,10 @@ void freeEntryArray(Entry* array, int capacity) {
 Entry* entryArrayGet(Entry* array, int capacity, Literal key, int startPos) {
 	//just in case
 	int index = startPos % capacity;
-
+//printf("%d\n", index);
 	//literal probing and collision checking
 	for (;;) {
-printf("loop: (%d / %d)\n", index, capacity);
+//printf("loop: (%d / %d)\n", index, capacity);
 		Entry* entry = &array[index];
 
 		if (IS_NIL(entry->key)) { //if key is empty, it's either empty or tombstone
@@ -109,7 +109,7 @@ LN	printf("adjusting capacity: %d -> %d\n", oldCapacity, capacity);
 	//new entries
 LN	Entry* newEntries = ALLOCATE(Entry, capacity); //ERROR: this line fails
 
-	printf("old, new, entries: %d %d %d\n", oldCapacity, capacity, newEntries);
+LN	printf("old, new, entries: %d %d %d\n", oldCapacity, capacity, newEntries);
 
 	if (newEntries == NULL) {
 		printf("Well, we're boned.\n");
@@ -138,10 +138,10 @@ LN			index = hashString(AS_STRING(array[i].key), strlen(AS_STRING(array[i].key))
 LN		}
 
 LN		if (index == -1) { //WARNING: This is definitely the problem
-	printLiteral(array[i].key);
-	printf("%d -> %d, %d\n", oldCapacity, capacity, i);
-	printf("array location: %d\n", array);
-LN			while(true);
+			printLiteral(array[i].key);
+			printf("%d -> %d, %d\n", oldCapacity, capacity, i);
+			printf("array location: %d\n", array);
+LN			exit(1);
 LN		}
 
 		//place the key and value in the new array (reusing string memory)
