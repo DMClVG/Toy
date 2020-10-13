@@ -8,8 +8,8 @@
 #define FAILURE (*failures)++
 #define TEST(x) if (x) SUCCESS; else FAILURE
 
-#define LN printf("%s: %d\n", __FILE__, __LINE__);
-//#define LN
+//#define LN printf("%s: %d\n", __FILE__, __LINE__);
+#define LN
 
 void dictionary_test(int* successes, int* failures) {
 	//init & free an empty dict

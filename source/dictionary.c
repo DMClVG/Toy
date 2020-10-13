@@ -76,7 +76,7 @@ void freeEntryArray(Entry* array, int capacity) {
 Entry* entryArrayGet(Entry* array, int capacity, Literal key, int startPos) {
 	//just in case
 	int index = startPos % capacity;
-printf("%d\n", index);
+
 	//literal probing and collision checking
 	for (;;) {
 printf("loop: (%d / %d)\n", index, capacity);
