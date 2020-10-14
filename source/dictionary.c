@@ -116,6 +116,7 @@ LN	}
 
 	//move the old array into the new one
 LN	for (int i = 0; i < oldCapacity; i++) {
+	printf("looping: %d / %d (%d)\n", i, oldCapacity, array);
 LN		if (IS_NIL(array[i].key)) {
 LN			continue;
 LN		}
