@@ -134,7 +134,7 @@ LN		}
 LN		if (index == -1) { //ERROR: This is definitely the problem
 LN			printf("%d -> %d, %d\n", oldCapacity, capacity, i);
 LN			printf("array location: %d\n", array);
-			printf("literal type: \n", array[i].key.type);
+			printf("literal type: %s\n", array[i].key.type);
 			printLiteral(array[i].key);
 LN			exit(1);
 LN		}
