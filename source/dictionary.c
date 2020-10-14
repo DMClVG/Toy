@@ -1,14 +1,11 @@
 #include "dictionary.h"
 #include "memory.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 //"don't use modulo" - some gamedev guy
-
-#include <stdio.h>
-//#define LN printf("%s: %d\n", __FILE__, __LINE__);
-#define LN
 
 //utility functions
 static uint32_t hashString(const char* string, int length) {
@@ -79,7 +76,7 @@ Entry* entryArrayGet(Entry* array, int capacity, Literal key, int startPos) {
 	int index = startPos % capacity;
 
 	//literal probing and collision checking
-	for (;;) {
+	for (;;) { //WARNING: this is the only function allowed to retrieve an entry from the array
 		Entry* entry = &array[index];
 
 		if (IS_NIL(entry->key)) { //if key is empty, it's either empty or tombstone
@@ -104,50 +101,39 @@ Entry* entryArrayGet(Entry* array, int capacity, Literal key, int startPos) {
 }
 
 Entry* adjustCapacity(Entry* array, int oldCapacity, int capacity) {
-LN	printf("adjusting capacity: %d -> %d\n", oldCapacity, capacity);
-
 	//new entries
-LN	Entry* newEntries = ALLOCATE(Entry, capacity); //ERROR: this line fails
+	Entry* newEntries = ALLOCATE(Entry, capacity); //ERROR: this line fails
 
-LN	for (int i = 0; i < capacity; i++) {
-LN		newEntries[i].key = TO_NIL_LITERAL;
-LN		newEntries[i].value = TO_NIL_LITERAL;
-LN	}
+	for (int i = 0; i < capacity; i++) {
+		newEntries[i].key = TO_NIL_LITERAL;
+		newEntries[i].value = TO_NIL_LITERAL;
+	}
 
 	//move the old array into the new one
-LN	for (int i = 0; i < oldCapacity; i++) {
-	printf("looping: %d / %d (%d)\n", i, oldCapacity, array);
-LN		if (IS_NIL(array[i].key)) {
-LN			continue;
-LN		}
+	for (int i = 0; i < oldCapacity; i++) {
+		if (IS_NIL(array[i].key)) {
+			continue;
+		}
 
-		//determine where to place the new entry
-LN		int index = -1;
+		Entry* pos = NULL;
 
-LN		if (IS_NUMBER(array[i].key)) {
-LN			index = ((int)AS_NUMBER(array[i].key)) % capacity;
-LN		}
+		if (IS_NUMBER(array[i].key)) {
+			pos = entryArrayGet(newEntries, capacity, TO_NIL_LITERAL, ((int)AS_NUMBER(array[i].key)) % capacity);
+		}
 
-LN		if (IS_STRING(array[i].key)) {
-LN			index = hashString(AS_STRING(array[i].key), strlen(AS_STRING(array[i].key))) % capacity;
-LN		}
-
-LN		if (index == -1) { //ERROR: This is definitely the problem
-LN			printf("%d -> %d, %d\n", oldCapacity, capacity, i);
-LN			printf("array location: %d\n", array);
-			printf("literal type: %s\n", array[i].key.type);
-			printLiteral(array[i].key);
-LN			exit(1);
-LN		}
+		if (IS_STRING(array[i].key)) {
+			pos = entryArrayGet(newEntries, capacity, TO_NIL_LITERAL, hashString(AS_STRING(array[i].key), strlen(AS_STRING(array[i].key))) % capacity);
+		}
 
 		//place the key and value in the new array (reusing string memory)
-LN		newEntries[index].key = array[i].key;
-LN		newEntries[index].value = array[i].value;
-LN	}
+		pos->key = array[i].key;
+		pos->value = array[i].value;
+	}
 
 	//clear the old array
-LN	FREE_ARRAY(Entry, array, oldCapacity);
-LN	return newEntries;
+	FREE_ARRAY(Entry, array, oldCapacity);
+
+	return newEntries;
 }
 
 bool entryArraySet(Entry** array, int* capacityPtr, int count, Literal key, Literal value, int startPos) {
@@ -208,29 +194,30 @@ void freeDictionary(Dictionary* dict) {
 }
 
 //accessors & mutators
-Literal* dictionaryGet(Dictionary* dict, Literal key) {
+Literal dictionaryGet(Dictionary* dict, Literal key) {
 	if (IS_NIL(key)) {
-		return &dict->nilEntry.value;
+		return dict->nilEntry.value;
 	} else
 
 	if (IS_BOOL(key) && AS_BOOL(key) == true) {
-		return &dict->trueEntry.value;
+		return dict->trueEntry.value;
 	} else
 
 	if (IS_BOOL(key) && AS_BOOL(key) == false) {
-		return &dict->falseEntry.value;
+		return dict->falseEntry.value;
 	} else
 
 	if (IS_NUMBER(key)) {
-		return &entryArrayGet(dict->numberEntries, dict->numberCapacity, key, ((int)AS_NUMBER(key)) % dict->numberCapacity)->value;
+		return entryArrayGet(dict->numberEntries, dict->numberCapacity, key, ((int)AS_NUMBER(key)) % dict->numberCapacity)->value;
 	} else
 
 	if (IS_STRING(key)) {
-		return &entryArrayGet(dict->stringEntries, dict->stringCapacity, key, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->stringCapacity)->value;
+		return entryArrayGet(dict->stringEntries, dict->stringCapacity, key, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->stringCapacity)->value;
 	} else
 
 	{
-		return NULL;
+		fprintf(stderr, "[Internal]Couldn't find that key's type in a dictionary\n");
+		exit(-1);
 	}
 
 	//TODO: interpolated strings
@@ -292,25 +279,19 @@ void dictionaryDelete(Dictionary* dict, Literal key) {
 
 //important
 void dictionaryCopy(Dictionary* target, Dictionary* source) {
-LN	freeDictionary(target);
+	setEntry(&target->nilEntry, &source->nilEntry.key, &source->nilEntry.value);
+	setEntry(&target->trueEntry, &source->trueEntry.key, &source->trueEntry.value);
+	setEntry(&target->falseEntry, &source->falseEntry.key, &source->falseEntry.value);
 
-LN	setEntry(&target->nilEntry, &source->nilEntry.key, &source->nilEntry.value);
-LN	setEntry(&target->trueEntry, &source->trueEntry.key, &source->trueEntry.value);
-LN	setEntry(&target->falseEntry, &source->falseEntry.key, &source->falseEntry.value);
+	for (int i = 0; i < source->numberCount; i++) {
+		if (!IS_NIL(source->numberEntries[i].key)) {
+			dictionarySet(target, source->numberEntries[i].key, source->numberEntries[i].value);
+		}
+	}
 
-LN	freeEntryArray(target->numberEntries, target->numberCapacity);
-LN	freeEntryArray(target->stringEntries, target->stringCapacity);
-
-LN	for (int i = 0; i < source->numberCount; i++) {
-LN		if (!IS_NIL(source->numberEntries[i].key)) {
-LN			dictionarySet(target, source->numberEntries[i].key, source->numberEntries[i].value);
-LN		}
-LN	}
-
-LN	for (int i = 0; i < source->stringCount; i++) {
-LN		if (!IS_NIL(source->stringEntries[i].key)) {
-LN			dictionarySet(target, source->stringEntries[i].key, source->stringEntries[i].value);
-LN		}
-LN	}
-LN
+	for (int i = 0; i < source->stringCount; i++) {
+		if (!IS_NIL(source->stringEntries[i].key)) {
+			dictionarySet(target, source->stringEntries[i].key, source->stringEntries[i].value);
+		}
+	}
 }

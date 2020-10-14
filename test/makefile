@@ -16,7 +16,7 @@ SRC = $(wildcard *.c)
 OBJ = $(addprefix $(ODIR)/,$(SRC:.c=.o))
 
 all: $(OBJ)
-	$(CC) -o $(OUT) $^ $(CFLAGS) $(LIBS)
+	$(CC) -g -o $(OUT) $^ $(CFLAGS) $(LIBS)
 
 $(OBJ): | $(ODIR)
 
@@ -24,7 +24,7 @@ $(ODIR):
 	mkdir $(ODIR)
 
 $(ODIR)/%.o: %.c
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -g -c -o $@ $< $(CFLAGS)
 
 .PHONY: clean
 

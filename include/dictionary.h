@@ -32,7 +32,7 @@ typedef struct {
 void initDictionary(Dictionary* dict);
 void freeDictionary(Dictionary* dict);
 
-Literal* dictionaryGet(Dictionary* dict, Literal key);
+Literal dictionaryGet(Dictionary* dict, Literal key);
 void dictionarySet(Dictionary* dict, Literal key, Literal value);
 void dictionaryDelete(Dictionary* dict, Literal key);
 
