@@ -102,7 +102,7 @@ Entry* entryArrayGet(Entry* array, int capacity, Literal key, int startPos) {
 
 Entry* adjustCapacity(Entry* array, int oldCapacity, int capacity) {
 	//new entries
-	Entry* newEntries = ALLOCATE(Entry, capacity); //ERROR: this line fails
+	Entry* newEntries = ALLOCATE(Entry, capacity);
 
 	for (int i = 0; i < capacity; i++) {
 		newEntries[i].key = TO_NIL_LITERAL;

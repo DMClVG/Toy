@@ -64,6 +64,10 @@ void printChunkByteArray(Chunk* chunk) {
 	}
 }
 
+void printLiteralArray(LiteralArray* literalArray) {
+	//TODO: print array
+}
+
 void printDictionary(Dictionary* dictionary) {
 	//TODO: print dict
 }
