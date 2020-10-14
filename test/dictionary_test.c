@@ -100,7 +100,7 @@ LN
 LN		TEST(AS_NUMBER(result) == 420);
 LN		freeDictionary(&dictionary);
 LN	}
-*/
+
 	//store a large number of values in a dictionary
 LN	{
 LN		Dictionary dictionary;
@@ -117,7 +117,7 @@ LN		TEST(dictionary.numberCapacity == 1024);
 LN		TEST(dictionary.numberCount == 500);
 LN		freeDictionary(&dictionary);
 LN	}
-
+*/
 	//test table copying
 	{
 LN		Dictionary source;
@@ -139,7 +139,7 @@ LN		TEST(dest.numberCount == 500);
 LN		freeDictionary(&source);
 LN		freeDictionary(&dest);
 LN	}
-
+/*
 	//test string ownership
 LN	{
 LN		Dictionary dictionary;
@@ -160,6 +160,6 @@ LN		TEST(strcmp(AS_STRING(result), "value") == 0);
 
 LN		freeDictionary(&dictionary);
 LN	}
-
+*/
 	//TODO: deletion test
 }

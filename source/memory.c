@@ -8,6 +8,7 @@
 #endif
 
 int memoryAllocated = 0;
+int stringCount = 0;
 
 static void blue() {
 #ifdef PLATFORM_WINDOWS
@@ -34,6 +35,16 @@ static void reset() {
 }
 
 void* reallocate(void* pointer, size_t oldSize, size_t newSize) {
+	//strings
+	if (newSize == 12) {
+		stringCount++;
+	}
+	if (oldSize == 12) {
+		stringCount--;
+	}
+
+	printf("stringCount: %d\n", stringCount);
+
 	if (newSize == 0) {
 		if (oldSize > 0) {
 			purple();
@@ -53,8 +64,8 @@ void* reallocate(void* pointer, size_t oldSize, size_t newSize) {
 	void* mem = realloc(pointer, newSize);
 
 	if (mem == NULL) {
-		fprintf(stderr, "[Internal]Memory allocation error\n");
-		exit(1);
+		fprintf(stderr, "[Internal]Memory allocation error (requested %d for %d)\n", newSize, pointer);
+		exit(-1);
 	}
 
 	memoryAllocated -= oldSize;
