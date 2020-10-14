@@ -113,7 +113,7 @@ int main(/* int argc, const char* argv[] */) {
 	TEST_FUNCTION(dictionary_test);
 
 	//finally
-	printf("[Final Result]: %d / %d \n", passes, passes + failures);
+	printf("[Final Result]: %d / %d\n", passes, passes + failures);
 
 	return failures;
 }

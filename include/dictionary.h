@@ -27,6 +27,9 @@ typedef struct {
 	int stringCapacity;
 	int stringCount;
 	Entry* stringEntries;
+
+	//placed the load here for benchmarking
+	double load;
 } Dictionary;
 
 void initDictionary(Dictionary* dict);
