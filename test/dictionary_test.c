@@ -8,10 +8,16 @@
 #define FAILURE (*failures)++
 #define TEST(x) if (x) SUCCESS; else FAILURE
 
+#ifdef LN
+#undef LN
+#endif
+
+#include <stdio.h>
 //#define LN printf("%s: %d\n", __FILE__, __LINE__);
 #define LN
 
 void dictionary_test(int* successes, int* failures) {
+/*
 	//init & free an empty dict
 LN	{
 LN		Dictionary dictionary;
@@ -94,7 +100,7 @@ LN
 LN		TEST(AS_NUMBER(result) == 420);
 LN		freeDictionary(&dictionary);
 LN	}
-
+*/
 	//store a large number of values in a dictionary
 LN	{
 LN		Dictionary dictionary;

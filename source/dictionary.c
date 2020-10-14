@@ -1,13 +1,14 @@
 #include "dictionary.h"
 #include "memory.h"
 
-#include <stdio.h> //debugging
-//#define LN printf("%s: %d\n", __FILE__, __LINE__);
-#define LN
-
+#include <stdlib.h>
 #include <string.h>
 
 //"don't use modulo" - some gamedev guy
+
+#include <stdio.h>
+//#define LN printf("%s: %d\n", __FILE__, __LINE__);
+#define LN
 
 //utility functions
 static uint32_t hashString(const char* string, int length) {
@@ -76,10 +77,9 @@ void freeEntryArray(Entry* array, int capacity) {
 Entry* entryArrayGet(Entry* array, int capacity, Literal key, int startPos) {
 	//just in case
 	int index = startPos % capacity;
-//printf("%d\n", index);
+
 	//literal probing and collision checking
 	for (;;) {
-//printf("loop: (%d / %d)\n", index, capacity);
 		Entry* entry = &array[index];
 
 		if (IS_NIL(entry->key)) { //if key is empty, it's either empty or tombstone
@@ -109,12 +109,6 @@ LN	printf("adjusting capacity: %d -> %d\n", oldCapacity, capacity);
 	//new entries
 LN	Entry* newEntries = ALLOCATE(Entry, capacity); //ERROR: this line fails
 
-LN	printf("old, new, entries: %d %d %d\n", oldCapacity, capacity, newEntries);
-
-	if (newEntries == NULL) {
-		printf("Well, we're boned.\n");
-	}
-
 LN	for (int i = 0; i < capacity; i++) {
 LN		newEntries[i].key = TO_NIL_LITERAL;
 LN		newEntries[i].value = TO_NIL_LITERAL;
@@ -137,16 +131,14 @@ LN		if (IS_STRING(array[i].key)) {
 LN			index = hashString(AS_STRING(array[i].key), strlen(AS_STRING(array[i].key))) % capacity;
 LN		}
 
-LN		if (index == -1) { //WARNING: This is definitely the problem
+LN		if (index == -1) { //ERROR: This is definitely the problem
+LN			printf("%d -> %d, %d\n", oldCapacity, capacity, i);
+LN			printf("array location: %d\n", array);
 			printLiteral(array[i].key);
-			printf("%d -> %d, %d\n", oldCapacity, capacity, i);
-			printf("array location: %d\n", array);
 LN			exit(1);
 LN		}
 
 		//place the key and value in the new array (reusing string memory)
-LN		printf("%d\n", array[i].key.type);
-LN		printf("%d %d %d %d\n", capacity, oldCapacity, index, i);
 LN		newEntries[index].key = array[i].key;
 LN		newEntries[index].value = array[i].value;
 LN	}
@@ -158,30 +150,30 @@ LN	return newEntries;
 
 bool entryArraySet(Entry** array, int* capacityPtr, int count, Literal key, Literal value, int startPos) {
 	//expand array
-LN	if (count + 1 > *capacityPtr * DICTIONARY_MAX_LOAD) {
-LN		int oldCapacity = *capacityPtr;
-LN		*capacityPtr = GROW_CAPACITY(*capacityPtr);
-LN		*array = adjustCapacity(*array, oldCapacity, *capacityPtr); //custom rather than automatic reallocation
+	if (count + 1 > *capacityPtr * DICTIONARY_MAX_LOAD) {
+		int oldCapacity = *capacityPtr;
+		*capacityPtr = GROW_CAPACITY(*capacityPtr);
+		*array = adjustCapacity(*array, oldCapacity, *capacityPtr); //custom rather than automatic reallocation
 
 		//recalc start pos
-LN		if (IS_NUMBER(key)) {
-LN			startPos = ((int)AS_NUMBER(key)) % *capacityPtr;
-LN		}
-LN		if (IS_STRING(key)) {
-LN			startPos = hashString(AS_STRING(key), strlen(AS_STRING(key))) % *capacityPtr;
-LN		}
-LN	}
+		if (IS_NUMBER(key)) {
+			startPos = ((int)AS_NUMBER(key)) % *capacityPtr;
+		}
+		if (IS_STRING(key)) {
+			startPos = hashString(AS_STRING(key), strlen(AS_STRING(key))) % *capacityPtr;
+		}
+	}
 
-LN	Entry* entry = entryArrayGet(*array, *capacityPtr, key, startPos);
+	Entry* entry = entryArrayGet(*array, *capacityPtr, key, startPos);
 
 	//TODO: count increase
-LN	if (IS_NIL(entry->key)) {
-LN		setEntry(entry, &key, &value);
-LN		return true;
-LN	} else {
-LN		setEntry(entry, &key, &value);
-LN		return false;
-LN	}
+	if (IS_NIL(entry->key)) {
+		setEntry(entry, &key, &value);
+		return true;
+	} else {
+		setEntry(entry, &key, &value);
+		return false;
+	}
 }
 
 //init & free
@@ -195,19 +187,13 @@ void initDictionary(Dictionary* dict) {
 
 	//HACK: because modulo by 0 is undefined, set the capacity to a non-zero value (and allocate the arrays)
 
-LN	dict->numberCapacity = GROW_CAPACITY(0);
-LN	dict->numberCount = 0;
-LN	dict->numberEntries = adjustCapacity(NULL, 0, dict->numberCapacity);
+	dict->numberCapacity = GROW_CAPACITY(0);
+	dict->numberCount = 0;
+	dict->numberEntries = adjustCapacity(NULL, 0, dict->numberCapacity);
 
-LN	dict->stringCapacity = GROW_CAPACITY(0);
-LN	dict->stringCount = 0;
-LN	dict->stringEntries = adjustCapacity(NULL, 0, dict->stringCapacity);
-LN
-//	printf("number location: %d\n", dict->numberEntries);
-//	printf("string location: %d\n", dict->stringEntries);
-
-//	printLiteral(dict->numberEntries[0].key);
-//s	printLiteral(dict->numberEntries[0].value);
+	dict->stringCapacity = GROW_CAPACITY(0);
+	dict->stringCount = 0;
+	dict->stringEntries = adjustCapacity(NULL, 0, dict->stringCapacity);
 }
 
 void freeDictionary(Dictionary* dict) {
@@ -249,30 +235,30 @@ Literal* dictionaryGet(Dictionary* dict, Literal key) {
 }
 
 void dictionarySet(Dictionary* dict, Literal key, Literal value) {
-LN	if (IS_NIL(key)) {
-LN		setEntry(&dict->nilEntry, &key, &value);
-LN	} else
+	if (IS_NIL(key)) {
+		setEntry(&dict->nilEntry, &key, &value);
+	} else
 
 	if (IS_BOOL(key) && AS_BOOL(key) == true) {
-LN		setEntry(&dict->trueEntry, &key, &value);
-LN	} else
+		setEntry(&dict->trueEntry, &key, &value);
+	} else
 
 	if (IS_BOOL(key) && AS_BOOL(key) == false) {
-LN		setEntry(&dict->falseEntry, &key, &value);
-LN	} else
+		setEntry(&dict->falseEntry, &key, &value);
+	} else
 
 	if (IS_NUMBER(key)) {
-LN		if (entryArraySet(&dict->numberEntries, &dict->numberCapacity, dict->numberCount, key, value, ((int)AS_NUMBER(key)) % dict->numberCapacity)) {
-LN			dict->numberCount++;
-LN		}
-LN	} else
+		if (entryArraySet(&dict->numberEntries, &dict->numberCapacity, dict->numberCount, key, value, ((int)AS_NUMBER(key)) % dict->numberCapacity)) {
+			dict->numberCount++;
+		}
+	} else
 
 	if (IS_STRING(key)) {
-LN		if (entryArraySet(&dict->stringEntries, &dict->stringCapacity, dict->stringCount, key, value, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->stringCapacity)) {
-LN			dict->stringCount++;
-LN		}
-LN	}
-LN
+		if (entryArraySet(&dict->stringEntries, &dict->stringCapacity, dict->stringCount, key, value, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->stringCapacity)) {
+			dict->stringCount++;
+		}
+	}
+
 	//TODO: interpolated strings
 }
 
@@ -326,5 +312,3 @@ LN		}
 LN	}
 LN
 }
-
-#undef LN
