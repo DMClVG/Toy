@@ -183,8 +183,6 @@ LN		dictionarySet(&dictionary, TO_STRING_LITERAL("bar"), TO_NUMBER_LITERAL(7));
 LN		dictionarySet(&dictionary, TO_STRING_LITERAL("baz"), TO_NUMBER_LITERAL(8));
 LN		dictionarySet(&dictionary, TO_STRING_LITERAL("fiz"), TO_NUMBER_LITERAL(9));
 
-//printLiteral(dictionaryGet(&dictionary, TO_STRING_LITERAL("delta")));
-
 LN		TEST(AS_NUMBER(dictionaryGet(&dictionary, TO_STRING_LITERAL("alpha"))) == 1);
 LN		TEST(IS_NIL(dictionaryGet(&dictionary, TO_STRING_LITERAL("gamma"))));
 LN		TEST(AS_NUMBER(dictionaryGet(&dictionary, TO_STRING_LITERAL("delta"))) == 4);
