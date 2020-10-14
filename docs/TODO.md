@@ -1,6 +1,7 @@
 * ~~line-based error messages in the VM~~
 * Chunk pack/unpack into files
 * Chunks will need names for importing, packing, caching, etc.
+* ~~Dictionaries~~
 * Variables
 * Scope
 * Functions

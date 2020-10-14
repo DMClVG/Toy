@@ -1,5 +1,5 @@
 export RM=del /S /Q
-export OUT = ../out
+export OUT = ../Toy
 
 all:
 	$(MAKE) -C source

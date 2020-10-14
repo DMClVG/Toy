@@ -48,9 +48,9 @@ int runTestFile(const char* fname, const char* expected) {
 
 	//open the file
 #ifdef PLATFORM_WINDOWS
-	sprintf(buffer, "out test/scripts/%s", fname);
+	sprintf(buffer, "Toy test/scripts/%s", fname);
 #else
-	sprintf(buffer, "./out test/scripts/%s", fname);
+	sprintf(buffer, "./Toy test/scripts/%s", fname);
 #endif
 	FILE* handle = popen(buffer, "r");
 
@@ -98,7 +98,7 @@ int runTestFile(const char* fname, const char* expected) {
 		failures += f; \
 	}
 
-int main(int argc, const char* argv[]) {
+int main(/* int argc, const char* argv[] */) {
 	//initialize these
 	int passes = 0, failures = 0;
 
