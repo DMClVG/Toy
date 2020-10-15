@@ -29,6 +29,7 @@ Literal dictionaryGet(Dictionary* dict, Literal key);
 void dictionarySet(Dictionary* dict, Literal key, Literal value);
 void dictionaryDelete(Dictionary* dict, Literal key);
 
+bool dictionaryDeclared(Dictionary* dict, Literal key);
 void dictionaryCopy(Dictionary* target, Dictionary* source);
 
 #endif

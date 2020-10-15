@@ -67,6 +67,8 @@ void initToy(Toy* toy) {
 	toy->stack = NULL;
 	toy->pc = NULL;
 	initLiteralArray(&toy->garbage);
+	initDictionary(&toy->constants);
+	initDictionary(&toy->variables);
 }
 
 void freeToy(Toy* toy) {
@@ -79,29 +81,85 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 	//NOTE: chunk MUST remain unchanged
 
 	for (toy->pc = chunk->code; *(toy->pc) && !toy->panic; /* EMPTY */) {
-		switch(*(toy->pc++)) {
+		switch(*(toy->pc++)) { //TODO: change this switch to a lookup table of functions?
 			//pushing && popping
 			case OP_LITERAL:
 				pushLiteral(toy, &chunk->literals.literals[*(toy->pc)]);
 				toy->pc++;
-				break;
+			break;
 
 			case OP_LITERAL_LONG:
 				pushLiteral(toy, &chunk->literals.literals[ *((uint32_t*)(toy->pc)) ]); //TODO: test long literals
 				toy->pc += sizeof(uint32_t);
-				break;
+			break;
 
 			case OP_POP:
 				popLiteral(toy);
-				break;
+			break;
 
 			case OP_PRINT: {
+				Literal* top = popLiteral(toy);
 				//guard against deferencing a null pointer
-				Literal* top = peekLiteral(toy);
 				if (top != NULL) {
 					printLiteral(*top);
-					printf("\n"); //not included in the function above
-					popLiteral(toy);
+					printf("\n"); //not included in the print function above
+				}
+			}
+			break;
+
+			case OP_CONSTANT_DECLARE: {
+				Literal* name = popLiteral(toy);
+				Literal* value = popLiteral(toy);
+
+				//check for existing constants & variables with that name
+				if (!IS_NIL(dictionaryGet(&toy->constants, *name)) || !IS_NIL(dictionaryGet(&toy->variables, *name))) {
+					error(toy, chunk, "Can't redefine a constant or variable");
+					break;
+				}
+
+				dictionarySet(&toy->constants, *name, *value);
+			}
+			break;
+
+			case OP_VARIABLE_DECLARE: {
+				Literal* name = popLiteral(toy);
+
+				//check for existing constants & variables with that name
+				if (!IS_NIL(dictionaryGet(&toy->constants, *name)) || !IS_NIL(dictionaryGet(&toy->variables, *name))) {
+					error(toy, chunk, "Can't redefine a constant or variable");
+					break;
+				}
+
+				dictionarySet(&toy->variables, *name, TO_NIL_LITERAL); //null as default
+			}
+			break;
+
+			case OP_VARIABLE_SET: {
+				Literal* name = popLiteral(toy);
+				Literal* value = popLiteral(toy);
+
+				//check for existing constants & variables with that name
+				if (dictionaryDeclared(&toy->constants, *name)) {
+					error(toy, chunk, "Can't assign a constant");
+					break;
+				}
+
+				if (!dictionaryDeclared(&toy->variables, *name)) {
+					error(toy, chunk, "Can't find a variable with that name");
+					break;
+				}
+
+				dictionarySet(&toy->variables, *name, *value);
+			}
+			break;
+
+			case OP_VARIABLE_GET: {
+				Literal* name = popLiteral(toy);
+
+				if (dictionaryDeclared(&toy->constants, *name)) {
+					PUSH_TEMP_LITERAL(toy, dictionaryGet(&toy->constants, *name));
+				} else {
+					PUSH_TEMP_LITERAL(toy, dictionaryGet(&toy->variables, *name));
 				}
 			}
 			break;
@@ -123,6 +181,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 
 				else {
 					error(toy, chunk, "Mismatched types in equality");
+					break;
 				}
 			}
 			break;
@@ -137,6 +196,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				}
 				else {
 					error(toy, chunk, "Mismatched types in comparison");
+					break;
 				}
 			}
 			break;
@@ -151,6 +211,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				}
 				else {
 					error(toy, chunk, "Mismatched types in comparison");
+					break;
 				}
 			}
 			break;
@@ -178,6 +239,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 
 				else {
 					error(toy, chunk, "Mismatched types in addition");
+					break;
 				}
 			}
 			break;
@@ -192,6 +254,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				}
 				else {
 					error(toy, chunk, "Mismatched types in subtraction");
+					break;
 				}
 			}
 			break;
@@ -206,6 +269,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				}
 				else {
 					error(toy, chunk, "Mismatched types in multiplication");
+					break;
 				}
 			}
 			break;
@@ -220,6 +284,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				}
 				else {
 					error(toy, chunk, "Mismatched types in division");
+					break;
 				}
 			}
 			break;
@@ -235,12 +300,14 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 					//determine if there's any fractional parts
 					if (rd - (long)rd != 0 || ld - (long)ld != 0) {
 						error(toy, chunk, "Operands to modulo must be whole numbers");
+						break;
 					}
 
 					PUSH_TEMP_LITERAL(toy, TO_NUMBER_LITERAL( (long)ld % (long)rd ));
 				}
 				else {
 					error(toy, chunk, "Mismatched types in modulo");
+					break;
 				}
 			}
 			break;
@@ -253,6 +320,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				}
 				else {
 					error(toy, chunk, "Unknown type in negation");
+					break;
 				}
 			}
 			break;

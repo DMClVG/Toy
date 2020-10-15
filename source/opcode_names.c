@@ -13,6 +13,11 @@ OpCodeName opCodeNames[] = {
 	{OP_NEGATE, "op_negate"},
 	{OP_NOT, "op_not"},
 	{OP_LITERAL, "op_literal"},
+	{OP_CONSTANT_DECLARE, "op_const_decl"},
+	{OP_VARIABLE_DECLARE, "op_var_decl"},
+	{OP_VARIABLE_GET, "op_var_get"},
+	{OP_VARIABLE_SET, "op_var_set"},
+
 	{OP_PRINT, "op_print"},
 	{OP_POP, "op_pop"},
 	{OP_LONG_SENTINEL, "_sentinel"},

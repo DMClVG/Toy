@@ -85,20 +85,20 @@ static ParseRule* getRule(TokenType type);
 static void parsePrecendence(Parser* parser, Chunk* chunk, Precedence precedence);
 
 //convenience
-static void emitByte(Parser* parser, Chunk* chunk, uint8_t byte) {
-	writeChunk(chunk, byte, parser->lexer->line);
+static void emitByte(Chunk* chunk, uint8_t byte, int line) {
+	writeChunk(chunk, byte, line);
 }
 
-static void emitTwoBytes(Parser* parser, Chunk* chunk, uint8_t byte1, uint8_t byte2) {
-	emitByte(parser, chunk, byte1);
-	emitByte(parser, chunk, byte2);
+static void emitTwoBytes(Chunk* chunk, uint8_t byte1, uint8_t byte2, int line) {
+	emitByte(chunk, byte1, line);
+	emitByte(chunk, byte2, line);
 }
 
-static void emitLong(Parser* parser, Chunk* chunk, uint32_t lng) {
-	writeChunkLong(chunk, lng, parser->lexer->line);
+static void emitLong(Chunk* chunk, uint32_t lng, int line) {
+	writeChunkLong(chunk, lng, line);
 }
 
-static void emitLiteral(Parser* parser, Chunk* chunk, Literal literal) {
+static void emitLiteral(Chunk* chunk, Literal literal, int line) {
 	//get the index of the new literal
 	int index = findLiteral(&chunk->literals, literal);
 
@@ -116,11 +116,11 @@ static void emitLiteral(Parser* parser, Chunk* chunk, Literal literal) {
 
 	//handle > 256 literals
 	if (index >= 256) {
-		emitByte(parser, chunk, (uint8_t)OP_LITERAL_LONG);
-		emitLong(parser, chunk, (uint32_t)index);
+		emitByte(chunk, (uint8_t)OP_LITERAL_LONG, line);
+		emitLong(chunk, (uint32_t)index, line);
 	} else {
-		emitByte(parser, chunk, (uint8_t)OP_LITERAL);
-		emitByte(parser, chunk, (uint8_t)index);
+		emitByte(chunk, (uint8_t)OP_LITERAL, line);
+		emitByte(chunk, (uint8_t)index, line);
 	}
 }
 
@@ -207,14 +207,16 @@ static void expression(Parser* parser, Chunk* chunk) {
 
 //grammar statement rules
 static void printStmt(Parser* parser, Chunk* chunk) {
+	int line = parser->previous.line;
 	expression(parser, chunk);
-	emitByte(parser, chunk, OP_PRINT);
+	emitByte(chunk, OP_PRINT, line);
 	consume(parser, TOKEN_SEMICOLON, "Expected ';' at end of print statement");
 }
 
 static void expressionStmt(Parser* parser, Chunk* chunk) {
+	int line = parser->previous.line;
 	expression(parser, chunk); //push
-	emitByte(parser, chunk, OP_POP); //pop
+	emitByte(chunk, OP_POP, line); //pop
 	consume(parser, TOKEN_SEMICOLON, "Expected ';' at the end of an expression statement");
 }
 
@@ -229,9 +231,66 @@ static void statement(Parser* parser, Chunk* chunk) {
 	expressionStmt(parser, chunk);
 }
 
+static void constDecl(Parser* parser, Chunk* chunk) {
+	//grab the const line
+	int line = parser->previous.line;
+
+	//constants must always be assigned a value at declaration
+	consume(parser, TOKEN_IDENTIFIER, "Expected identifier name after const");
+	Token identifier = parser->previous;
+
+	if (!match(parser, TOKEN_EQUAL)) {
+		error(parser, parser->current, "Expected assignment after const declaration");
+		return;
+	}
+
+	//emit an expression to the chunk
+	expression(parser, chunk);
+
+	//emit the constant name as a literal
+	emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(identifier.lexeme, identifier.length)), identifier.line);
+
+	//finally, give the command to declare & assign
+	emitByte(chunk, OP_CONSTANT_DECLARE, line);
+
+	consume(parser, TOKEN_SEMICOLON, "Expected ';' at the end of a const declaration");
+}
+
+static void varDecl(Parser* parser, Chunk* chunk) {
+	//grab the var line
+	int line = parser->previous.line;
+
+	consume(parser, TOKEN_IDENTIFIER, "Expected identifier name after var");
+	Token identifier = parser->previous;
+
+	//emit the variable name as a literal
+	emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(identifier.lexeme, identifier.length)), identifier.line);
+
+	//give the command to declare
+	emitByte(chunk, OP_VARIABLE_DECLARE, line);
+
+	if (match(parser, TOKEN_EQUAL)) {
+		int line = parser->previous.line; //line of the equal sign
+
+		//emit an expression to the chunk
+		expression(parser, chunk);
+
+		//give the command to assign
+		emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(identifier.lexeme, identifier.length)), identifier.line);
+		emitByte(chunk, OP_VARIABLE_SET, line);
+	}
+
+	consume(parser, TOKEN_SEMICOLON, "Expected ';' at the end of a var declaration");
+}
+
 static void declaration(Parser* parser, Chunk* chunk) {
-	//TODO: other grammar rules
-	statement(parser, chunk);
+	if (match(parser, TOKEN_CONST)) {
+		constDecl(parser, chunk);
+	} else if (match(parser, TOKEN_VAR)) {
+		varDecl(parser, chunk);
+	} else {
+		statement(parser, chunk);
+	}
 
 	if (parser->panic) {
 		synchronize(parser);
@@ -258,7 +317,7 @@ static void parsePrecendence(Parser* parser, Chunk* chunk, Precedence precedence
 		infixRule(parser, chunk, canBeAssigned);
 	}
 
-	//if your precedence is above "assignment"
+	//if your precedence is below "assignment"
 	if (canBeAssigned && match(parser, TOKEN_EQUAL)) {
 		error(parser, parser->previous, "Invalid assignment target");
 	}
@@ -269,12 +328,12 @@ static void string(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//handle interpolated strings as well
 	switch(parser->previous.type) {
 		case TOKEN_STRING:
-			emitLiteral(parser, chunk, TO_STRING_LITERAL(copyAndParseString(parser->previous.lexeme, parser->previous.length)));
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(parser->previous.lexeme, parser->previous.length)), parser->previous.line);
 			break;
 
-//		case TOKEN_INTERPOLATED_STRING:
-//			//TODO: interpolated strings
-//			break;
+		//case TOKEN_INTERPOLATED_STRING:
+			//TODO: interpolated strings
+		//	break;
 
 		default:
 			error(parser, parser->previous, "Unexpected token passed to string");
@@ -290,11 +349,28 @@ static void number(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 
 	//output the number & emit it
 	double number = strtod(buff, NULL);
-	emitLiteral(parser, chunk, TO_NUMBER_LITERAL(number));
+	emitLiteral(chunk, TO_NUMBER_LITERAL(number), parser->previous.line);
 }
 
 static void variable(Parser* parser, Chunk* chunk, bool canBeAssigned) {
-	//TODO: variables
+	//variables can be invoked for their values, or assigned a value, or both at once
+	Token identifier = parser->previous;
+
+	//if I am being assigned
+	if (match(parser, TOKEN_EQUAL)) {
+		int line = parser->previous.line; //line of the equal sign
+
+		//emit an expression to the chunk
+		expression(parser, chunk);
+
+		//give the command to assign
+		emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(identifier.lexeme, identifier.length)), identifier.line);
+		emitByte(chunk, OP_VARIABLE_SET, line);
+	}
+
+	//leave my value on the stack
+	emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(identifier.lexeme, identifier.length)), identifier.line);
+	emitByte(chunk, OP_VARIABLE_GET, identifier.line);
 }
 
 static void grouping(Parser* parser, Chunk* chunk, bool canBeAssigned) {
@@ -308,53 +384,54 @@ static void binary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 
 	//handle the left-side of the operator
 	TokenType operatorType = parser->previous.type;
+	int line = parser->previous.line;
 	parsePrecendence(parser, chunk, getRule(operatorType)->precedence + 1);
 
 	switch(operatorType) {
 		//compare
 		case TOKEN_EQUAL_EQUAL:
-			emitByte(parser, chunk, OP_EQUALITY);
+			emitByte(chunk, OP_EQUALITY, line);
 			break;
 
 		case TOKEN_BANG_EQUAL:
-			emitTwoBytes(parser, chunk, OP_EQUALITY, OP_NOT);
+			emitTwoBytes(chunk, OP_EQUALITY, OP_NOT, line);
 			break;
 
 		case TOKEN_GREATER:
-			emitByte(parser, chunk, OP_GREATER);
+			emitByte(chunk, OP_GREATER, line);
 			break;
 
 		case TOKEN_GREATER_EQUAL:
-			emitTwoBytes(parser, chunk, OP_LESS, OP_NOT);
+			emitTwoBytes(chunk, OP_LESS, OP_NOT, line);
 			break;
 
 		case TOKEN_LESS:
-			emitByte(parser, chunk, OP_LESS);
+			emitByte(chunk, OP_LESS, line);
 			break;
 
 		case TOKEN_LESS_EQUAL:
-			emitTwoBytes(parser, chunk, OP_GREATER, OP_NOT);
+			emitTwoBytes(chunk, OP_GREATER, OP_NOT, line);
 			break;
 
 		//arithmetic
 		case TOKEN_PLUS:
-			emitByte(parser, chunk, OP_ADD);
+			emitByte(chunk, OP_ADD, line);
 			break;
 
 		case TOKEN_MINUS:
-			emitByte(parser, chunk, OP_SUBTRACT);
+			emitByte(chunk, OP_SUBTRACT, line);
 			break;
 
 		case TOKEN_STAR:
-			emitByte(parser, chunk, OP_MULTIPLY);
+			emitByte(chunk, OP_MULTIPLY, line);
 			break;
 
 		case TOKEN_SLASH:
-			emitByte(parser, chunk, OP_DIVIDE);
+			emitByte(chunk, OP_DIVIDE, line);
 			break;
 
 		case TOKEN_MODULO:
-			emitByte(parser, chunk, OP_MODULO);
+			emitByte(chunk, OP_MODULO, line);
 			break;
 	}
 }
@@ -362,16 +439,17 @@ static void binary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 static void unary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//handle unary expressions
 	TokenType operatorType = parser->previous.type;
+	int line = parser->previous.line;
 
 	parsePrecendence(parser, chunk, PREC_UNARY);
 
 	switch(operatorType) {
 		case TOKEN_MINUS:
-			emitByte(parser, chunk, OP_NEGATE);
+			emitByte(chunk, OP_NEGATE, line);
 			break;
 
 		case TOKEN_BANG:
-			emitByte(parser, chunk, OP_NOT);
+			emitByte(chunk, OP_NOT, line);
 			break;
 	}
 }
@@ -380,15 +458,15 @@ static void atomic(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//handle atomic literals
 	switch(parser->previous.type) {
 		case TOKEN_NIL:
-			emitLiteral(parser, chunk, TO_NIL_LITERAL);
+			emitLiteral(chunk, TO_NIL_LITERAL, parser->previous.line);
 			break;
 
 		case TOKEN_TRUE:
-			emitLiteral(parser, chunk, TO_BOOL_LITERAL(true));
+			emitLiteral(chunk, TO_BOOL_LITERAL(true), parser->previous.line);
 			break;
 
 		case TOKEN_FALSE:
-			emitLiteral(parser, chunk, TO_BOOL_LITERAL(false));
+			emitLiteral(chunk, TO_BOOL_LITERAL(false), parser->previous.line);
 			break;
 	}
 }
@@ -434,7 +512,7 @@ ParseRule parseRules[] = {
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_QUESTION
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_COLON
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_COLON_COLON
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_IDENTIFIER
+	{variable,	NULL,		PREC_PRIMARY},		// TOKEN_IDENTIFIER
 	{number,	NULL,		PREC_PRIMARY},		// TOKEN_NUMBER
 	{string,	NULL,		PREC_PRIMARY},		// TOKEN_STRING
 	{string,	NULL,		PREC_PRIMARY},		// TOKEN_INTERPOLATED_STRING
@@ -496,7 +574,7 @@ Chunk* scanParser(Parser* parser) {
 		declaration(parser, chunk);
 	}
 
-	emitByte(parser, chunk, OP_EOF); //terminate the chunk
+	emitByte(chunk, OP_EOF, parser->previous.line); //terminate the chunk
 
 	return chunk;
 }

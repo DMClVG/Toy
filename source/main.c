@@ -94,10 +94,18 @@ void repl() {
 		if (parser.error) {
 			freeChunk(chunk);
 			freeParser(&parser);
-			break;
+			continue;
 		}
 
 		executeChunk(&toy, chunk);
+
+		if (toy.panic) {
+			toy.panic = false;
+			freeChunk(chunk);
+			freeParser(&parser);
+			continue;
+		}
+
 		freeChunk(chunk);
 
 		//cleanup

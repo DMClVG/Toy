@@ -1,10 +1,10 @@
 program -> delcaration* EOF ;
 
-declaration -> varDecl | constDecl | statement;
-
-varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
+declaration -> constDecl | varDecl | statement;
 
 constDecl -> "const" IDENTIFIER "=" expression ";" ;
+
+varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
 
 statement ->
 	  assertStmt

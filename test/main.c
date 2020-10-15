@@ -99,7 +99,7 @@ int runTestFile(const char* fname, const char* expected) {
 	}
 
 int main(/* int argc, const char* argv[] */) {
-	const int testCount = 15;
+	const int testCount = 16;
 
 	//initialize these
 	int passes = 0, failures = 0;
@@ -110,7 +110,7 @@ int main(/* int argc, const char* argv[] */) {
 	TEST_FILE("strings.toy", "foo\nbar\nfoobar\nbuzz\n");
 	TEST_FILE("groupings.toy", "0.6\n0.2\n");
 	TEST_FILE("long_literals.toy", "44850\n");
-//	TEST("variables.toy", "hello world\nhello world\nhello world goodnight world\nnull\n");
+	TEST_FILE("variables.toy", "hello world\nhello world\nhello world goodnight world\nfoobar\n");
 
 	TEST_FUNCTION(dictionary_test);
 

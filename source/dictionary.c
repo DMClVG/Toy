@@ -214,6 +214,18 @@ void dictionaryDelete(Dictionary* dict, Literal key) {
 	}
 }
 
+bool dictionaryDeclared(Dictionary* dict, Literal key) {
+	if (IS_STRING(key)) {
+		Entry* entry = entryArrayGet(dict->entries, dict->capacity, key, hashString(AS_STRING(key), STRLEN(key)) % dict->capacity);
+		return !IS_NIL(entry->key);
+	} else
+
+	{
+		fprintf(stderr, "[Internal] Couldn't query that key's type in a dictionary\n");
+		return false;
+	}
+}
+
 //important
 void dictionaryCopy(Dictionary* target, Dictionary* source) {
 	for (int i = 0; i < source->capacity; i++) {

@@ -18,6 +18,7 @@ typedef struct {
 
 	LiteralArray garbage; //can be cleaned between "declarations"
 
+	Dictionary constants; //a dict of live constants
 	Dictionary variables; //a dict of live variables
 	//TODO: scope via an array of tables?
 } Toy;
