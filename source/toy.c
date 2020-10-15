@@ -158,8 +158,10 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 
 				if (dictionaryDeclared(&toy->constants, *name)) {
 					PUSH_TEMP_LITERAL(toy, dictionaryGet(&toy->constants, *name));
-				} else {
+				} else if (dictionaryDeclared(&toy->variables, *name)) {
 					PUSH_TEMP_LITERAL(toy, dictionaryGet(&toy->variables, *name));
+				} else {
+					error(toy, chunk, "Undefined variable");
 				}
 			}
 			break;
