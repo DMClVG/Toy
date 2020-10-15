@@ -1,7 +1,6 @@
 High:
 
 * Rework literals into the more complex form
-* Move copyAndParseString to parser.c
 
 Normal:
 
@@ -30,3 +29,4 @@ Done:
 * ~~line-based error messages in the VM~~
 * ~~Dictionary structure~~
 * ~~Rework dictionaries into string-key-only structures (update the docs to match)~~
+* ~~Move copyAndParseString to parser.c~~
