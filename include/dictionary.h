@@ -13,23 +13,13 @@ typedef struct {
 } Entry;
 
 typedef struct {
-	//a key of "true" means these are present
-	Entry nilEntry;
-	Entry trueEntry;
-	Entry falseEntry;
-
-	//table of number keys
-	int numberCapacity;
-	int numberCount;
-	Entry* numberEntries;
-
 	//table of string keys
-	int stringCapacity;
-	int stringCount;
-	Entry* stringEntries;
+	int capacity;
+	int count;
+	Entry* entries;
 
 	//placed the load here for benchmarking
-	double load;
+	float load;
 } Dictionary;
 
 void initDictionary(Dictionary* dict);

@@ -30,7 +30,7 @@ void setEntry(Entry* dest, Literal* key, Literal* value) {
 		buffer[len] = '\0';
 		dest->key = TO_STRING_LITERAL(buffer);
 	} else {
-		dest->key = *key;
+		dest->key = *key; //not reachable
 	}
 
 	//values
@@ -47,7 +47,7 @@ void setEntry(Entry* dest, Literal* key, Literal* value) {
 }
 
 void freeEntry(Entry* entry) {
-	//TODO: handle interpolated strings
+	//TODO: handle interpolated strings?
 	if (IS_STRING(entry->key)) {
 		FREE_ARRAY(char, AS_STRING(entry->key), strlen( AS_STRING(entry->key) ) + 1);
 	}
@@ -86,11 +86,6 @@ Entry* entryArrayGet(Entry* array, int capacity, Literal key, int startPos) {
 			}
 			//else it's a tombstone - ignore
 		} else {
-			//we found a filled bucket
-			if (IS_NUMBER(key) && IS_NUMBER(entry->key) && AS_NUMBER(key) == AS_NUMBER(entry->key)) {
-				return entry;
-			}
-
 			if (IS_STRING(key) && IS_STRING(entry->key) && strcmp(AS_STRING(key), AS_STRING(entry->key)) == 0) {
 				return entry;
 			}
@@ -117,11 +112,8 @@ Entry* adjustCapacity(Entry* array, int oldCapacity, int capacity) {
 
 		Entry* pos = NULL;
 
-		if (IS_NUMBER(array[i].key)) {
-			pos = entryArrayGet(newEntries, capacity, TO_NIL_LITERAL, ((int)AS_NUMBER(array[i].key)) % capacity);
-		}
-
 		if (IS_STRING(array[i].key)) {
+			//grab a nil key at X
 			pos = entryArrayGet(newEntries, capacity, TO_NIL_LITERAL, hashString(AS_STRING(array[i].key), strlen(AS_STRING(array[i].key))) % capacity);
 		}
 
@@ -144,17 +136,19 @@ bool entryArraySet(Entry** array, int* capacityPtr, int count, double load, Lite
 		*array = adjustCapacity(*array, oldCapacity, *capacityPtr); //custom rather than automatic reallocation
 
 		//recalc start pos
-		if (IS_NUMBER(key)) {
-			startPos = ((int)AS_NUMBER(key)) % *capacityPtr;
-		}
 		if (IS_STRING(key)) {
 			startPos = hashString(AS_STRING(key), strlen(AS_STRING(key))) % *capacityPtr;
+		} else
+
+		{
+			fprintf(stderr, "[Internal] Couldn't recalc startPos\n");
+			return false;
 		}
 	}
 
 	Entry* entry = entryArrayGet(*array, *capacityPtr, key, startPos);
 
-	//TODO: count increase
+	//true = count increase
 	if (IS_NIL(entry->key)) {
 		setEntry(entry, &key, &value);
 		return true;
@@ -166,134 +160,65 @@ bool entryArraySet(Entry** array, int* capacityPtr, int count, double load, Lite
 
 //init & free
 void initDictionary(Dictionary* dict) {
-	dict->nilEntry.key = TO_NIL_LITERAL;
-	dict->nilEntry.value = TO_NIL_LITERAL;
-	dict->trueEntry.key = TO_NIL_LITERAL;
-	dict->trueEntry.value = TO_NIL_LITERAL;
-	dict->falseEntry.key = TO_NIL_LITERAL;
-	dict->falseEntry.value = TO_NIL_LITERAL;
-
 	//HACK: because modulo by 0 is undefined, set the capacity to a non-zero value (and allocate the arrays)
-
-	dict->numberCapacity = GROW_CAPACITY(0);
-	dict->numberCount = 0;
-	dict->numberEntries = adjustCapacity(NULL, 0, dict->numberCapacity);
-
-	dict->stringCapacity = GROW_CAPACITY(0);
-	dict->stringCount = 0;
-	dict->stringEntries = adjustCapacity(NULL, 0, dict->stringCapacity);
+	dict->capacity = GROW_CAPACITY(0);
+	dict->count = 0;
+	dict->entries = adjustCapacity(NULL, 0, dict->capacity);
 
 	dict->load = DICTIONARY_MAX_LOAD;
 }
 
 void freeDictionary(Dictionary* dict) {
-	freeEntry(&dict->nilEntry);
-	freeEntry(&dict->trueEntry);
-	freeEntry(&dict->falseEntry);
-
-	freeEntryArray(dict->numberEntries, dict->numberCapacity);
-	freeEntryArray(dict->stringEntries, dict->stringCapacity);
+	freeEntryArray(dict->entries, dict->capacity);
 }
 
 //accessors & mutators
 Literal dictionaryGet(Dictionary* dict, Literal key) {
-	if (IS_NIL(key)) {
-		return dict->nilEntry.value;
-	} else
-
-	if (IS_BOOL(key) && AS_BOOL(key) == true) {
-		return dict->trueEntry.value;
-	} else
-
-	if (IS_BOOL(key) && AS_BOOL(key) == false) {
-		return dict->falseEntry.value;
-	} else
-
-	if (IS_NUMBER(key)) {
-		return entryArrayGet(dict->numberEntries, dict->numberCapacity, key, ((int)AS_NUMBER(key)) % dict->numberCapacity)->value;
-	} else
-
 	if (IS_STRING(key)) {
-		return entryArrayGet(dict->stringEntries, dict->stringCapacity, key, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->stringCapacity)->value;
+		return entryArrayGet(dict->entries, dict->capacity, key, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->capacity)->value;
 	} else
 
 	{
-		fprintf(stderr, "[Internal]Couldn't find that key's type in a dictionary\n");
-		exit(-1);
+		fprintf(stderr, "[Internal] Couldn't get that key's type in a dictionary\n");
+		return TO_NIL_LITERAL;
 	}
 
 	//TODO: interpolated strings
 }
 
 void dictionarySet(Dictionary* dict, Literal key, Literal value) {
-	if (IS_NIL(key)) {
-		setEntry(&dict->nilEntry, &key, &value);
-	} else
-
-	if (IS_BOOL(key) && AS_BOOL(key) == true) {
-		setEntry(&dict->trueEntry, &key, &value);
-	} else
-
-	if (IS_BOOL(key) && AS_BOOL(key) == false) {
-		setEntry(&dict->falseEntry, &key, &value);
-	} else
-
-	if (IS_NUMBER(key)) {
-		if (entryArraySet(&dict->numberEntries, &dict->numberCapacity, dict->numberCount, dict->load, key, value, ((int)AS_NUMBER(key)) % dict->numberCapacity)) {
-			dict->numberCount++;
-		}
-	} else
-
 	if (IS_STRING(key)) {
-		if (entryArraySet(&dict->stringEntries, &dict->stringCapacity, dict->stringCount, dict->load, key, value, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->stringCapacity)) {
-			dict->stringCount++;
+		if (entryArraySet(&dict->entries, &dict->capacity, dict->count, dict->load, key, value, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->capacity)) {
+			dict->count++;
 		}
+	} else
+
+	{
+		fprintf(stderr, "[Internal] Couldn't set that key's type in a dictionary\n");
+		return;
 	}
 
 	//TODO: interpolated strings
 }
 
 void dictionaryDelete(Dictionary* dict, Literal key) {
-	if (IS_NIL(key)) {
-		freeEntry(&dict->nilEntry);
-	} else
-
-	if (IS_BOOL(key) && AS_BOOL(key) == true) {
-		freeEntry(&dict->trueEntry);
-	} else
-
-	if (IS_BOOL(key) && AS_BOOL(key) == false) {
-		freeEntry(&dict->falseEntry);
-	} else
-
-	if (IS_NUMBER(key)) {
-		Entry* entry = entryArrayGet(dict->numberEntries, dict->numberCapacity, key, ((int)AS_NUMBER(key)) % dict->numberCapacity);
-		freeEntry(entry);
-		entry->value = TO_BOOL_LITERAL(true);//tombstone
-	} else
-
 	if (IS_STRING(key)) {
-		Entry* entry = entryArrayGet(dict->stringEntries, dict->stringCapacity, key, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->stringCapacity);
+		Entry* entry = entryArrayGet(dict->entries, dict->capacity, key, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->capacity);
 		freeEntry(entry);
 		entry->value = TO_BOOL_LITERAL(true);//tombstone
+	} else
+
+	{
+		fprintf(stderr, "[Internal] Couldn't delete that key's type in a dictionary\n");
+		return;
 	}
 }
 
 //important
 void dictionaryCopy(Dictionary* target, Dictionary* source) {
-	setEntry(&target->nilEntry, &source->nilEntry.key, &source->nilEntry.value);
-	setEntry(&target->trueEntry, &source->trueEntry.key, &source->trueEntry.value);
-	setEntry(&target->falseEntry, &source->falseEntry.key, &source->falseEntry.value);
-
-	for (int i = 0; i < source->numberCount; i++) {
-		if (!IS_NIL(source->numberEntries[i].key)) {
-			dictionarySet(target, source->numberEntries[i].key, source->numberEntries[i].value);
-		}
-	}
-
-	for (int i = 0; i < source->stringCount; i++) {
-		if (!IS_NIL(source->stringEntries[i].key)) {
-			dictionarySet(target, source->stringEntries[i].key, source->stringEntries[i].value);
+	for (int i = 0; i < source->capacity; i++) {
+		if (!IS_NIL(source->entries[i].key)) {
+			dictionarySet(target, source->entries[i].key, source->entries[i].value);
 		}
 	}
 }

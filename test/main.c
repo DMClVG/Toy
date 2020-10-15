@@ -99,6 +99,8 @@ int runTestFile(const char* fname, const char* expected) {
 	}
 
 int main(/* int argc, const char* argv[] */) {
+	const int testCount = 15;
+
 	//initialize these
 	int passes = 0, failures = 0;
 
@@ -113,7 +115,11 @@ int main(/* int argc, const char* argv[] */) {
 	TEST_FUNCTION(dictionary_test);
 
 	//finally
-	printf("[Final Result]: %d / %d\n", passes, passes + failures);
+	if (passes + failures != testCount) {
+		red();
+	}
+	printf("[Final Result]: %d / %d (expected %d tests)\n", passes, passes + failures, testCount);
+	reset();
 
 	return failures;
 }

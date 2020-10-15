@@ -1,6 +1,5 @@
 High:
 
-* Rework dictionaries into string-key-only structures (update the docs to match)
 * Rework literals into the more complex form
 * Move copyAndParseString to parser.c
 
@@ -30,3 +29,4 @@ Done:
 
 * ~~line-based error messages in the VM~~
 * ~~Dictionary structure~~
+* ~~Rework dictionaries into string-key-only structures (update the docs to match)~~
