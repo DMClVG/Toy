@@ -1,7 +1,5 @@
 High:
 
-* Rework literals into the more complex form
-
 Normal:
 
 * Chunk pack/unpack into files
@@ -30,3 +28,4 @@ Done:
 * ~~Dictionary structure~~
 * ~~Rework dictionaries into string-key-only structures (update the docs to match)~~
 * ~~Move copyAndParseString to parser.c~~
+* ~~Rework literals into the more complex form~~

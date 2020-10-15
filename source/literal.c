@@ -27,8 +27,7 @@ void freeLiteralArray(LiteralArray* array) {
 	for(int i = 0; i < array->count; i++) {
 		//TODO: clean up interpolated literals
 		if (IS_STRING(array->literals[i])) {
-			char* str = AS_STRING(array->literals[i]);
-			FREE_ARRAY(char, str, strlen(str));
+			FREE_ARRAY(char, AS_STRING(array->literals[i]), STRLEN(array->literals[i]));
 		}
 	}
 

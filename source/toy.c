@@ -166,11 +166,11 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 
 				if (IS_STRING(*lhs) && IS_STRING(*rhs)) {
 					//allocate a buffer
-					int bufSize = strlen(AS_STRING(*lhs)) + strlen(AS_STRING(*rhs));
+					int bufSize = STRLEN(*lhs) + STRLEN(*rhs);
 					char* buffer = ALLOCATE(char, bufSize + 1);
 
 					strcpy(buffer, AS_STRING(*lhs));
-					strcpy(buffer + strlen( AS_STRING(*lhs) ), AS_STRING(*rhs));
+					strcpy(buffer + STRLEN(*lhs), AS_STRING(*rhs));
 
 					//the garbage array now gains ownership of this c-string
 					PUSH_TEMP_LITERAL(toy, TO_STRING_LITERAL( buffer ));

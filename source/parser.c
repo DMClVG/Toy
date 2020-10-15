@@ -110,8 +110,7 @@ static void emitLiteral(Parser* parser, Chunk* chunk, Literal literal) {
 		//free existing string literals
 		//TODO: interpolated strings
 		if (literal.type == LITERAL_STRING) {
-			char* str = AS_STRING(literal);
-			FREE_ARRAY(char, str, strlen(str));
+			FREE_ARRAY(char, AS_STRING(literal), STRLEN(literal));
 		}
 	}
 

@@ -24,7 +24,7 @@ void setEntry(Entry* dest, Literal* key, Literal* value) {
 	//keys
 	if (IS_STRING(*key)) {
 		//copy the string memory for the key
-		int len = strlen(AS_STRING(*key));
+		int len = STRLEN(*key);
 		char* buffer = ALLOCATE(char, len + 1);
 		strcpy(buffer, AS_STRING(*key));
 		buffer[len] = '\0';
@@ -36,7 +36,7 @@ void setEntry(Entry* dest, Literal* key, Literal* value) {
 	//values
 	if (IS_STRING(*value)) {
 		//copy the string memory for the key
-		int len = strlen(AS_STRING(*value));
+		int len = STRLEN(*value);
 		char* buffer = ALLOCATE(char, len + 1);
 		strcpy(buffer, AS_STRING(*value));
 		buffer[len] = '\0';
@@ -49,11 +49,11 @@ void setEntry(Entry* dest, Literal* key, Literal* value) {
 void freeEntry(Entry* entry) {
 	//TODO: handle interpolated strings?
 	if (IS_STRING(entry->key)) {
-		FREE_ARRAY(char, AS_STRING(entry->key), strlen( AS_STRING(entry->key) ) + 1);
+		FREE_ARRAY(char, AS_STRING(entry->key), STRLEN(entry->key) + 1);
 	}
 
 	if (IS_STRING(entry->value)) {
-		FREE_ARRAY(char, AS_STRING(entry->value), strlen( AS_STRING(entry->value) ) + 1);
+		FREE_ARRAY(char, AS_STRING(entry->value), STRLEN(entry->value) + 1);
 	}
 	entry->key = TO_NIL_LITERAL;
 	entry->value = TO_NIL_LITERAL;
@@ -114,7 +114,7 @@ Entry* adjustCapacity(Entry* array, int oldCapacity, int capacity) {
 
 		if (IS_STRING(array[i].key)) {
 			//grab a nil key at X
-			pos = entryArrayGet(newEntries, capacity, TO_NIL_LITERAL, hashString(AS_STRING(array[i].key), strlen(AS_STRING(array[i].key))) % capacity);
+			pos = entryArrayGet(newEntries, capacity, TO_NIL_LITERAL, hashString(AS_STRING(array[i].key), STRLEN(array[i].key)) % capacity);
 		}
 
 		//place the key and value in the new array (reusing string memory)
@@ -137,7 +137,7 @@ bool entryArraySet(Entry** array, int* capacityPtr, int count, double load, Lite
 
 		//recalc start pos
 		if (IS_STRING(key)) {
-			startPos = hashString(AS_STRING(key), strlen(AS_STRING(key))) % *capacityPtr;
+			startPos = hashString(AS_STRING(key), STRLEN(key)) % *capacityPtr;
 		} else
 
 		{
@@ -175,7 +175,7 @@ void freeDictionary(Dictionary* dict) {
 //accessors & mutators
 Literal dictionaryGet(Dictionary* dict, Literal key) {
 	if (IS_STRING(key)) {
-		return entryArrayGet(dict->entries, dict->capacity, key, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->capacity)->value;
+		return entryArrayGet(dict->entries, dict->capacity, key, hashString(AS_STRING(key), STRLEN(key)) % dict->capacity)->value;
 	} else
 
 	{
@@ -188,7 +188,7 @@ Literal dictionaryGet(Dictionary* dict, Literal key) {
 
 void dictionarySet(Dictionary* dict, Literal key, Literal value) {
 	if (IS_STRING(key)) {
-		if (entryArraySet(&dict->entries, &dict->capacity, dict->count, dict->load, key, value, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->capacity)) {
+		if (entryArraySet(&dict->entries, &dict->capacity, dict->count, dict->load, key, value, hashString(AS_STRING(key), STRLEN(key)) % dict->capacity)) {
 			dict->count++;
 		}
 	} else
@@ -203,7 +203,7 @@ void dictionarySet(Dictionary* dict, Literal key, Literal value) {
 
 void dictionaryDelete(Dictionary* dict, Literal key) {
 	if (IS_STRING(key)) {
-		Entry* entry = entryArrayGet(dict->entries, dict->capacity, key, hashString(AS_STRING(key), strlen(AS_STRING(key))) % dict->capacity);
+		Entry* entry = entryArrayGet(dict->entries, dict->capacity, key, hashString(AS_STRING(key), STRLEN(key)) % dict->capacity);
 		freeEntry(entry);
 		entry->value = TO_BOOL_LITERAL(true);//tombstone
 	} else
