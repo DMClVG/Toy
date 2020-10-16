@@ -54,6 +54,11 @@ int runTestFile(const char* fname, const char* expected) {
 #endif
 	FILE* handle = popen(buffer, "r");
 
+	if (!handle) {
+		fprintf(stderr, "Failed to open FILE stream\n");
+		return 1;
+	}
+
 	//read in the file toy output
 	memset(buffer, 0, 1024);
 	fread(buffer, 1, 1024, handle);
@@ -62,6 +67,7 @@ int runTestFile(const char* fname, const char* expected) {
 	fclose(handle);
 
 	//compare against the expected result
+	printf("%s\n", buffer);
 	return strcmp(buffer, expected);
 }
 

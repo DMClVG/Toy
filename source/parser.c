@@ -348,8 +348,7 @@ static void number(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	sprintf(buff, "%.*s\0", parser->previous.length, parser->previous.lexeme);
 
 	//output the number & emit it
-	double number = strtod(buff, NULL);
-	emitLiteral(chunk, TO_NUMBER_LITERAL(number), parser->previous.line);
+	emitLiteral(chunk, TO_NUMBER_LITERAL(strtod(buff, NULL)), parser->previous.line);
 }
 
 static void variable(Parser* parser, Chunk* chunk, bool canBeAssigned) {

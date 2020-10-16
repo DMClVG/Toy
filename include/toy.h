@@ -12,7 +12,7 @@ typedef struct {
 
 	int capacity; //capacity of the stack
 	int count; //number of literals in the stack
-	Literal** stack; //raw literal array for the stack
+	int* indexes; //array members refer to index within the garbage array
 
 	uint8_t* pc; //program counter
 
@@ -26,9 +26,5 @@ typedef struct {
 void initToy(Toy* toy);
 void freeToy(Toy* toy);
 void executeChunk(Toy* toy, Chunk* chunk); //pass one chunk at a time
-
-#define PUSH_TEMP_LITERAL(TOY, TEMP_LITERAL) \
-	writeLiteralArray(&TOY->garbage, TEMP_LITERAL); \
-	pushLiteral(TOY, &TOY->garbage.literals[TOY->garbage.count - 1]);
 
 #endif

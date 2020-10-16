@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define PUSH_TEMP_LITERAL pushLiteral
+
 static void error(Toy* toy, Chunk* chunk, const char* message) {
 	//TODO: option to strip debug data (lines) from the chunks
 	if (chunk->lines) {
@@ -18,17 +20,47 @@ static void error(Toy* toy, Chunk* chunk, const char* message) {
 	toy->panic = true;
 }
 
-void pushLiteral(Toy* toy, Literal* literal) {
+static void printStack(Toy* toy) {
+
+	printf(" <<indexes:");
+
+	for (int i = 0; i < toy->count; i++) {
+		printf("%d;", toy->indexes[i]);
+	}
+
+	printf(">>\n");
+
+	printf(" <<stack:");
+
+	for (int i = 0; i < toy->count; i++) {
+		printLiteral(toy->garbage.literals[toy->indexes[i]]);
+		printf(";");
+	}
+
+	printf(">>\n");
+
+	printf(" <<garbage:");
+
+	for (int i = 0; i < toy->garbage.count; i++) {
+		printLiteral(toy->garbage.literals[i]);
+		printf(";");
+	}
+
+	printf(">>\n");
+}
+
+void pushLiteral(Toy* toy, Literal literal) {
 	//grow the stack if necessary
 	if (toy->capacity < toy->count + 1) {
 		int oldCapacity = toy->capacity;
 
 		toy->capacity = GROW_CAPACITY(oldCapacity);
-		toy->stack = GROW_ARRAY(Literal*, toy->stack, oldCapacity, toy->capacity);
+		toy->indexes = GROW_ARRAY(int, toy->indexes, oldCapacity, toy->capacity);
 	}
 
-	//store the pointer to the literal (literals live in chunks)
-	toy->stack[toy->count++] = literal;
+	//store the index of the literal
+	writeLiteralArray(&toy->garbage, literal);
+	toy->indexes[toy->count++] = toy->garbage.count - 1;
 }
 
 Literal* peekLiteral(Toy* toy) {
@@ -38,7 +70,7 @@ Literal* peekLiteral(Toy* toy) {
 		return NULL;
 	}
 
-	return toy->stack[toy->count - 1];
+	return &toy->garbage.literals[toy->indexes[toy->count - 1]];
 }
 
 Literal* popLiteral(Toy* toy) {
@@ -50,10 +82,7 @@ Literal* popLiteral(Toy* toy) {
 	}
 
 	//grab the pointer to return
-	Literal* top = toy->stack[toy->count - 1];
-
-	//lose the reference to the literal, and decrement the counter
-	toy->stack[toy->count--] = NULL;
+	Literal* top = &toy->garbage.literals[toy->indexes[--toy->count]];
 
 	//finally
 	return top;
@@ -64,7 +93,7 @@ void initToy(Toy* toy) {
 	toy->error = false;
 	toy->capacity = 0;
 	toy->count = 0;
-	toy->stack = NULL;
+	toy->indexes = NULL;
 	toy->pc = NULL;
 	initLiteralArray(&toy->garbage);
 	initDictionary(&toy->constants);
@@ -72,24 +101,26 @@ void initToy(Toy* toy) {
 }
 
 void freeToy(Toy* toy) {
-	FREE_ARRAY(Literal*, toy->stack, toy->capacity);
+	FREE_ARRAY(int, toy->indexes, toy->capacity);
 	freeLiteralArray(&toy->garbage);
-	initToy(toy);
+	freeDictionary(&toy->constants);
+	freeDictionary(&toy->variables);
 }
 
 void executeChunk(Toy* toy, Chunk* chunk) {
 	//NOTE: chunk MUST remain unchanged
 
 	for (toy->pc = chunk->code; *(toy->pc) && !toy->panic; /* EMPTY */) {
+		printStack(toy);
 		switch(*(toy->pc++)) { //TODO: change this switch to a lookup table of functions?
 			//pushing && popping
 			case OP_LITERAL:
-				pushLiteral(toy, &chunk->literals.literals[*(toy->pc)]);
+				pushLiteral(toy, chunk->literals.literals[*(toy->pc)]);
 				toy->pc++;
 			break;
 
 			case OP_LITERAL_LONG:
-				pushLiteral(toy, &chunk->literals.literals[ *((uint32_t*)(toy->pc)) ]); //TODO: test long literals
+				pushLiteral(toy, chunk->literals.literals[ *((uint32_t*)(toy->pc)) ]);
 				toy->pc += sizeof(uint32_t);
 			break;
 

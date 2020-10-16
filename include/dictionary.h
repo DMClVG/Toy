@@ -17,9 +17,6 @@ typedef struct {
 	int capacity;
 	int count;
 	Entry* entries;
-
-	//placed the load here for benchmarking
-	float load;
 } Dictionary;
 
 void initDictionary(Dictionary* dict);

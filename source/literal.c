@@ -18,8 +18,7 @@ void writeLiteralArray(LiteralArray* array, Literal value) {
 		array->literals = GROW_ARRAY(Literal, array->literals, oldCapacity, array->capacity);
 	}
 
-	array->literals[array->count] = value;
-	array->count++;
+	array->literals[array->count++] = value;
 }
 
 void freeLiteralArray(LiteralArray* array) {
@@ -55,7 +54,7 @@ void printLiteral(Literal literal) {
 
 		default:
 			//should never bee seen
-			fprintf(stderr, "[Internal] Unrecognized literal type: %d\n", literal.type);
+			fprintf(stderr, "[Internal] Unrecognized literal type: %d", literal.type);
 	}
 }
 

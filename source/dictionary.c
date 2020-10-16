@@ -128,9 +128,9 @@ Entry* adjustCapacity(Entry* array, int oldCapacity, int capacity) {
 	return newEntries;
 }
 
-bool entryArraySet(Entry** array, int* capacityPtr, int count, double load, Literal key, Literal value, int startPos) {
+bool entryArraySet(Entry** array, int* capacityPtr, int count, Literal key, Literal value, int startPos) {
 	//expand array
-	if (count + 1 > *capacityPtr * load) {
+	if (count + 1 > *capacityPtr * DICTIONARY_MAX_LOAD) {
 		int oldCapacity = *capacityPtr;
 		*capacityPtr = GROW_CAPACITY(*capacityPtr);
 		*array = adjustCapacity(*array, oldCapacity, *capacityPtr); //custom rather than automatic reallocation
@@ -164,8 +164,6 @@ void initDictionary(Dictionary* dict) {
 	dict->capacity = GROW_CAPACITY(0);
 	dict->count = 0;
 	dict->entries = adjustCapacity(NULL, 0, dict->capacity);
-
-	dict->load = DICTIONARY_MAX_LOAD;
 }
 
 void freeDictionary(Dictionary* dict) {
@@ -188,7 +186,7 @@ Literal dictionaryGet(Dictionary* dict, Literal key) {
 
 void dictionarySet(Dictionary* dict, Literal key, Literal value) {
 	if (IS_STRING(key)) {
-		if (entryArraySet(&dict->entries, &dict->capacity, dict->count, dict->load, key, value, hashString(AS_STRING(key), STRLEN(key)) % dict->capacity)) {
+		if (entryArraySet(&dict->entries, &dict->capacity, dict->count, key, value, hashString(AS_STRING(key), STRLEN(key)) % dict->capacity)) {
 			dict->count++;
 		}
 	} else
