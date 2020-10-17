@@ -139,4 +139,30 @@ LN		TEST(AS_NUMBER(dictionaryGet(&dictionary, TO_STRING_LITERAL("delta"))) == 4)
 
 LN		freeDictionary(&dictionary);
 	}
+
+	//declaration check
+	{
+
+LN		Dictionary dictionary;
+LN		initDictionary(&dictionary);
+
+LN		dictionarySet(&dictionary, TO_STRING_LITERAL("alpha"), TO_NUMBER_LITERAL(1));
+LN		dictionarySet(&dictionary, TO_STRING_LITERAL("beta"), TO_NUMBER_LITERAL(2));
+LN		dictionarySet(&dictionary, TO_STRING_LITERAL("gamma"), TO_NUMBER_LITERAL(3));
+LN		dictionarySet(&dictionary, TO_STRING_LITERAL("delta"), TO_NUMBER_LITERAL(4));
+LN		dictionarySet(&dictionary, TO_STRING_LITERAL("epsilon"), TO_NUMBER_LITERAL(5));
+
+LN		dictionaryDelete(&dictionary, TO_STRING_LITERAL("gamma"));
+
+LN		dictionarySet(&dictionary, TO_STRING_LITERAL("foo"), TO_NUMBER_LITERAL(6));
+LN		dictionarySet(&dictionary, TO_STRING_LITERAL("bar"), TO_NUMBER_LITERAL(7));
+LN		dictionarySet(&dictionary, TO_STRING_LITERAL("baz"), TO_NUMBER_LITERAL(8));
+LN		dictionarySet(&dictionary, TO_STRING_LITERAL("fiz"), TO_NUMBER_LITERAL(9));
+
+LN		TEST(dictionaryDeclared(&dictionary, TO_STRING_LITERAL("alpha")) == true);
+LN		TEST(dictionaryDeclared(&dictionary, TO_STRING_LITERAL("gamma")) == false);
+LN		TEST(dictionaryDeclared(&dictionary, TO_STRING_LITERAL("omega")) == false);
+
+LN		freeDictionary(&dictionary);
+	}
 }

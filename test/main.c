@@ -108,7 +108,7 @@ int runTestFile(const char* fname, const char* expected) {
 	}
 
 int main(/* int argc, const char* argv[] */) {
-	const int testCount = 16;
+	const int testCount = 19;
 
 	//initialize these
 	int passes = 0, failures = 0;
