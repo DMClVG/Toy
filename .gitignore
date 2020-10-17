@@ -19,7 +19,8 @@ out/
 *.a
 *.exe
 *.meta
-out
+Toy
+testrunner
 
 #Shell files
 *.bat

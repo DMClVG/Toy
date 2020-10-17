@@ -7,14 +7,13 @@ void initChunk(Chunk* chunk) {
 	chunk->code = NULL;
 	chunk->lines = NULL;
 	initLiteralArray(&chunk->literals);
-//	initTable(&chunk->variables);
 }
 
 void freeChunk(Chunk* chunk) {
 	FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
 	FREE_ARRAY(int, chunk->lines, chunk->capacity);
+
 	freeLiteralArray(&chunk->literals);
-//	freeTable(&chunk->variables);
 	FREE(Chunk, chunk); //allocated in the parser
 }
 

@@ -2,6 +2,7 @@
 #include "opcodes.h"
 #include "opcode_names.h"
 #include "memory.h"
+#include "debug.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -111,7 +112,6 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 	//NOTE: chunk MUST remain unchanged
 
 	for (toy->pc = chunk->code; *(toy->pc) && !toy->panic; /* EMPTY */) {
-		printStack(toy);
 		switch(*(toy->pc++)) { //TODO: change this switch to a lookup table of functions?
 			//pushing && popping
 			case OP_LITERAL:

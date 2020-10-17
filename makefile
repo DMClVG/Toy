@@ -1,4 +1,9 @@
-export RM=del /S /Q
+ifeq ($(OS),Windows_NT)
+	export RM=del /S /Q
+else ifeq ($(shell uname), Linux)
+	export RM=rm -r
+endif
+
 export OUT = ../Toy
 
 all:
@@ -10,6 +15,5 @@ test: all
 clean:
 	$(MAKE) -C source clean
 	$(MAKE) -C test clean
-	$(RM) *.o *.a *.exe
 
 rebuild: clean all

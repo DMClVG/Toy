@@ -1,5 +1,7 @@
 #include "opcode_names.h"
 
+#include <stdio.h>
+
 OpCodeName opCodeNames[] = {
 	{OP_RETURN, "op_return"},
 	{OP_EQUALITY, "op_equality"},
@@ -33,5 +35,10 @@ char* findNameByOpCode(OpCode opcode) {
 		}
 	}
 
-	return NULL;
+	if (opcode != OP_EOF) {
+		fprintf(stderr, "Found an unknown opcode in findNameByOpCode: %d\n", (int)opcode);
+		return NULL;
+	}
+
+	return "op_eof";
 }

@@ -106,13 +106,10 @@ static void emitLiteral(Chunk* chunk, Literal literal, int line) {
 		//new literal
 		index = chunk->literals.count;
 		writeLiteralArray(&chunk->literals, literal);
-	} else {
-		//free existing string literals
-		//TODO: interpolated strings
-		if (literal.type == LITERAL_STRING) {
-			FREE_ARRAY(char, AS_STRING(literal), STRLEN(literal));
-		}
 	}
+
+	//free existing string literals
+	freeLiteral(&literal);
 
 	//handle > 256 literals
 	if (index >= 256) {
@@ -329,7 +326,7 @@ static void string(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	switch(parser->previous.type) {
 		case TOKEN_STRING:
 			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(parser->previous.lexeme, parser->previous.length)), parser->previous.line);
-			break;
+		break;
 
 		//case TOKEN_INTERPOLATED_STRING:
 			//TODO: interpolated strings

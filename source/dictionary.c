@@ -47,14 +47,8 @@ void setEntry(Entry* dest, Literal* key, Literal* value) {
 }
 
 void freeEntry(Entry* entry) {
-	//TODO: handle interpolated strings?
-	if (IS_STRING(entry->key)) {
-		FREE_ARRAY(char, AS_STRING(entry->key), STRLEN(entry->key) + 1);
-	}
-
-	if (IS_STRING(entry->value)) {
-		FREE_ARRAY(char, AS_STRING(entry->value), STRLEN(entry->value) + 1);
-	}
+	freeLiteral(&entry->key);
+	freeLiteral(&entry->value);
 	entry->key = TO_NIL_LITERAL;
 	entry->value = TO_NIL_LITERAL;
 }

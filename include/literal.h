@@ -62,7 +62,7 @@ typedef struct {
 #define TO_NIL_LITERAL				((Literal){LITERAL_NIL,		{ .number = 0 }})
 #define TO_BOOL_LITERAL(value)		((Literal){LITERAL_BOOL,	{ .boolean = value }})
 #define TO_NUMBER_LITERAL(value)	((Literal){LITERAL_NUMBER,	{ .number = value }})
-#define TO_STRING_LITERAL(value)	((Literal){LITERAL_STRING,	{ .string.ptr = (char*)value, .string.length = strlen((char*)value) }})
+#define TO_STRING_LITERAL(value)	_toStringLiteral(value)
 
 typedef struct {
 	int capacity;
@@ -76,9 +76,13 @@ void freeLiteralArray(LiteralArray* array);
 
 void printLiteral(Literal literal);
 int findLiteral(LiteralArray* array, Literal literal);
+void freeLiteral(Literal* literal);
 
 #define IS_TRUTHY(x) (IS_NIL(x) || (IS_BOOL(x) && AS_BOOL(x)) || (IS_NUMBER(x) && AS_NUMBER(x) != 0))
 
 #define STRLEN(lit) ((lit).as.string.length)
+
+//BUGFIX: macros are not functions
+Literal _toStringLiteral(char* cstr);
 
 #endif

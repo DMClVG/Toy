@@ -61,13 +61,16 @@ int runTestFile(const char* fname, const char* expected) {
 
 	//read in the file toy output
 	memset(buffer, 0, 1024);
-	fread(buffer, 1, 1024, handle);
+	size_t resultLength = fread(buffer, 1, 1024, handle);
 
 	//close the stream
 	fclose(handle);
 
+	if (resultLength != strlen(expected)) {
+		printf("Failed to read the whole expected output (only read %d bytes)\n", (int)resultLength);
+	}
+
 	//compare against the expected result
-	printf("%s\n", buffer);
 	return strcmp(buffer, expected);
 }
 

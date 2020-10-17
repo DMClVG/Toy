@@ -18,6 +18,17 @@ void writeLiteralArray(LiteralArray* array, Literal value) {
 		array->literals = GROW_ARRAY(Literal, array->literals, oldCapacity, array->capacity);
 	}
 
+	//TODO: interpolated strings
+
+	//if it's a string
+	if (IS_STRING(value)) {
+		int len = STRLEN(value);
+		char* buffer = ALLOCATE(char, len + 1);
+		strcpy(buffer, AS_STRING(value));
+		buffer[len] = '\0';
+		value = TO_STRING_LITERAL(buffer);
+	}
+
 	array->literals[array->count++] = value;
 }
 
@@ -25,9 +36,7 @@ void freeLiteralArray(LiteralArray* array) {
 	//clean up memory
 	for(int i = 0; i < array->count; i++) {
 		//TODO: clean up interpolated literals
-		if (IS_STRING(array->literals[i])) {
-			FREE_ARRAY(char, AS_STRING(array->literals[i]), STRLEN(array->literals[i]));
-		}
+		freeLiteral(&array->literals[i]);
 	}
 
 	FREE_ARRAY(Literal, array->literals, array->capacity);
@@ -96,4 +105,15 @@ int findLiteral(LiteralArray* array, Literal literal) {
 	}
 
 	return -1;
+}
+
+void freeLiteral(Literal* literal) {
+	//TODO: clean up interpolated literals
+	if (IS_STRING(*literal)) {
+		FREE_ARRAY(char, AS_STRING(*literal), STRLEN(*literal));
+	}
+}
+
+Literal _toStringLiteral(char* cstr) {
+	return ((Literal){LITERAL_STRING, { .string.ptr = (char*)cstr, .string.length = strlen((char*)cstr) }});
 }
