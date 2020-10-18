@@ -8,8 +8,10 @@ typedef enum {
 	//end of file
 	OP_EOF = 0,
 
-	//return
+	//misc. commands
 	OP_RETURN,
+	OP_SCOPE_BEGIN,
+	OP_SCOPE_END,
 
 	//operations
 	OP_EQUALITY,

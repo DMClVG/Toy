@@ -196,6 +196,9 @@ static void synchronize(Parser* parser) {
 	}
 }
 
+//forward declare as a kind of entry point
+static void declaration(Parser* parser, Chunk* chunk);
+
 //refer to the grammar expression rules below
 static void expression(Parser* parser, Chunk* chunk) {
 	//delegate to the pratt table for expression precedence
@@ -210,6 +213,23 @@ static void printStmt(Parser* parser, Chunk* chunk) {
 	consume(parser, TOKEN_SEMICOLON, "Expected ';' at end of print statement");
 }
 
+static void block(Parser* parser, Chunk* chunk) {
+	Token opening = parser->previous;
+
+	emitByte(chunk, OP_SCOPE_BEGIN, opening.line);
+
+	while(!match(parser, TOKEN_RIGHT_BRACE)) {
+		if (match(parser, TOKEN_EOF)) {
+			error(parser, opening, "Expected closing '}' to match opening '{'");
+			return;
+		}
+
+		declaration(parser, chunk);
+	}
+
+	emitByte(chunk, OP_SCOPE_END, parser->previous.line);
+}
+
 static void expressionStmt(Parser* parser, Chunk* chunk) {
 	int line = parser->previous.line;
 	expression(parser, chunk); //push
@@ -221,6 +241,16 @@ static void expressionStmt(Parser* parser, Chunk* chunk) {
 static void statement(Parser* parser, Chunk* chunk) {
 	if (match(parser, TOKEN_PRINT)) {
 		printStmt(parser, chunk);
+		return;
+	}
+
+	if (match(parser, TOKEN_LEFT_BRACE)) {
+		block(parser, chunk);
+		return;
+	}
+
+	//simple empty statements
+	if (match(parser, TOKEN_SEMICOLON)) {
 		return;
 	}
 

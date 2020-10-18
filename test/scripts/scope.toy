@@ -1,0 +1,20 @@
+var a = 1;
+var b = 1;
+var c = 1;
+
+{
+	var b = 2;
+	var c = 2;
+
+	{
+		var c = 3;
+
+		print a; //1\n
+		print b; //2\n
+		print c; //3\n
+	}
+}
+
+print a; //1\n
+print b; //1\n
+print c; //1\n

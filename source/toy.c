@@ -126,6 +126,19 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				popLiteral(toy);
 			break;
 
+			case OP_RETURN:
+				//TODO: implement this
+			break;
+
+			case OP_SCOPE_BEGIN:
+				toy->scope = pushScope(toy->scope);
+			break;
+
+			case OP_SCOPE_END:
+				toy->scope = popScope(toy->scope);
+			break;
+
+			//keywords
 			case OP_PRINT: {
 				Literal* top = popLiteral(toy);
 				//guard against deferencing a null pointer
@@ -136,6 +149,7 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 			}
 			break;
 
+			//handle variables
 			case OP_CONSTANT_DECLARE: {
 				Literal* name = popLiteral(toy);
 				Literal* value = popLiteral(toy);
