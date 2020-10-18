@@ -82,7 +82,7 @@ typedef struct {
 
 //get the precedence rule for each token type
 static ParseRule* getRule(TokenType type);
-static void parsePrecendence(Parser* parser, Chunk* chunk, Precedence precedence);
+static void parsePrecedence(Parser* parser, Chunk* chunk, Precedence precedence);
 
 //convenience
 static void emitByte(Chunk* chunk, uint8_t byte, int line) {
@@ -202,7 +202,7 @@ static void declaration(Parser* parser, Chunk* chunk);
 //refer to the grammar expression rules below
 static void expression(Parser* parser, Chunk* chunk) {
 	//delegate to the pratt table for expression precedence
-	parsePrecendence(parser, chunk, PREC_ASSIGNMENT);
+	parsePrecedence(parser, chunk, PREC_ASSIGNMENT);
 }
 
 //grammar statement rules
@@ -325,7 +325,7 @@ static void declaration(Parser* parser, Chunk* chunk) {
 }
 
 //precedence
-static void parsePrecendence(Parser* parser, Chunk* chunk, Precedence precedence) {
+static void parsePrecedence(Parser* parser, Chunk* chunk, Precedence precedence) {
 	//every expression has a prefix rule
 	advance(parser);
 	ParseFn prefixRule = getRule(parser->previous.type)->prefix;
@@ -340,6 +340,12 @@ static void parsePrecendence(Parser* parser, Chunk* chunk, Precedence precedence
 	//infix rules are left-recursive
 	while (precedence <= getRule(parser->current.type)->precedence) {
 		ParseFn infixRule = getRule(parser->current.type)->infix;
+
+		if (infixRule == NULL) {
+			error(parser, parser->current, "Expected operator");
+			return;
+		}
+
 		infixRule(parser, chunk, canBeAssigned);
 	}
 
@@ -414,7 +420,7 @@ static void binary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 
 	//handle the right-side of the operator
 	advance(parser);
-	parsePrecendence(parser, chunk, getRule(operatorType)->precedence + 1);
+	parsePrecedence(parser, chunk, getRule(operatorType)->precedence + 1);
 
 	switch(operatorType) {
 		//compare
@@ -546,7 +552,7 @@ static void unary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	TokenType operatorType = parser->previous.type;
 	int line = parser->previous.line;
 
-	parsePrecendence(parser, chunk, PREC_UNARY);
+	parsePrecedence(parser, chunk, PREC_UNARY);
 
 	switch(operatorType) {
 		case TOKEN_MINUS:
