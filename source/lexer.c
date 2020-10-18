@@ -64,7 +64,7 @@ static void eatWhitespace(Lexer* lexer) {
 			if (peekNext(lexer) == '*') {
 				advance(lexer);
 				advance(lexer);
-				while(peek(lexer) != '*' && peekNext(lexer) != '/') advance(lexer);
+				while(!(peek(lexer) == '*' && peekNext(lexer) == '/')) advance(lexer);
 				advance(lexer);
 				advance(lexer);
 				break;

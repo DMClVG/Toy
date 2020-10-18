@@ -6,12 +6,12 @@ High:
 Normal:
 
 * Arrays & dictionaries in the language
+* Arrays & dictionaries as literal values
+* Guard against non-string keys for dictionaries
 * Chunk pack/unpack into files
 * Chunks will need names for importing, packing, caching, etc.
 * More keywords
 * Interpolated strings
-* Arrays & dictionaries as literal values
-* Guard against non-string keys for dictionaries
 * Ternary operator
 * Libraries
 * Update the website
