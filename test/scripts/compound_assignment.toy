@@ -1,0 +1,10 @@
+var a = 1;
+
+print a += 1; //2\n
+print a *= 2; //4\n
+print a /= 4; //1\n
+print a -= 10; //-9\n
+
+a = 13;
+
+print a %= 5; //3\n

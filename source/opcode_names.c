@@ -4,6 +4,8 @@
 
 OpCodeName opCodeNames[] = {
 	{OP_RETURN, "op_return"},
+	{OP_SCOPE_BEGIN, "op_scope_begin"},
+	{OP_SCOPE_END, "op_scope_end"},
 	{OP_EQUALITY, "op_equality"},
 	{OP_GREATER, "op_greater"},
 	{OP_LESS, "op_less"},

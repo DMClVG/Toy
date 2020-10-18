@@ -114,7 +114,7 @@ int runTestFile(const char* fname, const char* expected) {
 	}
 
 int main(/* int argc, const char* argv[] */) {
-	const int testCount = 34;
+	const int testCount = 35;
 
 	//initialize these
 	int passes = 0, failures = 0;
@@ -127,6 +127,7 @@ int main(/* int argc, const char* argv[] */) {
 	TEST_FILE("long_literals.toy", "44850\n");
 	TEST_FILE("variables.toy", "hello world\nhello world\nhello world goodnight world\nfoobar\n");
 	TEST_FILE("scope.toy", "1\n2\n3\n1\n1\n1\n");
+	TEST_FILE("compound_assignment.toy", "2\n4\n1\n-9\n3\n");
 
 	TEST_FUNCTION(dictionary_test);
 	TEST_FUNCTION(scope_test);

@@ -339,8 +339,7 @@ static void parsePrecendence(Parser* parser, Chunk* chunk, Precedence precedence
 
 	//infix rules are left-recursive
 	while (precedence <= getRule(parser->current.type)->precedence) {
-		advance(parser);
-		ParseFn infixRule = getRule(parser->previous.type)->infix;
+		ParseFn infixRule = getRule(parser->current.type)->infix;
 		infixRule(parser, chunk, canBeAssigned);
 	}
 
@@ -406,11 +405,15 @@ static void grouping(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 }
 
 static void binary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
-	//handle binary expressions
+	//grab the previous token for the compound assignments
+	Token previous = parser->previous;
 
-	//handle the left-side of the operator
-	TokenType operatorType = parser->previous.type;
-	int line = parser->previous.line;
+	//handle binary expressions
+	TokenType operatorType = parser->current.type;
+	int line = parser->current.line;
+
+	//handle the right-side of the operator
+	advance(parser);
 	parsePrecendence(parser, chunk, getRule(operatorType)->precedence + 1);
 
 	switch(operatorType) {
@@ -458,6 +461,82 @@ static void binary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 
 		case TOKEN_MODULO:
 			emitByte(chunk, OP_MODULO, line);
+			break;
+
+		//complex stuff
+		case TOKEN_PLUS_EQUAL:
+			if (previous.type != TOKEN_IDENTIFIER) {
+				error(parser, previous, "Expected identifier on left-hand side of compound assignment operator");
+				break;
+			}
+
+			emitByte(chunk, OP_ADD, line);
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
+			emitByte(chunk, OP_VARIABLE_SET, line);
+
+			//leave the variable on the stack
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
+			emitByte(chunk, OP_VARIABLE_GET, line);
+			break;
+
+		case TOKEN_MINUS_EQUAL:
+			if (previous.type != TOKEN_IDENTIFIER) {
+				error(parser, previous, "Expected identifier on left-hand side of compound assignment operator");
+				break;
+			}
+
+			emitByte(chunk, OP_SUBTRACT, line);
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
+			emitByte(chunk, OP_VARIABLE_SET, line);
+
+			//leave the variable on the stack
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
+			emitByte(chunk, OP_VARIABLE_GET, line);
+			break;
+
+		case TOKEN_STAR_EQUAL:
+			if (previous.type != TOKEN_IDENTIFIER) {
+				error(parser, previous, "Expected identifier on left-hand side of compound assignment operator");
+				break;
+			}
+
+			emitByte(chunk, OP_MULTIPLY, line);
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
+			emitByte(chunk, OP_VARIABLE_SET, line);
+
+			//leave the variable on the stack
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
+			emitByte(chunk, OP_VARIABLE_GET, line);
+			break;
+
+		case TOKEN_SLASH_EQUAL:
+			if (previous.type != TOKEN_IDENTIFIER) {
+				error(parser, previous, "Expected identifier on left-hand side of compound assignment operator");
+				break;
+			}
+
+			emitByte(chunk, OP_DIVIDE, line);
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
+			emitByte(chunk, OP_VARIABLE_SET, line);
+
+			//leave the variable on the stack
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
+			emitByte(chunk, OP_VARIABLE_GET, line);
+			break;
+
+		case TOKEN_MODULO_EQUAL:
+			if (previous.type != TOKEN_IDENTIFIER) {
+				error(parser, previous, "Expected identifier on left-hand side of compound assignment operator");
+				break;
+			}
+
+			emitByte(chunk, OP_MODULO, line);
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
+			emitByte(chunk, OP_VARIABLE_SET, line);
+
+			//leave the variable on the stack
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
+			emitByte(chunk, OP_VARIABLE_GET, line);
 			break;
 	}
 }
@@ -508,17 +587,17 @@ ParseRule parseRules[] = {
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_SEMICOLON
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_COMMA
 	{NULL,		binary,		PREC_TERM},			// TOKEN_PLUS
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_PLUS_EQUAL
+	{NULL,		binary,		PREC_ASSIGNMENT},	// TOKEN_PLUS_EQUAL
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_PLUS_PLUS
 	{unary,		binary,		PREC_TERM},			// TOKEN_MINUS
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_MINUS_EQUAL
+	{NULL,		binary,		PREC_ASSIGNMENT},	// TOKEN_MINUS_EQUAL
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_MINUS_MINUS
 	{NULL,		binary,		PREC_FACTOR},		// TOKEN_STAR
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_STAR_EQUAL
+	{NULL,		binary,		PREC_ASSIGNMENT},	// TOKEN_STAR_EQUAL
 	{NULL,		binary,		PREC_FACTOR},		// TOKEN_SLASH
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_SLASH_EQUAL
+	{NULL,		binary,		PREC_ASSIGNMENT},	// TOKEN_SLASH_EQUAL
 	{NULL,		binary,		PREC_FACTOR},		// TOKEN_MODULO
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_MODULO_EQUAL
+	{NULL,		binary,		PREC_ASSIGNMENT},	// TOKEN_MODULO_EQUAL
 	{unary,		NULL,		PREC_NONE},			// TOKEN_BANG
 	{NULL,		binary,		PREC_EQUALITY},		// TOKEN_BANG_EQUAL
 	{NULL,		NULL,		PREC_NONE},			// TOKEN_EQUAL

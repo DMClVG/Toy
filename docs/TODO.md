@@ -1,17 +1,29 @@
 High:
 
-* Implement Scope within the language
-* Functions
-
-Normal:
-
+* Functions and Return
 * Arrays & dictionaries in the language
 * Arrays & dictionaries as literal values
 * Guard against non-string keys for dictionaries
+* Add events
+
+Normal:
+
+* ++(prefix)  --(prefix)  (postfix)++  (postfix)-- &&  ||  ?:  ::  .  |>  <|
 * Chunk pack/unpack into files
 * Chunks will need names for importing, packing, caching, etc.
+* If - else
+* while - do-while
+* for
+* switch, case & default
+* break & continue
+* Assert keyword
+* import as
 * More keywords
 * Interpolated strings
+* String functions
+* Array functions
+* Dictionary functions
+* Event functions
 * Ternary operator
 * Libraries
 * Update the website
@@ -35,3 +47,4 @@ Done:
 * ~~Move copyAndParseString to parser.c~~
 * ~~Rework literals into the more complex form~~
 * ~~Variables~~
+* ~~Implement Scope within the language~~

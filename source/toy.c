@@ -22,7 +22,7 @@ static void error(Toy* toy, Chunk* chunk, const char* message) {
 }
 
 static void printStack(Toy* toy) {
-
+/*
 	printf(" <<indexes:");
 
 	for (int i = 0; i < toy->count; i++) {
@@ -30,7 +30,7 @@ static void printStack(Toy* toy) {
 	}
 
 	printf(">>\n");
-
+*/
 	printf(" <<stack:");
 
 	for (int i = 0; i < toy->count; i++) {
@@ -39,7 +39,7 @@ static void printStack(Toy* toy) {
 	}
 
 	printf(">>\n");
-
+/*
 	printf(" <<garbage:");
 
 	for (int i = 0; i < toy->garbage.count; i++) {
@@ -48,6 +48,7 @@ static void printStack(Toy* toy) {
 	}
 
 	printf(">>\n");
+*/
 }
 
 void pushLiteral(Toy* toy, Literal literal) {

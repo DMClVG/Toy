@@ -90,6 +90,10 @@ void repl() {
 		//run
 		Chunk* chunk = scanParser(&parser);
 
+		if (chunk->count > 1) {
+			printChunk(chunk);
+		}
+
 		//clean up the memory
 		if (parser.error) {
 			freeChunk(chunk);
