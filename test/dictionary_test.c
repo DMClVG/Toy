@@ -1,9 +1,5 @@
 #include "dictionary_test.h"
 
-#include "../source/memory.c"
-#include "../source/literal.c"
-#include "../source/dictionary.c"
-
 #define SUCCESS (*successes)++
 #define FAILURE (*failures)++
 #define TEST(x) if (x) SUCCESS; else { FAILURE; printf("  Failed test on line %d: %s\n", __LINE__, #x); }

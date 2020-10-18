@@ -97,15 +97,13 @@ void initToy(Toy* toy) {
 	toy->indexes = NULL;
 	toy->pc = NULL;
 	initLiteralArray(&toy->garbage);
-	initDictionary(&toy->constants);
-	initDictionary(&toy->variables);
+	toy->scope = createScope();
 }
 
 void freeToy(Toy* toy) {
 	FREE_ARRAY(int, toy->indexes, toy->capacity);
 	freeLiteralArray(&toy->garbage);
-	freeDictionary(&toy->constants);
-	freeDictionary(&toy->variables);
+	freeScopeChain(toy->scope);
 }
 
 void executeChunk(Toy* toy, Chunk* chunk) {
@@ -142,26 +140,20 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				Literal* name = popLiteral(toy);
 				Literal* value = popLiteral(toy);
 
-				//check for existing constants & variables with that name
-				if (!IS_NIL(dictionaryGet(&toy->constants, *name)) || !IS_NIL(dictionaryGet(&toy->variables, *name))) {
+				if (!scopeSetConstant(toy->scope, *name, *value, true)) {
 					error(toy, chunk, "Can't redefine a constant or variable");
 					break;
 				}
-
-				dictionarySet(&toy->constants, *name, *value);
 			}
 			break;
 
 			case OP_VARIABLE_DECLARE: {
 				Literal* name = popLiteral(toy);
 
-				//check for existing constants & variables with that name
-				if (!IS_NIL(dictionaryGet(&toy->constants, *name)) || !IS_NIL(dictionaryGet(&toy->variables, *name))) {
+				if (!scopeSetVariable(toy->scope, *name, TO_NIL_LITERAL, true)) {
 					error(toy, chunk, "Can't redefine a constant or variable");
 					break;
 				}
-
-				dictionarySet(&toy->variables, *name, TO_NIL_LITERAL); //null as default
 			}
 			break;
 
@@ -169,30 +161,24 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				Literal* name = popLiteral(toy);
 				Literal* value = popLiteral(toy);
 
-				//check for existing constants & variables with that name
-				if (dictionaryDeclared(&toy->constants, *name)) {
-					error(toy, chunk, "Can't assign a constant");
+				if (!scopeSetVariable(toy->scope, *name, *value, false)) {
+					error(toy, chunk, "Must assign to a variable that has been declared (not a constant)");
 					break;
 				}
-
-				if (!dictionaryDeclared(&toy->variables, *name)) {
-					error(toy, chunk, "Can't find a variable with that name");
-					break;
-				}
-
-				dictionarySet(&toy->variables, *name, *value);
 			}
 			break;
 
 			case OP_VARIABLE_GET: {
 				Literal* name = popLiteral(toy);
+				bool defined = true;
 
-				if (dictionaryDeclared(&toy->constants, *name)) {
-					PUSH_TEMP_LITERAL(toy, dictionaryGet(&toy->constants, *name));
-				} else if (dictionaryDeclared(&toy->variables, *name)) {
-					PUSH_TEMP_LITERAL(toy, dictionaryGet(&toy->variables, *name));
-				} else {
+				Literal lit = scopeGet(toy->scope, *name, &defined);
+
+				if (!defined) {
 					error(toy, chunk, "Undefined variable");
+					break;
+				} else {
+					PUSH_TEMP_LITERAL(toy, lit);
 				}
 			}
 			break;
@@ -268,6 +254,9 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 
 					//the garbage array now gains ownership of this c-string
 					PUSH_TEMP_LITERAL(toy, TO_STRING_LITERAL( buffer ));
+
+					//BUFGIX: plug a hole
+					FREE_ARRAY(char, buffer, bufSize + 1);
 				}
 
 				else {

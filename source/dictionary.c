@@ -22,18 +22,28 @@ static uint32_t hashString(const char* string, int length) {
 //entry functions
 void setEntry(Entry* dest, Literal* key, Literal* value) {
 	//keys
+	if (IS_STRING(dest->key)) {
+		//free the original string and overwrite it
+		freeLiteral(dest->key);
+	}
+
 	if (IS_STRING(*key)) {
 		//copy the string memory for the key
 		int len = STRLEN(*key);
 		char* buffer = ALLOCATE(char, len + 1);
 		strcpy(buffer, AS_STRING(*key));
 		buffer[len] = '\0';
-		dest->key = TO_STRING_LITERAL(buffer);
+		dest->key = TO_STRING_LITERAL(buffer); //buffer becomes a part of the key literal
 	} else {
-		dest->key = *key; //not reachable
+		dest->key = *key; //probably unreachable
 	}
 
 	//values
+	if (IS_STRING(dest->value)) {
+		//fre the original string and overwrite it
+		freeLiteral(dest->value);
+	}
+
 	if (IS_STRING(*value)) {
 		//copy the string memory for the key
 		int len = STRLEN(*value);
@@ -47,8 +57,8 @@ void setEntry(Entry* dest, Literal* key, Literal* value) {
 }
 
 void freeEntry(Entry* entry) {
-	freeLiteral(&entry->key);
-	freeLiteral(&entry->value);
+	freeLiteral(entry->key);
+	freeLiteral(entry->value);
 	entry->key = TO_NIL_LITERAL;
 	entry->value = TO_NIL_LITERAL;
 }
@@ -162,6 +172,8 @@ void initDictionary(Dictionary* dict) {
 
 void freeDictionary(Dictionary* dict) {
 	freeEntryArray(dict->entries, dict->capacity);
+	dict->capacity = 0;
+	dict->count = 0;
 }
 
 //accessors & mutators

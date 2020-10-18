@@ -1,6 +1,6 @@
 High:
 
-* Scope
+* Implement Scope within the language
 * Functions
 
 Normal:
@@ -25,6 +25,7 @@ Low:
 
 * Add more to the TODO list
 * optimisations such as constant folding
+* Is there something wrong with block comments?
 
 Done:
 

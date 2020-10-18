@@ -11,6 +11,12 @@
 #endif
 
 #include "dictionary_test.h"
+#include "scope_test.h"
+
+#include "../source/memory.c"
+#include "../source/literal.c"
+#include "../source/dictionary.c"
+#include "../source/scope.c"
 
 void green() {
 #ifdef PLATFORM_WINDOWS
@@ -108,7 +114,7 @@ int runTestFile(const char* fname, const char* expected) {
 	}
 
 int main(/* int argc, const char* argv[] */) {
-	const int testCount = 19;
+	const int testCount = 33;
 
 	//initialize these
 	int passes = 0, failures = 0;
@@ -122,6 +128,7 @@ int main(/* int argc, const char* argv[] */) {
 	TEST_FILE("variables.toy", "hello world\nhello world\nhello world goodnight world\nfoobar\n");
 
 	TEST_FUNCTION(dictionary_test);
+	TEST_FUNCTION(scope_test);
 
 	//finally
 	if (passes + failures != testCount) {

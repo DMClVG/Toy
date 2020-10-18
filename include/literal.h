@@ -76,7 +76,7 @@ void freeLiteralArray(LiteralArray* array);
 
 void printLiteral(Literal literal);
 int findLiteral(LiteralArray* array, Literal literal);
-void freeLiteral(Literal* literal);
+void freeLiteral(Literal literal);
 
 #define IS_TRUTHY(x) (IS_NIL(x) || (IS_BOOL(x) && AS_BOOL(x)) || (IS_NUMBER(x) && AS_NUMBER(x) != 0))
 

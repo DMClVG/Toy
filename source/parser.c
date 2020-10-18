@@ -109,7 +109,7 @@ static void emitLiteral(Chunk* chunk, Literal literal, int line) {
 	}
 
 	//free existing string literals
-	freeLiteral(&literal);
+	freeLiteral(literal);
 
 	//handle > 256 literals
 	if (index >= 256) {
