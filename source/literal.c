@@ -33,7 +33,6 @@ void writeLiteralArray(LiteralArray* array, Literal value) {
 	//take ownership of functions too
 	if (IS_FUNCTION(value)) {
 		Function* func = ALLOCATE(Function, 1);
-		initFunction(func);
 
 		func->capacity = AS_FUNCTION_PTR(value)->capacity;
 		func->count = AS_FUNCTION_PTR(value)->count;
@@ -138,7 +137,12 @@ void freeLiteral(Literal literal) {
 	}
 
 	if (IS_FUNCTION(literal)) {
-		FREE(Function, AS_FUNCTION_PTR(literal));
+		Function* func = AS_FUNCTION_PTR(literal);
+
+		FREE_ARRAY(int, func->parameters, func->capacity);
+		freeChunk(func->chunk);
+
+		FREE(Function, func);
 	}
 }
 

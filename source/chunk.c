@@ -51,6 +51,7 @@ void writeChunkLong(Chunk* chunk, uint32_t val, int line) {
 
 Chunk* copyChunk(Chunk* chunk) {
 	Chunk* ret = ALLOCATE(Chunk, 1);
+	initChunk(ret);
 
 	ret->capacity = chunk->capacity;
 	ret->count = chunk->count;
