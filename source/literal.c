@@ -1,5 +1,6 @@
 #include "literal.h"
 #include "memory.h"
+#include "function.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -27,6 +28,22 @@ void writeLiteralArray(LiteralArray* array, Literal value) {
 		strcpy(buffer, AS_STRING(value));
 		buffer[len] = '\0';
 		value = TO_STRING_LITERAL(buffer);
+	}
+
+	//take ownership of functions too
+	if (IS_FUNCTION(value)) {
+		Function* func = ALLOCATE(Function, 1);
+		initFunction(func);
+
+		func->capacity = AS_FUNCTION_PTR(value)->capacity;
+		func->count = AS_FUNCTION_PTR(value)->count;
+		func->parameters = ALLOCATE(int, func->capacity);
+		memcpy(func->parameters, AS_FUNCTION_PTR(value)->parameters, func->capacity);
+
+		//copy the chunk automagically
+		func->chunk = copyChunk(AS_FUNCTION_PTR(value)->chunk);
+
+		value = TO_FUNCTION_PTR(func);
 	}
 
 	array->literals[array->count++] = value;
@@ -59,6 +76,10 @@ void printLiteral(Literal literal) {
 
 		case LITERAL_STRING:
 			printf("%s", AS_STRING(literal));
+			break;
+
+		case LITERAL_FUNCTION:
+			printf("<toy function>");
 			break;
 
 		default:
@@ -98,6 +119,9 @@ int findLiteral(LiteralArray* array, Literal literal) {
 				}
 				break;
 
+			case LITERAL_FUNCTION:
+				return i;
+
 			default:
 				fprintf(stderr, "Unexpected literal type in findLiteral: %d\n", literal.type);
 				break;
@@ -111,6 +135,10 @@ void freeLiteral(Literal literal) {
 	//TODO: clean up interpolated literals
 	if (IS_STRING(literal)) {
 		FREE_ARRAY(char, AS_STRING(literal), STRLEN(literal) + 1);
+	}
+
+	if (IS_FUNCTION(literal)) {
+		FREE(Function, AS_FUNCTION_PTR(literal));
 	}
 }
 

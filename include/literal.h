@@ -5,12 +5,6 @@
 
 #include <string.h>
 
-//forward declare these types
-struct LiteralArray;
-struct Dictionary;
-struct Function;
-struct Event;
-
 typedef enum {
 	LITERAL_NIL,
 	LITERAL_BOOL,
@@ -35,10 +29,10 @@ typedef struct {
 		} string;
 
 		//experimental
-		struct LiteralArray* array;
-		struct Dictionary* dictionary;
-		struct Function* function;
-		struct Event* event;
+		void* array;
+		void* dictionary;
+		void* function;
+		void* event;
 	} as;
 } Literal;
 
@@ -54,15 +48,19 @@ typedef struct {
 #define AS_BOOL(value)				((value).as.boolean)
 #define AS_NUMBER(value)			((value).as.number)
 #define AS_STRING(value)			((value).as.string.ptr)
-#define AS_ARRAY_PTR(value)			((value).as.array)
-#define AS_DICTIONARY_PTR(value)	((value).as.dictionary)
-#define AS_FUNCTION_PTR(value)		((value).as.function)
-#define AS_EVENT_PTR(value)			((value).as.event)
+#define AS_ARRAY_PTR(value)
+#define AS_DICTIONARY_PTR(value)
+#define AS_FUNCTION_PTR(value)		((Function*)((value).as.function))
+#define AS_EVENT_PTR(value)
 
-#define TO_NIL_LITERAL				((Literal){LITERAL_NIL,		{ .number = 0 }})
-#define TO_BOOL_LITERAL(value)		((Literal){LITERAL_BOOL,	{ .boolean = value }})
-#define TO_NUMBER_LITERAL(value)	((Literal){LITERAL_NUMBER,	{ .number = value }})
+#define TO_NIL_LITERAL				((Literal){LITERAL_NIL,			{ .number = 0 }})
+#define TO_BOOL_LITERAL(value)		((Literal){LITERAL_BOOL,		{ .boolean = value }})
+#define TO_NUMBER_LITERAL(value)	((Literal){LITERAL_NUMBER,		{ .number = value }})
 #define TO_STRING_LITERAL(value)	_toStringLiteral(value)
+#define TO_ARRAY_PTR
+#define TO_DICTIONARY_PTR
+#define TO_FUNCTION_PTR(value)		((Literal){LITERAL_FUNCTION,	{ .function = (Function*)value }})
+#define TO_EVENT_PTR
 
 typedef struct {
 	int capacity;

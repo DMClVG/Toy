@@ -6,6 +6,8 @@ OpCodeName opCodeNames[] = {
 	{OP_RETURN, "op_return"},
 	{OP_SCOPE_BEGIN, "op_scope_begin"},
 	{OP_SCOPE_END, "op_scope_end"},
+	{OP_GROUPING_BEGIN, "op_grouping_begin"},
+	{OP_GROUPING_END, "op_grouping_end"},
 	{OP_EQUALITY, "op_equality"},
 	{OP_GREATER, "op_greater"},
 	{OP_LESS, "op_less"},
@@ -26,6 +28,7 @@ OpCodeName opCodeNames[] = {
 	{OP_POP, "op_pop"},
 	{OP_LONG_SENTINEL, "_sentinel"},
 	{OP_LITERAL_LONG, "op_literal_long"},
+	{OP_FUNCTION_DECLARE, "op_function_declare"},
 
 	{OP_EOF, NULL}
 };

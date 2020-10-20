@@ -12,6 +12,8 @@ typedef enum {
 	OP_RETURN,
 	OP_SCOPE_BEGIN,
 	OP_SCOPE_END,
+	OP_GROUPING_BEGIN,
+	OP_GROUPING_END,
 
 	//operations
 	OP_EQUALITY,
@@ -33,6 +35,7 @@ typedef enum {
 	OP_VARIABLE_DECLARE,
 	OP_VARIABLE_GET,
 	OP_VARIABLE_SET,
+	OP_FUNCTION_DECLARE, //wipes any preceding groupings from the stack, as they were likely parameters
 
 	//keywords
 	OP_PRINT,

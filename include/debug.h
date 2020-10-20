@@ -6,12 +6,12 @@
 #include "dictionary.h"
 
 void printToken(Token* token);
-void printChunk(Chunk* chunk);
+void printChunk(Chunk* chunk, char* prepend);
 void printLiteralArray(LiteralArray* literalArray);
 void printDictionary(Dictionary* dictionary);
 
 void printChunkByteArray(Chunk* chunk);
-void dbPrintLiteral(Literal* literal);
+void dbPrintLiteral(Literal* literal, char* prepend, bool shrt);
 
 //TODO: integration testing
 

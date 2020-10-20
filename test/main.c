@@ -13,9 +13,11 @@
 #include "dictionary_test.h"
 #include "scope_test.h"
 
-#include "../source/memory.c"
-#include "../source/literal.c"
+#include "../source/chunk.c"
 #include "../source/dictionary.c"
+#include "../source/function.c"
+#include "../source/literal.c"
+#include "../source/memory.c"
 #include "../source/scope.c"
 
 void green() {
@@ -114,7 +116,7 @@ int runTestFile(const char* fname, const char* expected) {
 	}
 
 int main(/* int argc, const char* argv[] */) {
-	const int testCount = 35;
+	const int testCount = 36;
 
 	//initialize these
 	int passes = 0, failures = 0;
@@ -128,6 +130,7 @@ int main(/* int argc, const char* argv[] */) {
 	TEST_FILE("variables.toy", "hello world\nhello world\nhello world goodnight world\nfoobar\n");
 	TEST_FILE("scope.toy", "1\n2\n3\n1\n1\n1\n");
 	TEST_FILE("compound_assignment.toy", "2\n4\n1\n-9\n3\n");
+	TEST_FILE("functions_and_returns.toy", "inside f\nargument\n342\n1\n2\n3\n");
 
 	TEST_FUNCTION(dictionary_test);
 	TEST_FUNCTION(scope_test);

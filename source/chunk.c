@@ -48,3 +48,22 @@ void writeChunkLong(Chunk* chunk, uint32_t val, int line) {
 	chunk->lines[chunk->count] = line;
 	chunk->count += sizeof(uint32_t);
 }
+
+Chunk* copyChunk(Chunk* chunk) {
+	Chunk* ret = ALLOCATE(Chunk, 1);
+
+	ret->capacity = chunk->capacity;
+	ret->count = chunk->count;
+
+	ret->code = ALLOCATE(uint8_t, ret->capacity);
+	memcpy(ret->code, chunk->code, ret->capacity);
+	ret->lines = ALLOCATE(int, ret->capacity);
+	memcpy(ret->lines, chunk->lines, ret->capacity);
+
+	//write the literal array manually
+	for (int i = 0; i < chunk->literals.count; i++) {
+		writeLiteralArray(&ret->literals, chunk->literals.literals[i]);
+	}
+
+	return ret;
+}

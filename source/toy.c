@@ -4,6 +4,8 @@
 #include "memory.h"
 #include "debug.h"
 
+#include "function.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -22,7 +24,7 @@ static void error(Toy* toy, Chunk* chunk, const char* message) {
 }
 
 static void printStack(Toy* toy) {
-/*
+	/*
 	printf(" <<indexes:");
 
 	for (int i = 0; i < toy->count; i++) {
@@ -30,7 +32,8 @@ static void printStack(Toy* toy) {
 	}
 
 	printf(">>\n");
-*/
+	*/
+
 	printf(" <<stack:");
 
 	for (int i = 0; i < toy->count; i++) {
@@ -39,7 +42,8 @@ static void printStack(Toy* toy) {
 	}
 
 	printf(">>\n");
-/*
+
+	/*
 	printf(" <<garbage:");
 
 	for (int i = 0; i < toy->garbage.count; i++) {
@@ -48,10 +52,10 @@ static void printStack(Toy* toy) {
 	}
 
 	printf(">>\n");
-*/
+	*/
 }
 
-void pushLiteral(Toy* toy, Literal literal) {
+static void pushLiteral(Toy* toy, Literal literal) {
 	//grow the stack if necessary
 	if (toy->capacity < toy->count + 1) {
 		int oldCapacity = toy->capacity;
@@ -65,7 +69,7 @@ void pushLiteral(Toy* toy, Literal literal) {
 	toy->indexes[toy->count++] = toy->garbage.count - 1;
 }
 
-Literal* peekLiteral(Toy* toy) {
+static Literal* peekLiteral(Toy* toy) {
 	//prevent underflow
 	if (toy->count <= 0) {
 		toy->count = 0;
@@ -75,7 +79,7 @@ Literal* peekLiteral(Toy* toy) {
 	return &toy->garbage.literals[toy->indexes[toy->count - 1]];
 }
 
-Literal* popLiteral(Toy* toy) {
+static Literal* popLiteral(Toy* toy) {
 	//prevent underflow
 	if (toy->count <= 0) {
 		fprintf(stderr, "[No line data] Stack underflow\n");
@@ -90,27 +94,15 @@ Literal* popLiteral(Toy* toy) {
 	return top;
 }
 
-//exposed functions
-void initToy(Toy* toy) {
-	toy->error = false;
-	toy->capacity = 0;
-	toy->count = 0;
-	toy->indexes = NULL;
-	toy->pc = NULL;
-	initLiteralArray(&toy->garbage);
-	toy->scope = createScope();
-}
+static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: chunk MUST remain unchanged
+	const int initialDepth = groupingDepth;
 
-void freeToy(Toy* toy) {
-	FREE_ARRAY(int, toy->indexes, toy->capacity);
-	freeLiteralArray(&toy->garbage);
-	freeScopeChain(toy->scope);
-}
+	//initialize the values
+	int numberOfLoops = 0;
 
-void executeChunk(Toy* toy, Chunk* chunk) {
-	//NOTE: chunk MUST remain unchanged
+	while (*(toy->pc) && !toy->panic) {
+		numberOfLoops++;
 
-	for (toy->pc = chunk->code; *(toy->pc) && !toy->panic; /* EMPTY */) {
 		switch(*(toy->pc++)) { //TODO: change this switch to a lookup table of functions?
 			//pushing && popping
 			case OP_LITERAL:
@@ -137,6 +129,39 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 
 			case OP_SCOPE_END:
 				toy->scope = popScope(toy->scope);
+			break;
+
+			case OP_GROUPING_BEGIN: {
+				//grab any functions on top of the stack
+				Function* func = NULL;
+
+				if (IS_FUNCTION(*peekLiteral(toy))) {
+					func = AS_FUNCTION_PTR(*peekLiteral(toy));
+				}
+
+				//use C's stack frame to read the insides of the grouping
+				loopOverChunk(toy, chunk, groupingDepth + 1);
+
+				//process and execute the function
+				if (func != NULL) {
+					//pop each value from the stack and pass in as a parameter (backwards)
+					for (int count = func->count - 1; count >= 0; count--) {
+						Literal* arg = popLiteral(toy);
+
+						//the arg needs to be given the name at thisChunk->literals(parameters[i])
+						//push chunk->literals[ func->parameters[i] ];
+						//TODO: (1) Crap, it's supposed to have scope
+					}
+
+					//finally, call the function
+					loopOverChunk(toy, func->chunk, 0);
+				}
+			}
+			break;
+
+			case OP_GROUPING_END: {
+				return numberOfLoops;
+			}
 			break;
 
 			//keywords
@@ -195,6 +220,23 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				} else {
 					PUSH_TEMP_LITERAL(toy, lit);
 				}
+			}
+			break;
+
+			case OP_FUNCTION_DECLARE: {
+				//get the function
+				Literal* top = popLiteral(toy);
+
+				//pop the arguments, as they're just rubbish at this point
+				for (int i = 0; i < AS_FUNCTION_PTR(*top)->count; i++) {
+					freeLiteral(*popLiteral(toy));
+				}
+
+				//leave the function on the stack
+				pushLiteral(toy, *top);
+
+				//free the popped literal
+				freeLiteral(*top);
 			}
 			break;
 
@@ -379,5 +421,31 @@ void executeChunk(Toy* toy, Chunk* chunk) {
 				toy->error = true;
 				break;
 		}
+
+//		printStack(toy);
 	}
+
+	return numberOfLoops;
+}
+
+//exposed functions
+void initToy(Toy* toy) {
+	toy->error = false;
+	toy->capacity = 0;
+	toy->count = 0;
+	toy->indexes = NULL;
+	toy->pc = NULL;
+	initLiteralArray(&toy->garbage);
+	toy->scope = createScope();
+}
+
+void freeToy(Toy* toy) {
+	FREE_ARRAY(int, toy->indexes, toy->capacity);
+	freeLiteralArray(&toy->garbage);
+	freeScopeChain(toy->scope);
+}
+
+void executeChunk(Toy* toy, Chunk* chunk) {
+	toy->pc = chunk->code;
+	loopOverChunk(toy, chunk, 0);
 }

@@ -93,9 +93,9 @@ function -> ( "(" parameters ")" | IDENTIFIER ) "=>" ( expression | block ) ;
 
 parameters -> IDENTIFIER ( "," IDENTIFIER )* ;
 
-array -> "[" ( primary ( "," primary )* )? "]" ;
+array -> "[" ` primary ( "," primary )* )? "]" ;
 
-dictionary -> "[" ( primary ":" primary ( "," primary : primary )* | ":" ) "]" ;
+dictionary -> "[" ( (STRING | IDENTIFIER) ":" primary ( "," (STRING | IDENTIFIER) : primary )* | ":" ) "]" ;
 
 event -> "[" "..." "]" ;
 

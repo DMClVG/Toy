@@ -3,6 +3,9 @@
 #include "token_type.h"
 #include "opcodes.h"
 
+#include "literal.h"
+#include "function.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,7 +101,7 @@ static void emitLong(Chunk* chunk, uint32_t lng, int line) {
 	writeChunkLong(chunk, lng, line);
 }
 
-static void emitLiteral(Chunk* chunk, Literal literal, int line) {
+static int emitLiteral(Chunk* chunk, Literal literal, int line) {
 	//get the index of the new literal
 	int index = findLiteral(&chunk->literals, literal);
 
@@ -119,6 +122,8 @@ static void emitLiteral(Chunk* chunk, Literal literal, int line) {
 		emitByte(chunk, (uint8_t)OP_LITERAL, line);
 		emitByte(chunk, (uint8_t)index, line);
 	}
+
+	return index;
 }
 
 //parsing utilities
@@ -198,6 +203,33 @@ static void synchronize(Parser* parser) {
 
 //forward declare as a kind of entry point
 static void declaration(Parser* parser, Chunk* chunk);
+static void expression(Parser* parser, Chunk* chunk);
+
+static Function* readFunctionCode(Parser* parser, Function* func) {
+	//read the code into the function's chunk
+	if (match(parser, TOKEN_LEFT_BRACE)) {
+		//for error handling
+		Token opening = parser->previous;
+
+		//process the grammar rules
+		while (!match(parser, TOKEN_RIGHT_BRACE)) {
+			if (match(parser, TOKEN_EOF)) {
+				error(parser, opening, "Expected closing '}' to match opening '{' in function declaration");
+				return NULL;
+			}
+
+			declaration(parser, func->chunk);
+		}
+	} else {
+		//single-line expression
+		expression(parser, func->chunk);
+		emitByte(func->chunk, OP_RETURN, parser->previous.line);
+	}
+
+	emitByte(func->chunk, OP_EOF, parser->previous.line); //terminate the chunk
+
+	return func;
+}
 
 //refer to the grammar expression rules below
 static void expression(Parser* parser, Chunk* chunk) {
@@ -346,7 +378,7 @@ static void parsePrecedence(Parser* parser, Chunk* chunk, Precedence precedence)
 			return;
 		}
 
-		infixRule(parser, chunk, canBeAssigned);
+		infixRule(parser, chunk, canBeAssigned); //NOTE: infix rule must advance the parser
 	}
 
 	//if your precedence is below "assignment"
@@ -387,6 +419,28 @@ static void variable(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	//variables can be invoked for their values, or assigned a value, or both at once
 	Token identifier = parser->previous;
 
+	//variables can also lead off function declarations
+	if (match(parser, TOKEN_EQUAL_GREATER)) {
+		Token op = parser->previous;
+
+		Function* func = ALLOCATE(Function, 1);
+		initFunction(func);
+
+		//read the parameter
+		int index = emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(identifier.lexeme, identifier.length)), identifier.line);
+		pushFunctionParameter(func, index);
+
+		//read the code
+		func = readFunctionCode(parser, func);
+
+		if (func != NULL) {
+			emitLiteral(chunk, TO_FUNCTION_PTR(func), op.line);
+		}
+
+		emitByte(chunk, OP_FUNCTION_DECLARE, op.line);
+		return;
+	}
+
 	//if I am being assigned
 	if (match(parser, TOKEN_EQUAL)) {
 		int line = parser->previous.line; //line of the equal sign
@@ -404,10 +458,72 @@ static void variable(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	emitByte(chunk, OP_VARIABLE_GET, identifier.line);
 }
 
-static void grouping(Parser* parser, Chunk* chunk, bool canBeAssigned) {
-	//handle groupings
-	expression(parser, chunk);
-	consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after grouping");
+static void groupingPrefix(Parser* parser, Chunk* chunk, bool canBeAssigned) {
+	//this can be a function?
+	Function* func = ALLOCATE(Function, 1);
+	initFunction(func);
+	bool canBeFunction = true;
+
+	//for errors
+	Token leftParen = parser->previous;
+
+	//begin the grouping
+	emitByte(chunk, OP_GROUPING_BEGIN, parser->previous.line);
+
+	//check for functions with 0+ parameters signalled by ()
+	if (!match(parser, TOKEN_RIGHT_PAREN)) {
+		//handle groupings - expressions or function parameters
+		while(!match(parser, TOKEN_EOF)) {
+
+			//get the identifier OR expression
+			if (match(parser, TOKEN_IDENTIFIER)) {
+				//store all identifiers as strings, because why not?
+				int index = emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(parser->previous.lexeme, parser->previous.length)), parser->previous.line);
+				pushFunctionParameter(func, index);
+			} else {
+				canBeFunction = false;
+				expression(parser, chunk);
+			}
+
+			if (match(parser, TOKEN_RIGHT_PAREN)) {
+				break;
+			}
+
+			if (!match(parser, TOKEN_COMMA)) {
+				error(parser, parser->current, "Expected ',' in grouping");
+				break;
+			}
+		}
+	}
+
+	//end the grouping
+	emitByte(chunk, OP_GROUPING_END, parser->previous.line);
+
+	//this might be a function
+	if (match(parser, TOKEN_EQUAL_GREATER)) {
+		if (canBeFunction) {
+			Token op = parser->previous;
+
+			func = readFunctionCode(parser, func);
+
+			if (func != NULL) {
+				emitLiteral(chunk, TO_FUNCTION_PTR(func), op.line);
+				emitByte(chunk, OP_FUNCTION_DECLARE, op.line);
+			}
+		} else {
+			freeFunction(func);
+			FREE(Function, func);
+			error(parser, leftParen, "Incorrect parameters for function declaration");
+		}
+	} else {
+		freeFunction(func);
+		FREE(Function, func);
+	}
+}
+
+static void groupingInfix(Parser* parser, Chunk* chunk, bool canBeAssigned) {
+	advance(parser);
+	groupingPrefix(parser, chunk, canBeAssigned);
 }
 
 static void binary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
@@ -469,81 +585,39 @@ static void binary(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 			emitByte(chunk, OP_MODULO, line);
 			break;
 
-		//complex stuff
-		case TOKEN_PLUS_EQUAL:
-			if (previous.type != TOKEN_IDENTIFIER) {
-				error(parser, previous, "Expected identifier on left-hand side of compound assignment operator");
-				break;
-			}
-
-			emitByte(chunk, OP_ADD, line);
-			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
-			emitByte(chunk, OP_VARIABLE_SET, line);
-
-			//leave the variable on the stack
-			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
+		//complex stuff repeated, so put it in a temp macro
+#define COMPOUND_ASSIGNMENT(COMPOUND_OPERATOR) \
+			if (previous.type != TOKEN_IDENTIFIER) { \
+				error(parser, previous, "Expected identifier on left-hand side of compound assignment operator"); \
+				break; \
+			} \
+			emitByte(chunk, COMPOUND_OPERATOR, line); \
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line); \
+			emitByte(chunk, OP_VARIABLE_SET, line); \
+			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line); \
 			emitByte(chunk, OP_VARIABLE_GET, line);
+
+		case TOKEN_PLUS_EQUAL:
+			COMPOUND_ASSIGNMENT(OP_ADD);
 			break;
 
 		case TOKEN_MINUS_EQUAL:
-			if (previous.type != TOKEN_IDENTIFIER) {
-				error(parser, previous, "Expected identifier on left-hand side of compound assignment operator");
-				break;
-			}
-
-			emitByte(chunk, OP_SUBTRACT, line);
-			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
-			emitByte(chunk, OP_VARIABLE_SET, line);
-
-			//leave the variable on the stack
-			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
-			emitByte(chunk, OP_VARIABLE_GET, line);
+			COMPOUND_ASSIGNMENT(OP_SUBTRACT);
 			break;
 
 		case TOKEN_STAR_EQUAL:
-			if (previous.type != TOKEN_IDENTIFIER) {
-				error(parser, previous, "Expected identifier on left-hand side of compound assignment operator");
-				break;
-			}
-
-			emitByte(chunk, OP_MULTIPLY, line);
-			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
-			emitByte(chunk, OP_VARIABLE_SET, line);
-
-			//leave the variable on the stack
-			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
-			emitByte(chunk, OP_VARIABLE_GET, line);
+			COMPOUND_ASSIGNMENT(OP_MULTIPLY);
 			break;
 
 		case TOKEN_SLASH_EQUAL:
-			if (previous.type != TOKEN_IDENTIFIER) {
-				error(parser, previous, "Expected identifier on left-hand side of compound assignment operator");
-				break;
-			}
-
-			emitByte(chunk, OP_DIVIDE, line);
-			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
-			emitByte(chunk, OP_VARIABLE_SET, line);
-
-			//leave the variable on the stack
-			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
-			emitByte(chunk, OP_VARIABLE_GET, line);
+			COMPOUND_ASSIGNMENT(OP_DIVIDE);
 			break;
 
 		case TOKEN_MODULO_EQUAL:
-			if (previous.type != TOKEN_IDENTIFIER) {
-				error(parser, previous, "Expected identifier on left-hand side of compound assignment operator");
-				break;
-			}
-
-			emitByte(chunk, OP_MODULO, line);
-			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
-			emitByte(chunk, OP_VARIABLE_SET, line);
-
-			//leave the variable on the stack
-			emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(previous.lexeme, previous.length)), previous.line);
-			emitByte(chunk, OP_VARIABLE_GET, line);
+			COMPOUND_ASSIGNMENT(OP_MODULO);
 			break;
+
+#undef COMPOUND_ASSIGNMENT
 	}
 }
 
@@ -584,79 +658,79 @@ static void atomic(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 
 //a pratt table
 ParseRule parseRules[] = {
-	{grouping,	NULL,		PREC_CALL},			// TOKEN_LEFT_PAREN
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_RIGHT_PAREN
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_LEFT_BRACE
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_RIGHT_BRACE
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_LEFT_BRACKET
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_RIGHT_BRACKET
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_SEMICOLON
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_COMMA
-	{NULL,		binary,		PREC_TERM},			// TOKEN_PLUS
-	{NULL,		binary,		PREC_ASSIGNMENT},	// TOKEN_PLUS_EQUAL
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_PLUS_PLUS
-	{unary,		binary,		PREC_TERM},			// TOKEN_MINUS
-	{NULL,		binary,		PREC_ASSIGNMENT},	// TOKEN_MINUS_EQUAL
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_MINUS_MINUS
-	{NULL,		binary,		PREC_FACTOR},		// TOKEN_STAR
-	{NULL,		binary,		PREC_ASSIGNMENT},	// TOKEN_STAR_EQUAL
-	{NULL,		binary,		PREC_FACTOR},		// TOKEN_SLASH
-	{NULL,		binary,		PREC_ASSIGNMENT},	// TOKEN_SLASH_EQUAL
-	{NULL,		binary,		PREC_FACTOR},		// TOKEN_MODULO
-	{NULL,		binary,		PREC_ASSIGNMENT},	// TOKEN_MODULO_EQUAL
-	{unary,		NULL,		PREC_NONE},			// TOKEN_BANG
-	{NULL,		binary,		PREC_EQUALITY},		// TOKEN_BANG_EQUAL
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_EQUAL
-	{NULL,		binary,		PREC_EQUALITY},		// TOKEN_EQUAL_EQUAL
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_EQUAL_GREATER
-	{NULL,		binary,		PREC_COMPARISON},	// TOKEN_GREATER
-	{NULL,		binary,		PREC_COMPARISON},	// TOKEN_GREATER_EQUAL
-	{NULL,		binary,		PREC_COMPARISON},	// TOKEN_LESS
-	{NULL,		binary,		PREC_COMPARISON},	// TOKEN_LESS_EQUAL
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_LESS_OR
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_AND_AND
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_OR_OR
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_OR_GREATER
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_DOT
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_DOT_DOT
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_DOT_DOT_DOT
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_QUESTION
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_COLON
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_COLON_COLON
-	{variable,	NULL,		PREC_PRIMARY},		// TOKEN_IDENTIFIER
-	{number,	NULL,		PREC_PRIMARY},		// TOKEN_NUMBER
-	{string,	NULL,		PREC_PRIMARY},		// TOKEN_STRING
-	{string,	NULL,		PREC_PRIMARY},		// TOKEN_INTERPOLATED_STRING
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_AS
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_ASSERT
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_ASYNC
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_AWAIT
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_BREAK
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_CASE
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_CONST
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_CONTINUE
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_DEFAULT
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_DO
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_ELSE
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_EXPORT
-	{atomic,	NULL,		PREC_PRIMARY},		// TOKEN_FALSE
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_FOR
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_FOREACH
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_IF
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_IMPORT
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_IN
-	{atomic,	NULL,		PREC_PRIMARY},		// TOKEN_NIL
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_OF
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_PRINT
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_PURE
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_RETURN
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_SWITCH
-	{atomic,	NULL,		PREC_PRIMARY},		// TOKEN_TRUE
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_VAR
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_WHILE
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_PASS
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_ERROR
-	{NULL,		NULL,		PREC_NONE},			// TOKEN_EOF
+	{groupingPrefix,	groupingInfix,	PREC_CALL},			// TOKEN_LEFT_PAREN
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_RIGHT_PAREN
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_LEFT_BRACE
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_RIGHT_BRACE
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_LEFT_BRACKET
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_RIGHT_BRACKET
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_SEMICOLON
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_COMMA
+	{NULL,				binary,			PREC_TERM},			// TOKEN_PLUS
+	{NULL,				binary,			PREC_ASSIGNMENT},	// TOKEN_PLUS_EQUAL
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_PLUS_PLUS
+	{unary,				binary,			PREC_TERM},			// TOKEN_MINUS
+	{NULL,				binary,			PREC_ASSIGNMENT},	// TOKEN_MINUS_EQUAL
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_MINUS_MINUS
+	{NULL,				binary,			PREC_FACTOR},		// TOKEN_STAR
+	{NULL,				binary,			PREC_ASSIGNMENT},	// TOKEN_STAR_EQUAL
+	{NULL,				binary,			PREC_FACTOR},		// TOKEN_SLASH
+	{NULL,				binary,			PREC_ASSIGNMENT},	// TOKEN_SLASH_EQUAL
+	{NULL,				binary,			PREC_FACTOR},		// TOKEN_MODULO
+	{NULL,				binary,			PREC_ASSIGNMENT},	// TOKEN_MODULO_EQUAL
+	{unary,				NULL,			PREC_NONE},			// TOKEN_BANG
+	{NULL,				binary,			PREC_EQUALITY},		// TOKEN_BANG_EQUAL
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_EQUAL
+	{NULL,				binary,			PREC_EQUALITY},		// TOKEN_EQUAL_EQUAL
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_EQUAL_GREATER
+	{NULL,				binary,			PREC_COMPARISON},	// TOKEN_GREATER
+	{NULL,				binary,			PREC_COMPARISON},	// TOKEN_GREATER_EQUAL
+	{NULL,				binary,			PREC_COMPARISON},	// TOKEN_LESS
+	{NULL,				binary,			PREC_COMPARISON},	// TOKEN_LESS_EQUAL
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_LESS_OR
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_AND_AND
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_OR_OR
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_OR_GREATER
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_DOT
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_DOT_DOT
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_DOT_DOT_DOT
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_QUESTION
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_COLON
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_COLON_COLON
+	{variable,			NULL,			PREC_PRIMARY},		// TOKEN_IDENTIFIER
+	{number,			NULL,			PREC_PRIMARY},		// TOKEN_NUMBER
+	{string,			NULL,			PREC_PRIMARY},		// TOKEN_STRING
+	{string,			NULL,			PREC_PRIMARY},		// TOKEN_INTERPOLATED_STRING
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_AS
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_ASSERT
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_ASYNC
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_AWAIT
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_BREAK
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_CASE
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_CONST
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_CONTINUE
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_DEFAULT
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_DO
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_ELSE
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_EXPORT
+	{atomic,			NULL,			PREC_PRIMARY},		// TOKEN_FALSE
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_FOR
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_FOREACH
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_IF
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_IMPORT
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_IN
+	{atomic,			NULL,			PREC_PRIMARY},		// TOKEN_NIL
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_OF
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_PRINT
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_PURE
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_RETURN
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_SWITCH
+	{atomic,			NULL,			PREC_PRIMARY},		// TOKEN_TRUE
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_VAR
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_WHILE
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_PASS
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_ERROR
+	{NULL,				NULL,			PREC_NONE},			// TOKEN_EOF
 };
 
 ParseRule* getRule(TokenType type) {
