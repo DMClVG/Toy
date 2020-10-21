@@ -1,6 +1,5 @@
 High:
 
-* Functions and Returns
 * Arrays & dictionaries in the language
 * Arrays & dictionaries as literal values
 * Guard against non-string keys for dictionaries
@@ -47,3 +46,4 @@ Done:
 * ~~Rework literals into the more complex form~~
 * ~~Variables~~
 * ~~Implement Scope within the language~~
+* ~~Functions and Returns~~
