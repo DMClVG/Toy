@@ -33,7 +33,7 @@ void printToken(Token* token) {
 }
 
 void printChunk(Chunk* chunk, char* prepend) {
-	printf("%sPrinting chunk: %d/%d\n\n", prepend, chunk->count, chunk->capacity);
+	printf("%sPrinting chunk: %d/%d\n%s=====Opcodes=====\n", prepend, chunk->count, chunk->capacity, prepend);
 
 	for (int i = 0; i < chunk->count; /* EMPTY */) {
 		switch(chunk->code[i]) {
@@ -66,8 +66,10 @@ void printChunkByteArray(Chunk* chunk) {
 	}
 }
 
-void printLiteralArray(LiteralArray* literalArray) {
-	//TODO: print array
+void printLiteralArray(LiteralArray* array, char* prepend) {
+	for (int i = 0; i < array->count; i++) {
+		dbPrintLiteral(&array->literals[i], prepend, false);
+	}
 }
 
 void printDictionary(Dictionary* dictionary) {
@@ -77,34 +79,31 @@ void printDictionary(Dictionary* dictionary) {
 void dbPrintLiteral(Literal* literal, char* prepend, bool shrt) {
 	switch(literal->type) {
 		case LITERAL_NIL:
-			printf("%snull", prepend);
+			printf("%snull\n", prepend);
 			break;
 		case LITERAL_BOOL:
-			printf("%sbool (%s)", prepend, AS_BOOL(*literal) ? "true" : "false");
+			printf("%sbool (%s)\n", prepend, AS_BOOL(*literal) ? "true" : "false");
 			break;
 		case LITERAL_NUMBER:
-			printf("%snumber (%f)", prepend, AS_NUMBER(*literal));
+			printf("%snumber (%f)\n", prepend, AS_NUMBER(*literal));
 			break;
 		case LITERAL_STRING:
-			printf("%sstring (%s)", prepend, AS_STRING(*literal));
+			printf("%sstring (%s)\n", prepend, AS_STRING(*literal));
 			break;
 		case LITERAL_FUNCTION:
-			printf("%stoy function (%d parameters)\n", prepend, AS_FUNCTION_PTR(*literal)->count);
+			printf("%stoy function (%d parameters)\n", prepend, AS_FUNCTION_PTR(*literal)->parameters.count);
 
 			if (shrt) {
 				break;
 			}
 
 			char p[128];
-			sprintf(p, "  %s", prepend);
+			char a[128];
+			sprintf(p, "%s  ", prepend);
+			sprintf(a, "%s >", prepend);
 
-			for (int i = 0; i < AS_FUNCTION_PTR(*literal)->count; i++) {
-				printf("%sparam: %d\n", p, AS_FUNCTION_PTR(*literal)->parameters[i]);
-			}
-
+			printLiteralArray(&AS_FUNCTION_PTR(*literal)->parameters, a);
 			printChunk(AS_FUNCTION_PTR(*literal)->chunk, p);
 			break;
 	}
-
-	printf("\n");
 }

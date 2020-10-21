@@ -220,13 +220,14 @@ static Function* readFunctionCode(Parser* parser, Function* func) {
 
 			declaration(parser, func->chunk);
 		}
+
+		emitLiteral(func->chunk, TO_NIL_LITERAL, parser->previous.line); //leave a null
+		emitByte(func->chunk, OP_RETURN, parser->previous.line); //terminate the chunk
 	} else {
 		//single-line expression
 		expression(parser, func->chunk);
 		emitByte(func->chunk, OP_RETURN, parser->previous.line);
 	}
-
-	emitByte(func->chunk, OP_EOF, parser->previous.line); //terminate the chunk
 
 	return func;
 }
@@ -243,6 +244,20 @@ static void printStmt(Parser* parser, Chunk* chunk) {
 	expression(parser, chunk);
 	emitByte(chunk, OP_PRINT, line);
 	consume(parser, TOKEN_SEMICOLON, "Expected ';' at end of print statement");
+}
+
+static void returnStmt(Parser* parser, Chunk* chunk) {
+	//leave an exrpession or a null on the stack
+	int line = parser->previous.line;
+
+	if (!match(parser, TOKEN_SEMICOLON)) {
+		expression(parser, chunk);
+		emitByte(chunk, OP_RETURN, line);
+		consume(parser, TOKEN_SEMICOLON, "Expected ';' at end of return statement");
+	} else {
+		emitLiteral(chunk, TO_NIL_LITERAL, line); //leave a null
+		emitByte(chunk, OP_RETURN, line);
+	}
 }
 
 static void block(Parser* parser, Chunk* chunk) {
@@ -273,6 +288,11 @@ static void expressionStmt(Parser* parser, Chunk* chunk) {
 static void statement(Parser* parser, Chunk* chunk) {
 	if (match(parser, TOKEN_PRINT)) {
 		printStmt(parser, chunk);
+		return;
+	}
+
+	if (match(parser, TOKEN_RETURN)) {
+		returnStmt(parser, chunk);
 		return;
 	}
 
@@ -427,14 +447,17 @@ static void variable(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 		initFunction(func);
 
 		//read the parameter
-		int index = emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(identifier.lexeme, identifier.length)), identifier.line);
-		pushFunctionParameter(func, index);
+		char* buffer = ALLOCATE(char, identifier.length + 1);
+		sprintf(buffer, "%.*s", identifier.length, identifier.lexeme);
+		writeLiteralArray(&func->parameters, TO_STRING_LITERAL(buffer));
+		FREE(char, buffer);
 
 		//read the code
 		func = readFunctionCode(parser, func);
 
 		if (func != NULL) {
 			emitLiteral(chunk, TO_FUNCTION_PTR(func), op.line);
+			FREE(Function, func);
 		}
 
 		emitByte(chunk, OP_FUNCTION_DECLARE, op.line);
@@ -478,8 +501,10 @@ static void groupingPrefix(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 			//get the identifier OR expression
 			if (match(parser, TOKEN_IDENTIFIER)) {
 				//store all identifiers as strings, because why not?
-				int index = emitLiteral(chunk, TO_STRING_LITERAL(copyAndParseString(parser->previous.lexeme, parser->previous.length)), parser->previous.line);
-				pushFunctionParameter(func, index);
+				char* buffer = ALLOCATE(char, parser->previous.length + 1);
+				sprintf(buffer, "%.*s", parser->previous.length, parser->previous.lexeme);
+				writeLiteralArray(&func->parameters, TO_STRING_LITERAL(buffer));
+				FREE(char, buffer);
 			} else {
 				canBeFunction = false;
 				expression(parser, chunk);
@@ -508,6 +533,7 @@ static void groupingPrefix(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 
 			if (func != NULL) {
 				emitLiteral(chunk, TO_FUNCTION_PTR(func), op.line);
+				FREE(Function, func);
 				emitByte(chunk, OP_FUNCTION_DECLARE, op.line);
 			}
 		} else {

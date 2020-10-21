@@ -1,16 +1,4 @@
 
-
-
-
-/*intreter logic: 
-	find GROUPING
-		read expression
-		...
-	end GROUPING - if grouping count > 1 && you don't find a function call -> runtime error
-
-const a = ("Hello world", "foobar");
-*/
-
 const f = () => {
 	print "inside f";
 };
@@ -28,9 +16,10 @@ print h(42, 300); //342\n
 
 //test closures
 const makeCounter = () => {
-	var counter = 0;
+	var increment = 0;
+
 	return () => {
-		return counter += 1;
+		return increment += 1;
 	};
 };
 

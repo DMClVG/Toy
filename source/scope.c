@@ -3,18 +3,31 @@
 
 #include <stdio.h>
 
-Scope* createScope() {
+Scope* pushScope(Scope* ancestor) {
 	Scope* scope = ALLOCATE(Scope, 1);
-	scope->ancestor = NULL;
+	scope->ancestor = ancestor;
 	initDictionary(&scope->constants);
 	initDictionary(&scope->variables);
+
+	scope->references = 0;
+	for (Scope* ptr = scope; ptr; ptr = ptr->ancestor) {
+		ptr->references++;
+	}
+
 	return scope;
 }
 
-void freeScopeChain(Scope* scope) {
+//run up the ancestor chain, freeing anything with 0 references left
+static void freeScopeChain(Scope* scope) {
+	scope->references--;
+
 	//free scope chain
 	if (scope->ancestor != NULL) {
 		freeScopeChain(scope->ancestor);
+	}
+
+	if (scope->references > 0) {
+		return;
 	}
 
 	freeDictionary(&scope->constants);
@@ -23,24 +36,33 @@ void freeScopeChain(Scope* scope) {
 	FREE(Scope, scope);
 }
 
-Scope* pushScope(Scope* scope) {
-	Scope* ret = ALLOCATE(Scope, 1);
+Scope* popScope(Scope* scope) {
+	Scope* ret = scope->ancestor;
 
-	ret->ancestor = scope;
-	initDictionary(&ret->constants);
-	initDictionary(&ret->variables);
+	freeScopeChain(scope);
 
 	return ret;
 }
 
-Scope* popScope(Scope* scope) {
-	Scope* ret = scope->ancestor;
+Scope* referenceScope(Scope* scope) {
+	for (Scope* ptr = scope; ptr; ptr = ptr->ancestor) {
+		ptr->references++;
+	}
 
-	freeDictionary(&scope->constants);
-	freeDictionary(&scope->variables);
-	FREE(Scope, scope);
+	return scope;
+}
 
-	return ret;
+Scope* unreferenceScope(Scope* scope) {
+	if (scope->references == 1) {
+		freeScopeChain(scope);
+		return NULL;
+	}
+
+	for (Scope* ptr = scope; ptr; ptr = ptr->ancestor) {
+		ptr->references--;
+	}
+
+	return scope;
 }
 
 Literal scopeGet(Scope* scope, Literal key, bool* defined) {
@@ -106,4 +128,12 @@ bool scopeSetVariable(Scope* scope, Literal key, Literal value, bool declaration
 
 		return false;
 	}
+}
+
+int getScopeDepth(Scope* scope) {
+	if (scope->ancestor == NULL) {
+		return 0;
+	}
+
+	return getScopeDepth(scope->ancestor) + 1;
 }

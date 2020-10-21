@@ -7,7 +7,7 @@
 
 void printToken(Token* token);
 void printChunk(Chunk* chunk, char* prepend);
-void printLiteralArray(LiteralArray* literalArray);
+void printLiteralArray(LiteralArray* array, char* prepend);
 void printDictionary(Dictionary* dictionary);
 
 void printChunkByteArray(Chunk* chunk);

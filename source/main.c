@@ -58,6 +58,10 @@ void runFile(const char* fname) {
 
 	Chunk* chunk = scanParser(&parser);
 
+	if (chunk->count > 1) {
+//		printChunk(chunk, "    ");
+	}
+
 	executeChunk(&toy, chunk);
 
 	freeChunk(chunk);
@@ -91,7 +95,7 @@ void repl() {
 		Chunk* chunk = scanParser(&parser);
 
 		if (chunk->count > 1) {
-			printChunk(chunk, "");
+//			printChunk(chunk, "    ");
 		}
 
 		//clean up the memory

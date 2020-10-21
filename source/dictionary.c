@@ -69,7 +69,9 @@ void freeEntryArray(Entry* array, int capacity) {
 	}
 
 	for (int i = 0; i < capacity; i++) {
-		freeEntry(&array[i]);
+		if (!IS_NIL(array[i].key)) {
+			freeEntry(&array[i]);
+		}
 	}
 
 	FREE_ARRAY(Entry, array, capacity);

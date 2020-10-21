@@ -1,6 +1,7 @@
 #include "literal.h"
 #include "memory.h"
 #include "function.h"
+#include "debug.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -33,11 +34,13 @@ void writeLiteralArray(LiteralArray* array, Literal value) {
 	//take ownership of functions too
 	if (IS_FUNCTION(value)) {
 		Function* func = ALLOCATE(Function, 1);
+		initLiteralArray(&func->parameters);
+		func->scope = NULL;
 
-		func->capacity = AS_FUNCTION_PTR(value)->capacity;
-		func->count = AS_FUNCTION_PTR(value)->count;
-		func->parameters = ALLOCATE(int, func->capacity);
-		memcpy(func->parameters, AS_FUNCTION_PTR(value)->parameters, func->capacity);
+		//copy manually
+		for (int i = 0; i < AS_FUNCTION_PTR(value)->parameters.count; i++) {
+			writeLiteralArray(&func->parameters, AS_FUNCTION_PTR(value)->parameters.literals[i]);
+		}
 
 		//copy the chunk automagically
 		func->chunk = copyChunk(AS_FUNCTION_PTR(value)->chunk);
@@ -53,6 +56,11 @@ void freeLiteralArray(LiteralArray* array) {
 	for(int i = 0; i < array->count; i++) {
 		//TODO: clean up interpolated literals
 		freeLiteral(array->literals[i]);
+
+		if (IS_FUNCTION(array->literals[i])) {
+			//usually allocated
+			FREE(Function, AS_FUNCTION_PTR(array->literals[i]));
+		}
 	}
 
 	FREE_ARRAY(Literal, array->literals, array->capacity);
@@ -89,6 +97,11 @@ void printLiteral(Literal literal) {
 
 //find a literal in the array that matches the "literal" argument
 int findLiteral(LiteralArray* array, Literal literal) {
+	//handle functions
+	if (IS_FUNCTION(literal)) {
+		return -1;
+	}
+
 	for (int i = 0; i < array->count; i++) {
 		//not the same type
 		if (array->literals[i].type != literal.type) {
@@ -118,9 +131,6 @@ int findLiteral(LiteralArray* array, Literal literal) {
 				}
 				break;
 
-			case LITERAL_FUNCTION:
-				return i;
-
 			default:
 				fprintf(stderr, "Unexpected literal type in findLiteral: %d\n", literal.type);
 				break;
@@ -133,16 +143,13 @@ int findLiteral(LiteralArray* array, Literal literal) {
 void freeLiteral(Literal literal) {
 	//TODO: clean up interpolated literals
 	if (IS_STRING(literal)) {
-		FREE_ARRAY(char, AS_STRING(literal), STRLEN(literal) + 1);
+		FREE(char, AS_STRING(literal));
+		return;
 	}
 
 	if (IS_FUNCTION(literal)) {
-		Function* func = AS_FUNCTION_PTR(literal);
-
-		FREE_ARRAY(int, func->parameters, func->capacity);
-		freeChunk(func->chunk);
-
-		FREE(Function, func);
+		freeFunction(AS_FUNCTION_PTR(literal));
+		return;
 	}
 }
 
