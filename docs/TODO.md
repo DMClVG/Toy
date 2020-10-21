@@ -1,5 +1,6 @@
 High:
 
+* Upper limit on recursion
 * Arrays & dictionaries in the language
 * Arrays & dictionaries as literal values
 * Guard against non-string keys for dictionaries
