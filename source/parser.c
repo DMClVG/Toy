@@ -221,8 +221,11 @@ static Function* readFunctionCode(Parser* parser, Function* func) {
 			declaration(parser, func->chunk);
 		}
 
-		emitLiteral(func->chunk, TO_NIL_LITERAL, parser->previous.line); //leave a null
-		emitByte(func->chunk, OP_RETURN, parser->previous.line); //terminate the chunk
+		//if the last statement of the function was not a return, insert a null return at the end
+		if (func->chunk->code[func->chunk->count - 1] != OP_RETURN) {
+			emitLiteral(func->chunk, TO_NIL_LITERAL, parser->previous.line); //leave a null
+			emitByte(func->chunk, OP_RETURN, parser->previous.line); //terminate the chunk
+		}
 	} else {
 		//single-line expression
 		expression(parser, func->chunk);

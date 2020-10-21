@@ -35,7 +35,7 @@ void writeChunk(Chunk* chunk, uint8_t val, int line) {
 
 void writeChunkLong(Chunk* chunk, uint32_t val, int line) {
 	//grow the arrays if necessary
-	if (chunk->capacity < chunk->count + sizeof(uint32_t)) {
+	if (chunk->capacity < chunk->count + (int)sizeof(uint32_t)) {
 		int oldCapacity = chunk->capacity;
 
 		chunk->capacity = GROW_CAPACITY(oldCapacity);

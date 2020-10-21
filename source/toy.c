@@ -53,6 +53,13 @@ static void printStack(Toy* toy) {
 
 	printf(">>\n");
 	*/
+	/*
+	printf(" <<scope:");
+	for (Scope* ptr = toy->scope; ptr; ptr = ptr->ancestor) {
+		printf("(%d) ", ptr->references);
+	}
+	printf(">>\n");
+	*/
 }
 
 static void pushLiteral(Toy* toy, Literal literal) {
@@ -97,6 +104,9 @@ static Literal* popLiteral(Toy* toy) {
 //TODO: could use int for multiple returns
 static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: chunk MUST remain unchanged
 	while (*(toy->pc) && !toy->panic) {
+
+		// printStack(toy); //debugging
+
 		switch(*(toy->pc++)) { //TODO: change this switch to a lookup table of functions?
 			//pushing && popping
 			case OP_LITERAL:
@@ -127,17 +137,17 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 
 			case OP_GROUPING_BEGIN: {
 				// printf("OP_GROUPING_BEGIN\n");
-				// //grab any functions on top of the stack
-				// Function* func = NULL;
+				//grab any functions on top of the stack
+				Function* func = NULL;
 
-				// if (peekLiteral(toy) != NULL && IS_FUNCTION(*peekLiteral(toy))) {
-				// 	func = AS_FUNCTION_PTR(*peekLiteral(toy)); //leave it on the stack as a sentinel
-				// }
+				if (peekLiteral(toy) != NULL && IS_FUNCTION(*peekLiteral(toy))) {
+					func = AS_FUNCTION_PTR(*peekLiteral(toy)); //leave it on the stack as a sentinel
+				}
 
-				// //use C's stack frame to read the insides of the grouping
-				// loopOverChunk(toy, chunk, groupingDepth + 1);
+				//use C's stack frame to read the insides of the grouping
+				loopOverChunk(toy, chunk, groupingDepth + 1);
 
-				// //process and execute the function
+				//process and execute the function
 				// if (func != NULL) {
 					//push a new scope onto the function
 					// func->scope = pushScope(toy->scope);
@@ -276,7 +286,7 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 
 			case OP_FUNCTION_DECLARE: {
 				//store a reference to the current scope in the pointer
-				//AS_FUNCTION_PTR(*peekLiteral(toy))->scope = referenceScope(toy->scope);
+				// AS_FUNCTION_PTR(*peekLiteral(toy))->scope = referenceScope(toy->scope);
 
 				//TODO: pure functions?
 			}
@@ -463,9 +473,6 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 				toy->error = true;
 				break;
 		}
-
-		// printf("references %d\n", toy->scope->references);
-		// printStack(toy);
 	}
 
 	return 0;
