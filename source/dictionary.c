@@ -1,5 +1,6 @@
 #include "dictionary.h"
 #include "memory.h"
+#include "function.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,6 +22,8 @@ static uint32_t hashString(const char* string, int length) {
 
 //entry functions
 void setEntry(Entry* dest, Literal* key, Literal* value) {
+	//TODO: more literal types as values
+
 	//keys
 	if (IS_STRING(dest->key)) {
 		//free the original string and overwrite it
@@ -51,6 +54,8 @@ void setEntry(Entry* dest, Literal* key, Literal* value) {
 		strcpy(buffer, AS_STRING(*value));
 		buffer[len] = '\0';
 		dest->value = TO_STRING_LITERAL(buffer);
+	} else if (IS_FUNCTION(*value)) {
+		dest->value = TO_FUNCTION_PTR(copyFunction(AS_FUNCTION_PTR(*value)));
 	} else {
 		dest->value = *value;
 	}

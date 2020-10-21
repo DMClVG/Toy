@@ -21,6 +21,8 @@ out/
 *.meta
 Toy
 testrunner
+vgcore.*
+log
 
 #Shell files
 *.bat

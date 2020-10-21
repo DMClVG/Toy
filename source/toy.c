@@ -53,13 +53,6 @@ static void printStack(Toy* toy) {
 
 	printf(">>\n");
 	*/
-	/*
-	printf(" <<scope:");
-	for (Scope* ptr = toy->scope; ptr; ptr = ptr->ancestor) {
-		printf("(%d) ", ptr->references);
-	}
-	printf(">>\n");
-	*/
 }
 
 static void pushLiteral(Toy* toy, Literal literal) {
@@ -105,7 +98,7 @@ static Literal* popLiteral(Toy* toy) {
 static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: chunk MUST remain unchanged
 	while (*(toy->pc) && !toy->panic) {
 
-		// printStack(toy); //debugging
+//		printStack(toy); //debugging
 
 		switch(*(toy->pc++)) { //TODO: change this switch to a lookup table of functions?
 			//pushing && popping
@@ -136,7 +129,6 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 			break;
 
 			case OP_GROUPING_BEGIN: {
-				// printf("OP_GROUPING_BEGIN\n");
 				//grab any functions on top of the stack
 				Function* func = NULL;
 
@@ -148,75 +140,58 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 				loopOverChunk(toy, chunk, groupingDepth + 1);
 
 				//process and execute the function
-				// if (func != NULL) {
+				if (func != NULL) {
 					//push a new scope onto the function
-					// func->scope = pushScope(toy->scope);
+					func->scope = pushScope(func->scope);
 
-					// printf("parameter count: %d\n", func->parameters.count);
+					//pop each value from the stack and pass in as a parameter (backwards)
+					for (int i = func->parameters.count - 1; i >= 0; i--) {
+						Literal* arg = popLiteral(toy);
 
-					// //pop each value from the stack and pass in as a parameter (backwards)
-					// for (int i = func->parameters.count - 1; i >= 0; i--) {
-					// 	printf("processing argument %d\n", i);
-					// 	Literal* arg = popLiteral(toy);
+						if (IS_FUNCTION(*arg) && AS_FUNCTION_PTR(*arg) == func) {
+							error(toy, chunk, "Too few parameters found");
+							break;
+						}
 
-					// 	if (IS_FUNCTION(*arg) && AS_FUNCTION_PTR(*arg) == func) {
-					// 		error(toy, chunk, "Too few parameters found");
-					// 		break;
-					// 	}
+						//the arg needs to be given the name at thisChunk->literals(parameters[i])
+						if (!scopeSetVariable(func->scope, func->parameters.literals[func->parameters.count - i - 1], *arg, true)) {
+							error(toy, chunk, "Can't reuse function parameters");
+						}
+					}
 
-					// 	//the arg needs to be given the name at thisChunk->literals(parameters[i])
-					// 	if (scopeSetVariable(func->scope, func->parameters.literals[func->parameters.count - i - 1], *arg, true)) {
-					// 		//debugging
-					// 		printf("variable set: ");
-					// 		printLiteral(func->parameters.literals[func->parameters.count - i - 1]);
-					// 		printf(" ~ ");
-					// 		printLiteral(*arg);
-					// 		printf("\n");
-					// 	} else {
-					// 		printf("problem setting variable\n");
-					// 	}
-					// }
+					if (toy->panic) { //double loops
+						break;
+					}
 
-					// if (toy->panic) { //double loops
-					// 	break;
-					// }
+					//check the sentinel pointer
+					if (!(peekLiteral(toy) != NULL && IS_FUNCTION(*peekLiteral(toy)) && func == AS_FUNCTION_PTR(*peekLiteral(toy)))) {
+						error(toy, chunk, "Too many parameters found");
 
-					// //check the sentinel pointer
-					// if (!(peekLiteral(toy) != NULL && IS_FUNCTION(*peekLiteral(toy)) && func == AS_FUNCTION_PTR(*peekLiteral(toy)))) {
-					// 	error(toy, chunk, "Too many parameters found");
+						printLiteral(*peekLiteral(toy));
+						break;
+					}
 
-					// 	printLiteral(*peekLiteral(toy));
-					// 	break;
-					// }
+					popLiteral(toy); //pop the function now
 
-					// popLiteral(toy); //pop the function now
+					//switch in the new function scope
+					Scope* tmpScopePtr = toy->scope;
+					toy->scope = func->scope;
 
-					// //switch in the new function scope
-					// Scope* tmpScopePtr = toy->scope;
-					// toy->scope = func->scope;
+					//switch the pc for the new chunk pc
+					uint8_t* pc = toy->pc;
+					toy->pc = func->chunk->code;
 
-					// //switch the pc for the new chunk pc
-					// uint8_t* pc = toy->pc;
-					// toy->pc = func->chunk->code;
-
-					// //finally, call the function
-					// printStack(toy);
-					// printf("running chunk...\n");
-					// loopOverChunk(toy, func->chunk, groupingDepth + 1);
-					// printf("finished running chunk\n");
+					//finally, call the function
+					loopOverChunk(toy, func->chunk, groupingDepth + 1);
 
 					// //begin reverting what was done
-					// toy->scope = tmpScopePtr;
-					// toy->pc = pc;
-// 
-					// Literal counter = scopeGet(func->scope, TO_STRING_LITERAL("counter"), NULL);
+					toy->scope = tmpScopePtr;
+					toy->pc = pc;
 
-					// func->scope = popScope(func->scope);
+					func->scope = popScope(func->scope);
 
 					//any returned value should be on the stack
-				// }
-
-				// printf("END - OP_GROUPING_BEGIN\n");
+				}
 			}
 			break;
 
@@ -286,7 +261,7 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 
 			case OP_FUNCTION_DECLARE: {
 				//store a reference to the current scope in the pointer
-				// AS_FUNCTION_PTR(*peekLiteral(toy))->scope = referenceScope(toy->scope);
+				AS_FUNCTION_PTR(*peekLiteral(toy))->scope = referenceScope(toy->scope);
 
 				//TODO: pure functions?
 			}
@@ -493,7 +468,7 @@ void initToy(Toy* toy) {
 void freeToy(Toy* toy) {
 	FREE_ARRAY(int, toy->indexes, toy->capacity);
 	freeLiteralArray(&toy->garbage);
-	popScope(toy->scope);
+	toy->scope = popScope(toy->scope);
 }
 
 void executeChunk(Toy* toy, Chunk* chunk) {

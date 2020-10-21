@@ -222,7 +222,7 @@ static Function* readFunctionCode(Parser* parser, Function* func) {
 		}
 
 		//if the last statement of the function was not a return, insert a null return at the end
-		if (func->chunk->code[func->chunk->count - 1] != OP_RETURN) {
+		if (func->chunk->count == 0 || func->chunk->code[func->chunk->count - 1] != OP_RETURN) {
 			emitLiteral(func->chunk, TO_NIL_LITERAL, parser->previous.line); //leave a null
 			emitByte(func->chunk, OP_RETURN, parser->previous.line); //terminate the chunk
 		}
@@ -460,7 +460,6 @@ static void variable(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 
 		if (func != NULL) {
 			emitLiteral(chunk, TO_FUNCTION_PTR(func), op.line);
-			FREE(Function, func);
 		}
 
 		emitByte(chunk, OP_FUNCTION_DECLARE, op.line);
@@ -506,6 +505,19 @@ static void groupingPrefix(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 				//store all identifiers as strings, because why not?
 				char* buffer = ALLOCATE(char, parser->previous.length + 1);
 				sprintf(buffer, "%.*s", parser->previous.length, parser->previous.lexeme);
+
+				//check for duplicate parameter names
+				for (int i = 0; i < func->parameters.count; i++) {
+					if (strcmp(AS_STRING(func->parameters.literals[i]), buffer) == 0) {
+						error(parser, parser->previous, "Can't have duplicate parameter names in a function declaration");
+						break;
+					}
+				}
+
+				if (parser->panic) { //double loops
+					break;
+				}
+
 				writeLiteralArray(&func->parameters, TO_STRING_LITERAL(buffer));
 				FREE(char, buffer);
 			} else {
@@ -536,17 +548,14 @@ static void groupingPrefix(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 
 			if (func != NULL) {
 				emitLiteral(chunk, TO_FUNCTION_PTR(func), op.line);
-				FREE(Function, func);
 				emitByte(chunk, OP_FUNCTION_DECLARE, op.line);
 			}
 		} else {
 			freeFunction(func);
-			FREE(Function, func);
 			error(parser, leftParen, "Incorrect parameters for function declaration");
 		}
 	} else {
 		freeFunction(func);
-		FREE(Function, func);
 	}
 }
 

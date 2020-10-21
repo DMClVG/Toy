@@ -33,19 +33,7 @@ void writeLiteralArray(LiteralArray* array, Literal value) {
 
 	//take ownership of functions too
 	if (IS_FUNCTION(value)) {
-		Function* func = ALLOCATE(Function, 1);
-		initLiteralArray(&func->parameters);
-		func->scope = NULL;
-
-		//copy manually
-		for (int i = 0; i < AS_FUNCTION_PTR(value)->parameters.count; i++) {
-			writeLiteralArray(&func->parameters, AS_FUNCTION_PTR(value)->parameters.literals[i]);
-		}
-
-		//copy the chunk automagically
-		func->chunk = copyChunk(AS_FUNCTION_PTR(value)->chunk);
-
-		value = TO_FUNCTION_PTR(func);
+		value = TO_FUNCTION_PTR(copyFunction(AS_FUNCTION_PTR(value)));
 	}
 
 	array->literals[array->count++] = value;
@@ -56,11 +44,6 @@ void freeLiteralArray(LiteralArray* array) {
 	for(int i = 0; i < array->count; i++) {
 		//TODO: clean up interpolated literals
 		freeLiteral(array->literals[i]);
-
-		if (IS_FUNCTION(array->literals[i])) {
-			//usually allocated
-			FREE(Function, AS_FUNCTION_PTR(array->literals[i]));
-		}
 	}
 
 	FREE_ARRAY(Literal, array->literals, array->capacity);

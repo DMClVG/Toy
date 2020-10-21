@@ -1,7 +1,7 @@
 #include "scope.h"
 #include "memory.h"
 
-#include <stdio.h>
+#include "function.h"
 
 Scope* pushScope(Scope* ancestor) {
 	Scope* scope = ALLOCATE(Scope, 1);
@@ -38,6 +38,24 @@ static void freeScopeChain(Scope* scope) {
 
 Scope* popScope(Scope* scope) {
 	Scope* ret = scope->ancestor;
+
+	//TODO: foreach
+	//search for functions that reference the scope, and unref them
+	for (int i = 0; i < scope->constants.count; i++) {
+		if (IS_FUNCTION(scope->constants.entries[i].value)) {
+			//detach the function scopes before they're free'd
+			unreferenceScope(AS_FUNCTION_PTR(scope->constants.entries[i].value)->scope);
+			AS_FUNCTION_PTR(scope->constants.entries[i].value)->scope = NULL;
+		}
+	}
+
+	for (int i = 0; i < scope->variables.count; i++) {
+		if (IS_FUNCTION(scope->variables.entries[i].value)) {
+			//detach the function scopes before they're free'd
+			unreferenceScope(AS_FUNCTION_PTR(scope->variables.entries[i].value)->scope);
+			AS_FUNCTION_PTR(scope->variables.entries[i].value)->scope = NULL;
+		}
+	}
 
 	freeScopeChain(scope);
 

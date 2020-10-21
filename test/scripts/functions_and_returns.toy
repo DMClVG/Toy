@@ -1,4 +1,3 @@
-
 const f = () => {
 	print "inside f";
 };

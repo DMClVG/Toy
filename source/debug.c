@@ -107,3 +107,11 @@ void dbPrintLiteral(Literal* literal, char* prepend, bool shrt) {
 			break;
 	}
 }
+
+void printScope(Scope* scope) {
+	printf(" <<scope:");
+	for (Scope* ptr = scope; ptr; ptr = ptr->ancestor) {
+		printf("(%d) ", ptr->references);
+	}
+	printf(">>\n");
+}

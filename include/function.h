@@ -15,4 +15,6 @@ typedef struct {
 void initFunction(Function* func);
 void freeFunction(Function* func);
 
+Function* copyFunction(Function* orig);
+
 #endif
