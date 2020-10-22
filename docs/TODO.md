@@ -1,5 +1,8 @@
 High:
 
+* If & else
+* while & do-while; break & continue
+* for; break & continue
 * Arrays & dictionaries in the language
 * Arrays & dictionaries as literal values
 * Guard against non-string keys for dictionaries
@@ -10,9 +13,6 @@ Normal:
 * ++(prefix)  --(prefix)  (postfix)++  (postfix)-- &&  ||  ?:  ::  .  |>  <|
 * Chunk pack/unpack into files
 * Chunks will need names for importing, packing, caching, etc.
-* If & else
-* while & do-while; break & continue
-* for; break & continue
 * switch-case-default; break
 * Assert keyword
 * import as
@@ -49,3 +49,7 @@ Done:
 * ~~Implement Scope within the language~~
 * ~~Functions and Returns~~
 * ~~Upper limit on recursion~~
+
+Notes:
+---
+
