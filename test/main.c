@@ -56,14 +56,14 @@ int runTestFile(const char* fname, const char* expected) {
 
 	//open the file
 #ifdef PLATFORM_WINDOWS
-	sprintf(buffer, "Toy test/scripts/%s", fname);
+	sprintf(buffer, "Toy -f test/scripts/%s", fname);
 #else
-	sprintf(buffer, "./Toy test/scripts/%s", fname);
+	sprintf(buffer, "./Toy -f test/scripts/%s", fname);
 #endif
 	FILE* handle = popen(buffer, "r");
 
 	if (!handle) {
-		fprintf(stderr, "Failed to open FILE stream\n");
+		fprintf(stderr, "Failed to open FILE stream: %s\n", buffer);
 		return 1;
 	}
 

@@ -10,8 +10,10 @@
 //for testing
 #include "debug.h"
 
+#include "command.h"
+
 //read a file and return it as a char array
-char* readFile(const char* path) {
+char* readFile(char* path) {
 	FILE* file = fopen(path, "rb");
 
 	if (file == NULL) {
@@ -45,9 +47,7 @@ char* readFile(const char* path) {
 }
 
 //run functions
-void runFile(const char* fname) {
-	char* source = readFile(fname);
-
+void runString(char* source) {
 	Lexer lexer;
 	Parser parser;
 	Toy toy;
@@ -58,8 +58,8 @@ void runFile(const char* fname) {
 
 	Chunk* chunk = scanParser(&parser);
 
-	if (chunk->count > 1) {
-//		printChunk(chunk, "    ");
+	if (chunk->count > 1 && command.verbose) {
+		printChunk(chunk, "    ");
 	}
 
 	executeChunk(&toy, chunk);
@@ -68,6 +68,13 @@ void runFile(const char* fname) {
 
 	freeToy(&toy);
 	freeParser(&parser);
+}
+
+void runFile(char* fname) {
+	char* source = readFile(fname);
+
+	runString(source);
+
 	free((void*)source);
 }
 
@@ -94,8 +101,8 @@ void repl() {
 		//run
 		Chunk* chunk = scanParser(&parser);
 
-		if (chunk->count > 1) {
-//			printChunk(chunk, "    ");
+		if (chunk->count > 1 && command.verbose) {
+			printChunk(chunk, "    ");
 		}
 
 		//clean up the memory
@@ -125,13 +132,34 @@ void repl() {
 
 //entry point
 int main(int argc, const char* argv[]) {
-	if (argc == 1) {
-		repl();
-	} else if (argc == 2) {
-		runFile(argv[1]);
-	} else {
-		printf("Usage: %s [file]\n", argv[0]);
+	initCommand(argc, argv);
+
+	//command specific actions
+	if (command.error) {
+		usageCommand(argc, argv);
+		return 0;
 	}
 
+	if (command.help) {
+		helpCommand(argc, argv);
+		return 0;
+	}
+
+	if (command.version) {
+		copyrightCommand(argc, argv);
+		return 0;
+	}
+
+	if (command.fname) {
+		runFile(command.fname);
+		return 0;
+	}
+
+	if (command.source) {
+		runString(command.source);
+		return 0;
+	}
+
+	repl();
 	return 0;
 }
