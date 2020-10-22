@@ -15,11 +15,6 @@ void initCommand(int argc, const char* argv[]) {
 	command.verbose = false;
 
 	for (int i = 1; i < argc; i++) { //start at 1 to skip the program name
-		//only read "-" commands
-		if (argv[i][0] != '-') {
-			continue;
-		}
-
 		if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 			command.help = true;
 			continue;
@@ -32,11 +27,13 @@ void initCommand(int argc, const char* argv[]) {
 
 		if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "--file")) {
 			command.fname = (char*)argv[i + 1];
+			i++;
 			continue;
 		}
 
 		if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--input")) {
 			command.source = (char*)argv[i + 1];
+			i++;
 			continue;
 		}
 

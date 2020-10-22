@@ -64,6 +64,8 @@ static void pushLiteral(Toy* toy, Literal literal) {
 		toy->indexes = GROW_ARRAY(int, toy->indexes, oldCapacity, toy->capacity);
 	}
 
+	//TODO: smart push, save on garbage size
+
 	//store the index of the literal
 	writeLiteralArray(&toy->garbage, literal);
 	toy->indexes[toy->count++] = toy->garbage.count - 1;
@@ -95,7 +97,14 @@ static Literal* popLiteral(Toy* toy) {
 }
 
 //TODO: could use int for multiple returns
-static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: chunk MUST remain unchanged
+static int loopOverChunk(Toy* toy, Chunk* chunk, int callDepth) { //NOTE: chunk MUST remain unchanged
+	//don't recurse too deep
+	if (callDepth > 10000) {
+		error(toy, chunk, "Stack overflow (> 10000 calls deep)");
+		return -1;
+	}
+
+	//do the thing
 	while (*(toy->pc) && !toy->panic) {
 
 //		printStack(toy); //debugging
@@ -128,16 +137,16 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 				toy->scope = popScope(toy->scope);
 			break;
 
-			case OP_GROUPING_BEGIN: {
+			case OP_GROUPING_BEGIN: { //call... *sigh*
 				//grab any functions on top of the stack
 				Function* func = NULL;
 
 				if (peekLiteral(toy) != NULL && IS_FUNCTION(*peekLiteral(toy))) {
-					func = AS_FUNCTION_PTR(*peekLiteral(toy)); //leave it on the stack as a sentinel
+					func = AS_FUNCTION_PTR(*popLiteral(toy));
 				}
 
 				//use C's stack frame to read the insides of the grouping
-				loopOverChunk(toy, chunk, groupingDepth + 1);
+				loopOverChunk(toy, chunk, callDepth + 1);
 
 				//process and execute the function
 				if (func != NULL) {
@@ -146,15 +155,15 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 
 					//pop each value from the stack and pass in as a parameter (backwards)
 					for (int i = func->parameters.count - 1; i >= 0; i--) {
-						Literal* arg = popLiteral(toy);
-
-						if (IS_FUNCTION(*arg) && AS_FUNCTION_PTR(*arg) == func) {
+						if (toy->count <= 0) {
 							error(toy, chunk, "Too few parameters found");
 							break;
 						}
 
+						Literal* arg = popLiteral(toy);
+
 						//the arg needs to be given the name at thisChunk->literals(parameters[i])
-						if (!scopeSetVariable(func->scope, func->parameters.literals[func->parameters.count - i - 1], *arg, true)) {
+						if (!scopeSetVariable(func->scope, func->parameters.literals[func->parameters.count - 1 - i], *arg, true)) {
 							error(toy, chunk, "Can't reuse function parameters");
 						}
 					}
@@ -164,14 +173,10 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 					}
 
 					//check the sentinel pointer
-					if (!(peekLiteral(toy) != NULL && IS_FUNCTION(*peekLiteral(toy)) && func == AS_FUNCTION_PTR(*peekLiteral(toy)))) {
+					if (toy->count > 0) {
 						error(toy, chunk, "Too many parameters found");
-
-						printLiteral(*peekLiteral(toy));
 						break;
 					}
-
-					popLiteral(toy); //pop the function now
 
 					//switch in the new function scope
 					Scope* tmpScopePtr = toy->scope;
@@ -182,7 +187,7 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 					toy->pc = func->chunk->code;
 
 					//finally, call the function
-					loopOverChunk(toy, func->chunk, groupingDepth + 1);
+					loopOverChunk(toy, func->chunk, callDepth + 1);
 
 					// //begin reverting what was done
 					toy->scope = tmpScopePtr;
@@ -264,6 +269,22 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 				AS_FUNCTION_PTR(*peekLiteral(toy))->scope = referenceScope(toy->scope); //is it possible to combine this with the push opcodes?
 
 				//TODO: pure functions?
+			}
+			break;
+
+			case OP_PARAMETER_DECLARE: {
+				//just like variable get, except specialized for parameter declarations
+				Literal* name = popLiteral(toy);
+				bool defined = true;
+
+				Literal lit = scopeGet(toy->scope, *name, &defined);
+
+				if (!defined) {
+					//NOTE: ignore undeclared parameters (this is probably a function declaration)
+					break;
+				} else {
+					PUSH_TEMP_LITERAL(toy, lit);
+				}
 			}
 			break;
 

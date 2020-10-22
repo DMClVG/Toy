@@ -35,7 +35,8 @@ typedef enum {
 	OP_VARIABLE_DECLARE,
 	OP_VARIABLE_GET,
 	OP_VARIABLE_SET,
-	OP_FUNCTION_DECLARE, //wipes any preceding groupings from the stack, as they were likely parameters
+	OP_FUNCTION_DECLARE, //for bookkeeping
+	OP_PARAMETER_DECLARE, //a variable declared as part of a function declaration, possibly
 
 	//keywords
 	OP_PRINT,

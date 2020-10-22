@@ -1,6 +1,11 @@
 #include "lexer.h"
 #include "keyword_types.h"
 
+#include "command.h"
+
+#include "debug.h"
+
+#include <stdio.h>
 #include <string.h>
 
 static void cleanLexer(Lexer* lexer) {
@@ -107,6 +112,11 @@ static Token makeErrorToken(Lexer* lexer, char* msg) {
 	token.length = strlen(msg);
 	token.line = lexer->line;
 
+	if (command.verbose) {
+		printf("err:");
+		printToken(&token);
+	}
+
 	return token;
 }
 
@@ -117,6 +127,11 @@ static Token makeToken(Lexer* lexer, TokenType type) {
 	token.lexeme = &lexer->source[lexer->current - 1];
 	token.length = 1;
 	token.line = lexer->line;
+
+	if (command.verbose) {
+		printf("tok:");
+		printToken(&token);
+	}
 
 	return token;
 }
@@ -135,6 +150,11 @@ static Token makeNumber(Lexer* lexer) {
 	token.lexeme = &lexer->source[lexer->start];
 	token.length = lexer->current - lexer->start;
 	token.line = lexer->line;
+
+	if (command.verbose) {
+		printf("num:");
+		printToken(&token);
+	}
 
 	return token;
 }
@@ -161,6 +181,11 @@ static Token makeString(Lexer* lexer, char terminator) {
 	token.lexeme = &lexer->source[lexer->start + 1];
 	token.length = lexer->current - lexer->start - 2;
 	token.line = lexer->line;
+
+	if (command.verbose) {
+		printf("str:");
+		printToken(&token);
+	}
 
 	return token;
 }
@@ -193,6 +218,11 @@ static Token makeKeywordOrIdentifier(Lexer* lexer) {
 	token.lexeme = &lexer->source[lexer->start];
 	token.length = lexer->current - lexer->start;
 	token.line = lexer->line;
+
+	if (command.verbose) {
+		printf("key:");
+		printToken(&token);
+	}
 
 	return token;
 }

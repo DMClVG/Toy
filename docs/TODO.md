@@ -1,6 +1,5 @@
 High:
 
-* Upper limit on recursion
 * Arrays & dictionaries in the language
 * Arrays & dictionaries as literal values
 * Guard against non-string keys for dictionaries
@@ -34,6 +33,7 @@ Normal:
 
 Low:
 
+* Some opcodes have lost their line data
 * Add more to the TODO list
 * optimisations such as constant folding
 * Is there something wrong with block comments?
@@ -48,3 +48,4 @@ Done:
 * ~~Variables~~
 * ~~Implement Scope within the language~~
 * ~~Functions and Returns~~
+* ~~Upper limit on recursion~~

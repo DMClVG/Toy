@@ -1,6 +1,7 @@
 print 1 + 2 - 3 * 4 / 5; //0.6
 print 5 % 2; //1
 
+//interpolated strings don't work yet.
 print "Hello world," + "foobar" + `interpolation ${5 * 6}`;
 
 /*

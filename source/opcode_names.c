@@ -29,6 +29,7 @@ OpCodeName opCodeNames[] = {
 	{OP_LONG_SENTINEL, "_sentinel"},
 	{OP_LITERAL_LONG, "op_literal_long"},
 	{OP_FUNCTION_DECLARE, "op_function_declare"},
+	{OP_PARAMETER_DECLARE, "op_parameter_declare"},
 
 	{OP_EOF, NULL}
 };

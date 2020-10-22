@@ -149,7 +149,7 @@ bool scopeSetVariable(Scope* scope, Literal key, Literal value, bool declaration
 }
 
 int getScopeDepth(Scope* scope) {
-	if (scope->ancestor == NULL) {
+	if (scope == NULL) {
 		return 0;
 	}
 

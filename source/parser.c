@@ -518,8 +518,10 @@ static void groupingPrefix(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 					break;
 				}
 
-				writeLiteralArray(&func->parameters, TO_STRING_LITERAL(buffer));
-				FREE(char, buffer);
+				//write to the nascent chunk and functions, both
+				writeLiteralArray(&func->parameters, TO_STRING_LITERAL(buffer)); //parameter names
+				emitLiteral(chunk, TO_STRING_LITERAL(buffer), parser->previous.line);
+				emitByte(chunk, OP_PARAMETER_DECLARE, parser->previous.line); //get the actual value on stack OR pop it as a parameter
 			} else {
 				canBeFunction = false;
 				expression(parser, chunk);
@@ -548,7 +550,7 @@ static void groupingPrefix(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 
 			if (func != NULL) {
 				emitLiteral(chunk, TO_FUNCTION_PTR(func), op.line);
-				emitByte(chunk, OP_FUNCTION_DECLARE, op.line);
+				emitByte(chunk, OP_FUNCTION_DECLARE, op.line); //ah crap.
 			}
 		} else {
 			freeFunction(func);

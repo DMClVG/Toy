@@ -15,7 +15,7 @@ void printToken(Token* token) {
 		return;
 	}
 
-	printf("%d\t%d\t", token->type, token->line);
+	printf("\t%d\t%d\t", token->type, token->line);
 
 	if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_NUMBER || token->type == TOKEN_STRING || token->type == TOKEN_INTERPOLATED_STRING) {
 		printf("%.*s\t", token->length, token->lexeme);
@@ -29,13 +29,14 @@ void printToken(Token* token) {
 		}
 	}
 
-	printf("\t%d\n", token->line);
+	printf("\n");
 }
 
 void printChunk(Chunk* chunk, char* prepend) {
 	printf("%sPrinting chunk: %d/%d\n%s=====Opcodes=====\n", prepend, chunk->count, chunk->capacity, prepend);
 
 	for (int i = 0; i < chunk->count; /* EMPTY */) {
+		//handle literals differently
 		switch(chunk->code[i]) {
 			case OP_LITERAL:
 				dbPrintLiteral(&chunk->literals.literals[ chunk->code[i + 1] ], prepend, false);
