@@ -150,6 +150,11 @@ int main(int argc, const char* argv[]) {
 		return 0;
 	}
 
+	//print this until the interpreter meets the specification
+	if (command.verbose) {
+		printf("Warning! This interpreter is a work in progress, it does not yet meet the %d.%d.%d specification.\n", TOY_VERSION_MAJOR, TOY_VERSION_MINOR, TOY_VERSION_PATCH);
+	}
+
 	if (command.fname) {
 		runFile(command.fname);
 		return 0;
