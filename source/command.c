@@ -20,27 +20,27 @@ void initCommand(int argc, const char* argv[]) {
 			continue;
 		}
 
-		if (!strcmp(argv[i], "-h")) {
+		if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 			command.help = true;
 			continue;
 		}
 
-		if (!strcmp(argv[i], "-v")) {
+		if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version")) {
 			command.version = true;
 			continue;
 		}
 
-		if (!strcmp(argv[i], "-f")) {
+		if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "--file")) {
 			command.fname = (char*)argv[i + 1];
 			continue;
 		}
 
-		if (!strcmp(argv[i], "-i")) {
+		if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--input")) {
 			command.source = (char*)argv[i + 1];
 			continue;
 		}
 
-		if (!strcmp(argv[i], "-d")) {
+		if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--debug")) {
 			command.verbose = true;
 			continue;
 		}
@@ -50,17 +50,17 @@ void initCommand(int argc, const char* argv[]) {
 }
 
 void usageCommand(int argc, const char* argv[]) {
-	printf("Usage: %s [-h | -v | [-d][-f file | -i source]]\n\n", argv[0]);
+	printf("Usage: %s [-h | -v | [-d][-f source | -i source]]\n\n", argv[0]);
 }
 
 void helpCommand(int argc, const char* argv[]) {
 	usageCommand(argc, argv);
 
-	printf("-h\t\tShow this help then exit.\n");
-	printf("-v\t\tShow version and copyright information then exit.\n");
-	printf("-f file\t\tParse and execute the specified file.\n");
-	printf("-i source\tParse and execute this given string of source code.\n");
-	printf("-d\t\tBe verbose when operating.\n");
+	printf("-h | --help\t\tShow this help then exit.\n");
+	printf("-v | --version\t\tShow version and copyright information then exit.\n");
+	printf("-f | --file source\tParse and execute the source file.\n");
+	printf("-i | --input source\tParse and execute this given string of source code.\n");
+	printf("-d | --debug\t\tBe verbose when operating.\n");
 }
 
 void copyrightCommand(int argc, const char* argv[]) {
