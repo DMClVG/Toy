@@ -42,10 +42,7 @@ void setEntry(Entry* dest, Literal* key, Literal* value) {
 	}
 
 	//values
-	if (IS_STRING(dest->value)) {
-		//fre the original string and overwrite it
-		freeLiteral(dest->value);
-	}
+	freeLiteral(dest->value);
 
 	if (IS_STRING(*value)) {
 		//copy the string memory for the key

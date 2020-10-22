@@ -261,7 +261,7 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int groupingDepth) { //NOTE: ch
 
 			case OP_FUNCTION_DECLARE: {
 				//store a reference to the current scope in the pointer
-				AS_FUNCTION_PTR(*peekLiteral(toy))->scope = referenceScope(toy->scope);
+				AS_FUNCTION_PTR(*peekLiteral(toy))->scope = referenceScope(toy->scope); //is it possible to combine this with the push opcodes?
 
 				//TODO: pure functions?
 			}
