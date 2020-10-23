@@ -11,26 +11,29 @@
 //	return factorial(i - 1);
 //};
 
-//const fibonacci = i => {
-//	if (i <= 2) {
-//		return i;
-//	}
-//
-//	return fibonacci(i - 1) + fibonacci(i - 2);
-//}
+//WARNING: it chokes on this
+const fibonacci = i => {
+	if (i <= 2) {
+		return i;
+	}
+
+	return fibonacci(i - 1) + fibonacci(i - 2);
+};
 
 
 
-//print factorial(9999);
+print factorial(12);
 
 
 //goes forever, until stack overflow
 const count = (i) => {
-	print i;
+	print i += 1;
 
-	i += 1;
+	if (i >= 10) {
+		return;
+	}
 
 	count(i);
 };
 
-print count(0);
+count(0);

@@ -6,6 +6,8 @@
 
 #include "function.h"
 
+#include "command.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -98,6 +100,10 @@ static Literal* popLiteral(Toy* toy) {
 
 //TODO: could use int for multiple returns
 static int loopOverChunk(Toy* toy, Chunk* chunk, int callDepth) { //NOTE: chunk MUST remain unchanged
+	if (command.verbose) {
+		printf("Call depth: %d\n", callDepth);
+	}
+
 	//don't recurse too deep
 	if (callDepth > 10000) {
 		error(toy, chunk, "Stack overflow (> 10000 calls deep)");
@@ -164,7 +170,7 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int callDepth) { //NOTE: chunk 
 
 						//the arg needs to be given the name at thisChunk->literals(parameters[i])
 						if (!scopeSetVariable(func->scope, func->parameters.literals[func->parameters.count - 1 - i], *arg, true)) {
-							error(toy, chunk, "Can't reuse function parameters");
+							error(toy, chunk, "Can't reuse function parameter names");
 						}
 					}
 
@@ -202,6 +208,16 @@ static int loopOverChunk(Toy* toy, Chunk* chunk, int callDepth) { //NOTE: chunk 
 
 			case OP_GROUPING_END: {
 				return 0;
+			}
+			break;
+
+			case OP_IF_FALSE_JUMP: {
+				if (!IS_TRUTHY(*popLiteral(toy))) {
+					int param = *(int*)toy->pc;
+					toy->pc = chunk->code + param;
+				} else {
+					toy->pc += sizeof(uint32_t);
+				}
 			}
 			break;
 

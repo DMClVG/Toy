@@ -15,6 +15,8 @@ typedef enum {
 	OP_GROUPING_BEGIN,
 	OP_GROUPING_END,
 
+	OP_IF_FALSE_JUMP, //if the expression on stack is false (or stack is empty) jump to a specific position
+
 	//operations
 	OP_EQUALITY,
 	OP_GREATER,

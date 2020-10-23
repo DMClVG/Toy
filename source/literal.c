@@ -136,6 +136,10 @@ void freeLiteral(Literal literal) {
 	}
 }
 
+bool _isTruthy(Literal x) {
+	return (IS_NIL(x) || (IS_BOOL(x) && AS_BOOL(x)) || (IS_NUMBER(x) && AS_NUMBER(x) != 0));
+}
+
 Literal _toStringLiteral(char* cstr) {
 	return ((Literal){LITERAL_STRING, { .string.ptr = (char*)cstr, .string.length = strlen((char*)cstr) }});
 }

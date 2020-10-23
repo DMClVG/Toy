@@ -2,7 +2,7 @@ if:
 
 ```
 push expression
-IF_NOT_JMP end
+OP_IF_FALSE_JUMP end
 {
 	//true code
 }
@@ -13,12 +13,12 @@ if, else:
 
 ```
 push expression
-IF_NOT_JMP else
+OP_IF_FALSE_JUMP else
 {
 	//true code
 }
 else:
-IF_NOT_JMP end
+OP_IF_FALSE_JUMP end
 {
 	//false code
 }
@@ -30,11 +30,11 @@ while:
 ```
 begin:
 push expression
-IF_NOT_JMP end
+OP_IF_FALSE_JUMP end
 {
 	//loop
 }
-IF_NOT_JMP begin
+OP_IF_FALSE_JUMP begin
 end:
 ```
 
@@ -46,8 +46,8 @@ begin:
 	//loop
 }
 push expression
-IF_NOT_JMP end
-IF_NOT_JMP begin
+OP_IF_FALSE_JUMP end
+OP_IF_FALSE_JUMP begin
 end:
 ```
 
@@ -58,14 +58,14 @@ for:
 	//init code
 	begin:
 	push expression
-	IF_NOT_JMP end
+	OP_IF_FALSE_JUMP end
 	{
 		//body
 	}
 	{
 		//increment
 	}
-	IF_NOT_JMP begin
+	OP_IF_FALSE_JUMP begin
 	end:
 }
 ```

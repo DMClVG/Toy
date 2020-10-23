@@ -1,8 +1,10 @@
 High:
 
-* If & else
+* Solve the scope artefact issue
+* Solve the fibonacci problem
 * while & do-while; break & continue
 * for; break & continue
+* Loop test files
 * Arrays & dictionaries in the language
 * Arrays & dictionaries as literal values
 * Guard against non-string keys for dictionaries
@@ -49,6 +51,7 @@ Done:
 * ~~Implement Scope within the language~~
 * ~~Functions and Returns~~
 * ~~Upper limit on recursion~~
+* ~~If & else~~
 
 Notes:
 ---

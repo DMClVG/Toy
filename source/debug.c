@@ -48,6 +48,11 @@ void printChunk(Chunk* chunk, char* prepend) {
 				i += 5;
 				break;
 
+			case OP_IF_FALSE_JUMP:
+				printf("%s%s [%d]\n", prepend, findNameByOpCode(chunk->code[i]), *((uint32_t*)(chunk->code + i + 1)));
+				i+= 5; //eat the parameter
+				break;
+
 			default:
 				printf("%s%s\n", prepend, findNameByOpCode(chunk->code[i]));
 				i++;

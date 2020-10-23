@@ -126,6 +126,10 @@ static int emitLiteral(Chunk* chunk, Literal literal, int line) {
 	return index;
 }
 
+static void overwriteLong(Chunk* chunk, int index, uint32_t value, int line) {
+	overwriteChunkLong(chunk, index, value, line);
+}
+
 //parsing utilities
 static void error(Parser* parser, Token token, const char* message) {
 	//keep going while panicing
@@ -202,7 +206,7 @@ static void synchronize(Parser* parser) {
 }
 
 //forward declare as a kind of entry point
-static void declaration(Parser* parser, Chunk* chunk);
+static void declaration(Parser* parser, Chunk* chunk, int popScopesOnReturn);
 static void expression(Parser* parser, Chunk* chunk);
 
 static Function* readFunctionCode(Parser* parser, Function* func) {
@@ -218,7 +222,7 @@ static Function* readFunctionCode(Parser* parser, Function* func) {
 				return NULL;
 			}
 
-			declaration(parser, func->chunk);
+			declaration(parser, func->chunk, 0);
 		}
 
 		//if the last statement of the function was not a return, insert a null return at the end
@@ -235,13 +239,57 @@ static Function* readFunctionCode(Parser* parser, Function* func) {
 	return func;
 }
 
-//refer to the grammar expression rules below
-static void expression(Parser* parser, Chunk* chunk) {
-	//delegate to the pratt table for expression precedence
-	parsePrecedence(parser, chunk, PREC_ASSIGNMENT);
+//grammar statement rules
+static void breakStmt(Parser* parser, Chunk* chunk) {
+	//TODO: implement this
 }
 
-//grammar statement rules
+static void continueStmt(Parser* parser, Chunk* chunk) {
+	//TODO: implement this
+}
+
+static void doStmt(Parser* parser, Chunk* chunk) {
+	//TODO: implement this
+}
+
+static void forStmt(Parser* parser, Chunk* chunk) {
+	//TODO: implement this
+}
+
+static void ifStmt(Parser* parser, Chunk* chunk) {
+	//push the expression
+	consume(parser, TOKEN_LEFT_PAREN, "Expected '(' after if statement");
+	expression(parser, chunk);
+	consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after if expression");
+
+	//catch the opcode parameter
+	emitByte(chunk, OP_IF_FALSE_JUMP, parser->previous.line);
+	int index = chunk->count;
+	emitLong(chunk, 0, parser->previous.line); //dummy parameter
+
+	//body
+	emitByte(chunk, OP_SCOPE_BEGIN, parser->previous.line);
+	declaration(parser, chunk, true);
+	emitByte(chunk, OP_SCOPE_END, parser->previous.line);
+
+	overwriteLong(chunk, index, (uint32_t)chunk->count, parser->previous.line);
+
+	//handle else
+	if (match(parser, TOKEN_ELSE)) { //same as above
+		//catch the opcode parameter
+		emitByte(chunk, OP_IF_FALSE_JUMP, parser->previous.line);
+		int index = chunk->count;
+		emitLong(chunk, 0, parser->previous.line); //dummy parameter
+
+		//body
+		emitByte(chunk, OP_SCOPE_BEGIN, parser->previous.line);
+		declaration(parser, chunk, true);
+		emitByte(chunk, OP_SCOPE_END, parser->previous.line);
+
+		overwriteLong(chunk, index, (uint32_t)chunk->count, parser->previous.line);
+	}
+}
+
 static void printStmt(Parser* parser, Chunk* chunk) {
 	int line = parser->previous.line;
 	expression(parser, chunk);
@@ -249,9 +297,14 @@ static void printStmt(Parser* parser, Chunk* chunk) {
 	consume(parser, TOKEN_SEMICOLON, "Expected ';' at end of print statement");
 }
 
-static void returnStmt(Parser* parser, Chunk* chunk) {
+static void returnStmt(Parser* parser, Chunk* chunk, int popScopesOnReturn) {
 	//leave an exrpession or a null on the stack
 	int line = parser->previous.line;
+
+	while(popScopesOnReturn > 0) {
+		emitByte(chunk, OP_SCOPE_END, parser->previous.line);
+		popScopesOnReturn -= 1;
+	}
 
 	if (!match(parser, TOKEN_SEMICOLON)) {
 		expression(parser, chunk);
@@ -263,7 +316,11 @@ static void returnStmt(Parser* parser, Chunk* chunk) {
 	}
 }
 
-static void block(Parser* parser, Chunk* chunk) {
+static void whileStmt(Parser* parser, Chunk* chunk) {
+	//TODO: implement this
+}
+
+static void block(Parser* parser, Chunk* chunk, int popScopesOnReturn) {
 	Token opening = parser->previous;
 
 	emitByte(chunk, OP_SCOPE_BEGIN, opening.line);
@@ -274,7 +331,7 @@ static void block(Parser* parser, Chunk* chunk) {
 			return;
 		}
 
-		declaration(parser, chunk);
+		declaration(parser, chunk, popScopesOnReturn + 1);
 	}
 
 	emitByte(chunk, OP_SCOPE_END, parser->previous.line);
@@ -288,19 +345,49 @@ static void expressionStmt(Parser* parser, Chunk* chunk) {
 }
 
 //high-level grammar rules
-static void statement(Parser* parser, Chunk* chunk) {
+static void statement(Parser* parser, Chunk* chunk, int popScopesOnReturn) {
+	if (match(parser, TOKEN_BREAK)) {
+		breakStmt(parser, chunk);
+		return;
+	}
+
+	if (match(parser, TOKEN_CONTINUE)) {
+		continueStmt(parser, chunk);
+		return;
+	}
+
+	if (match(parser, TOKEN_DO)) {
+		doStmt(parser, chunk);
+		return;
+	}
+
+	if (match(parser, TOKEN_FOR)) {
+		forStmt(parser, chunk);
+		return;
+	}
+
+	if (match(parser, TOKEN_IF)) {
+		ifStmt(parser, chunk);
+		return;
+	}
+
 	if (match(parser, TOKEN_PRINT)) {
 		printStmt(parser, chunk);
 		return;
 	}
 
 	if (match(parser, TOKEN_RETURN)) {
-		returnStmt(parser, chunk);
+		returnStmt(parser, chunk, popScopesOnReturn);
+		return;
+	}
+
+	if (match(parser, TOKEN_WHILE)) {
+		whileStmt(parser, chunk);
 		return;
 	}
 
 	if (match(parser, TOKEN_LEFT_BRACE)) {
-		block(parser, chunk);
+		block(parser, chunk, popScopesOnReturn);
 		return;
 	}
 
@@ -365,18 +452,24 @@ static void varDecl(Parser* parser, Chunk* chunk) {
 	consume(parser, TOKEN_SEMICOLON, "Expected ';' at the end of a var declaration");
 }
 
-static void declaration(Parser* parser, Chunk* chunk) {
+static void declaration(Parser* parser, Chunk* chunk, int popScopesOnReturn) {
 	if (match(parser, TOKEN_CONST)) {
 		constDecl(parser, chunk);
 	} else if (match(parser, TOKEN_VAR)) {
 		varDecl(parser, chunk);
 	} else {
-		statement(parser, chunk);
+		statement(parser, chunk, popScopesOnReturn);
 	}
 
 	if (parser->panic) {
 		synchronize(parser);
 	}
+}
+
+//refer to the grammar expression rules below
+static void expression(Parser* parser, Chunk* chunk) {
+	//delegate to the pratt table for expression precedence
+	parsePrecedence(parser, chunk, PREC_ASSIGNMENT);
 }
 
 //precedence
@@ -499,6 +592,8 @@ static void groupingPrefix(Parser* parser, Chunk* chunk, bool canBeAssigned) {
 	if (!match(parser, TOKEN_RIGHT_PAREN)) {
 		//handle groupings - expressions or function parameters
 		while(!match(parser, TOKEN_EOF)) {
+
+			//TODO: fibonacci problem
 
 			//get the identifier OR expression
 			if (match(parser, TOKEN_IDENTIFIER)) {
@@ -796,7 +891,7 @@ Chunk* scanParser(Parser* parser) {
 
 	//process the grammar rules
 	while (!match(parser, TOKEN_EOF)) {
-		declaration(parser, chunk);
+		declaration(parser, chunk, 0);
 	}
 
 	emitByte(chunk, OP_EOF, parser->previous.line); //terminate the chunk

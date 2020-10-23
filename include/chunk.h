@@ -19,6 +19,8 @@ void freeChunk(Chunk* chunk);
 void writeChunk(Chunk* chunk, uint8_t val, int line);
 void writeChunkLong(Chunk* chunk, uint32_t val, int line);
 
+void overwriteChunkLong(Chunk* chunk, int index, uint32_t value, int line);
+
 Chunk* copyChunk(Chunk* chunk);
 
 #endif

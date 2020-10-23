@@ -8,6 +8,7 @@ OpCodeName opCodeNames[] = {
 	{OP_SCOPE_END, "op_scope_end"},
 	{OP_GROUPING_BEGIN, "op_grouping_begin"},
 	{OP_GROUPING_END, "op_grouping_end"},
+	{OP_IF_FALSE_JUMP, "op_if_false_jump"},
 	{OP_EQUALITY, "op_equality"},
 	{OP_GREATER, "op_greater"},
 	{OP_LESS, "op_less"},

@@ -49,6 +49,12 @@ void writeChunkLong(Chunk* chunk, uint32_t val, int line) {
 	chunk->count += sizeof(uint32_t);
 }
 
+void overwriteChunkLong(Chunk* chunk, int index, uint32_t value, int line) {
+	//write a uint32
+	*(uint32_t*)(chunk->code + index) = value;
+	chunk->lines[index] = line;
+}
+
 Chunk* copyChunk(Chunk* chunk) {
 	Chunk* ret = ALLOCATE(Chunk, 1);
 	initChunk(ret);
