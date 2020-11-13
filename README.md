@@ -1,6 +1,8 @@
 ![C/C++ CI](https://github.com/Ratstail91/Toy/workflows/C/C++%20CI/badge.svg?branch=0.4.0)
 
+<div align=centered>
 ![Toy Logo](docs/img/toylogo.png)
+</div>
 
 # Toy
 
