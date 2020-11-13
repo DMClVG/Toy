@@ -1,5 +1,7 @@
 ![C/C++ CI](https://github.com/Ratstail91/Toy/workflows/C/C++%20CI/badge.svg?branch=0.4.0)
 
+![Toy Logo](docs/img/toylogo.png)
+
 # Toy
 
 This is the Toy programming language interpreter, written in C.
