@@ -503,7 +503,7 @@ This function calls "cb" once for every pair in the dictionary, with that key an
 
 This function calls "cb" once for every pair in the dictionary, with that key and value passed in as "k" and "v", respectfully. It returns a new dictionary with keys copied from the current dictionary, and values replaced with the results of the calls to "cb".
 
-## recuce(default: type3, cb(acc: type3, k: type, v: type2): type3): type3
+## reduce(default: type3, cb(acc: type3, k: type, v: type2): type3): type3
 
 This function calls "cb" once for every pair in the dictionary, with that key and value passed in as "k" and "v", respectfully, and the value of the previous call passed in as "acc". For the first call to "cb", "default" is used for "acc". It returns the final value of "acc".
 
