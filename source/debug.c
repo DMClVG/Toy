@@ -4,6 +4,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "value.h"
+#include "object.h"
+#include "table.h"
 
 void printToken(Token* token) {
 	if (token->type == TOKEN_ERROR) {
@@ -27,3 +32,15 @@ void printToken(Token* token) {
 
 	printf("\n");
 }
+
+
+void runDebug() {
+	Object* pool = NULL;
+	Table storageTable;
+
+	takeString(&pool, &storageTable, "hello world", strlen("hello world"));
+
+	freeObjectPool(&pool);
+}
+
+//TODO: Do I really need hashes?

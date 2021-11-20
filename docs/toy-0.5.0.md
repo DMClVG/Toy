@@ -457,7 +457,7 @@ Nesting an array within it's own data structure will cause the inner reference t
 
 # Dictionary
 
-Dictionaries are key-value collections of variables. Every key has a single associated value; any missing value is considered `null`.
+Dictionaries are key-value collections of variables. Every key has a single associated value; any missing value is considered `null`. `null` is an invalid key type.
 
 ```
 var dictionary: dict[string, string] = ["key one": "value one", "key two": "value two"];

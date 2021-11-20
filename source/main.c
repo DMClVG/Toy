@@ -2,7 +2,7 @@
 #include "debug.h"
 
 #include "lexer.h"
-//#include "parser.h"
+#include "parser.h"
 //#include "toy.h"
 
 #include <stdio.h>
@@ -162,21 +162,23 @@ int main(int argc, const char* argv[]) {
 	if (command.source) {
 //		runString(command.source);
 
-		Lexer lexer;
-		initLexer(&lexer, command.source);
+		// Lexer lexer;
+		// initLexer(&lexer, command.source);
 
-		//debugging
-		while(true) {
-			Token token = scanLexer(&lexer);
+		// //debugging
+		// while(true) {
+		// 	Token token = scanLexer(&lexer);
 
-			if (token.type == TOKEN_EOF) {
-				break;
-			}
-		}
+		// 	if (token.type == TOKEN_EOF) {
+		// 		break;
+		// 	}
+		// }
 
 		return 0;
 	}
 
 //	repl();
+	runDebug();
+
 	return 0;
 }
