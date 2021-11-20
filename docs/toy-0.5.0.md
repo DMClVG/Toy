@@ -362,6 +362,12 @@ print arr[1]; //world
 var arr: int[] = []; //empty
 ```
 
+To create an array of constants, use the `const` keyword in the type definition (read from from right to left):
+
+```
+var arr: int const[] = [1, 2, 3]; //1, 2 and 3 are constant, but arr is not
+```
+
 ## push(x: type): null
 
 This function inserts the value of "x" at the end of the array.
