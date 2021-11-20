@@ -1,5 +1,5 @@
 <p align="center">
-  <image src="docs/img/toylogo.png" />
+  <image src="img/toylogo.png" />
 </p>
 
 # Toy Language
