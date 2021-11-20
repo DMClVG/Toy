@@ -4,13 +4,15 @@ Version 0.5.0
 
 Welcome to the reference for the Toy programming language!
 
-Toy is a strongly typed imperative bytecode-interpreted language.
-
-# Fundementals
+Toy is a strongly typed imperative bytecode-interpreted language. It has been revised, and revised, and revised again. Eventually I'll get it right.
 
 ## Comments
 
 Toy supports two types of comments, `//single line` and `/* block */`. Comments are used to leave notes for yourself in the code; they are ignored by the interpreter.
+
+## Names
+
+Variable names must start with a letter or underscore, and must contain only letters, numbers and underscores.
 
 ## Types
 
@@ -72,8 +74,6 @@ Other operators available are the assignment, colon, semicolon and dot operators
 ```
 = : , .
 ```
-
-# Basics
 
 ## Entry Point
 
@@ -583,5 +583,5 @@ print str[::-2]; //drwolH
 
 ## Error Handling
 
-CBF - just crash for now.
+TODO: CBF - just crash for now.
 
