@@ -467,6 +467,16 @@ print dictionary["key one"]; //value one
 var dictionary: dict[int, int] = []; //empty
 ```
 
+Keys and values of a dictionary can be declared const, like so:
+
+```
+var dictionary: dict[string const, int const] = [
+	"one": 1,
+	"two": 2,
+	"three": 3
+];
+```
+
 ## Indexing
 
 Dictionaries can be indexed using traditional bracket notation, or the dot operator when the keys are strings. Existing elements can be accessed or overwritten, or new ones inserted if they don't already exist this way.
