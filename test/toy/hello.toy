@@ -1,0 +1,26 @@
+// hello.toy
+
+/* This file tests a number of features:
+
+* reading source-code
+  - lexing
+  - parsing
+  - compiling bytecode
+  - executing bytecode
+* single-line comments
+* multi-line comments
+* function declarations
+  - func keyword
+  - function name
+  - function arguments
+  - function returns
+* print statement
+* global entry point
+
+*/
+
+func main(args: string[]): int {
+	print "Hello world";
+	return 0;
+}
+

@@ -1,10 +1,14 @@
+<p align="center">
+  <image src="docs/img/toylogo.png" />
+</p>
+
 # Toy Language
 
 Version 0.5.0
 
 Welcome to the reference for the Toy programming language!
 
-Toy is a strongly typed imperative bytecode-interpreted language. It has been revised, and revised, and revised again. Eventually I'll get it right.
+Toy is a strongly typed stack-based imperative bytecode-interpreted language. It has been revised, and revised, and revised again. Eventually I'll get it right.
 
 ## Comments
 
